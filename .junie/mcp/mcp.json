@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "C:\\Users\\Uros Pantelic\\.config\\herd\\bin\\php84\\php.exe",
+            "args": [
+                "C:\\Users\\Uros Pantelic\\Documents\\www-personal\\wedding-invitation\\artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
