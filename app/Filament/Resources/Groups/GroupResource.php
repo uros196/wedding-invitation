@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Filament\Resources\Groups;
+
+use App\Filament\Resources\Groups\Pages\CreateGroup;
+use App\Filament\Resources\Groups\Pages\EditGroup;
+use App\Filament\Resources\Groups\Pages\ListGroups;
+use App\Filament\Resources\Groups\Schemas\GroupForm;
+use App\Filament\Resources\Groups\Tables\GroupsTable;
+use App\Models\Group;
+use BackedEnum;
+use Filament\Resources\Pages\PageRegistration;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+
+/**
+ * Resource for managing guest groups.
+ */
+class GroupResource extends Resource
+{
+    protected static ?string $model = Group::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    /**
+     * Configure the form schema.
+     */
+    public static function form(Schema $schema): Schema
+    {
+        return GroupForm::configure($schema);
+    }
+
+    /**
+     * Configure the table schema.
+     */
+    public static function table(Table $table): Table
+    {
+        return GroupsTable::configure($table);
+    }
+
+    /**
+     * Get the relationship managers for the resource.
+     *
+     * @return array<int, string>
+     */
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\GuestsRelationManager::class,
+        ];
+    }
+
+    /**
+     * Get the pages for the resource.
+     *
+     * @return array<string, PageRegistration>
+     */
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListGroups::route('/'),
+            'create' => CreateGroup::route('/create'),
+            'edit' => EditGroup::route('/{record}/edit'),
+        ];
+    }
+}

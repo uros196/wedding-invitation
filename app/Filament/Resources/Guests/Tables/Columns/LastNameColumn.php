@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\Guests\Tables\Columns;
+
+use Filament\Tables\Columns\TextColumn;
+
+class LastNameColumn
+{
+    /**
+     * Generates a last name column.
+     */
+    public static function make(): TextColumn
+    {
+        return TextColumn::make('last_name')
+            ->label('Prezime')
+            ->searchable()
+            ->sortable();
+    }
+}
