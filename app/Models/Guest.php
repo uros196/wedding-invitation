@@ -7,6 +7,7 @@ use App\Enums\Gender;
 use App\Enums\GuestStatus;
 use App\Observers\GuestObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -73,6 +74,14 @@ class Guest extends Model
     }
 
     /**
+     * Scope a query to only include guests with a confirmed status.
+     */
+    public function scopeConfirmed(Builder $query): void
+    {
+        $query->where('status', GuestStatus::Confirmed);
+    }
+
+    /**
      * Get the guest's full name.
      */
     public function fullName(): Attribute
@@ -80,6 +89,22 @@ class Guest extends Model
         return Attribute::make(
             get: fn () => "{$this->first_name} {$this->last_name}",
         );
+    }
+
+    /**
+     * Get the age label of the guest.
+     */
+    public function ageLabel(): Attribute
+    {
+        return Attribute::get(fn () => $this->age?->getLabel());
+    }
+
+    /**
+     * Get the label for the guest's gender.
+     */
+    public function genderLabel(): Attribute
+    {
+        return Attribute::get(fn () => $this->gender?->getLabel());
     }
 
     /**
