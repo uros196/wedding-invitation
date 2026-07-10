@@ -12,8 +12,8 @@ class NameInput
     public static function make(): TextInput
     {
         return TextInput::make('name')
-            ->label('Naziv grupe')
-            ->placeholder('npr. Porodica Petrović')
+            ->label(__('Group Name'))
+            ->placeholder(__('e.g. Petrović Family'))
             ->required()
             ->string()
             ->maxLength(255);

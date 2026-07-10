@@ -19,7 +19,8 @@ class NoCompanionAddedState
         $isVisible = fn (?Guest $record) => $record?->exists && ! $record->hasCompanions();
 
         return EmptyState::make('No content')
-            ->description('Dodajte posetioce koji dolaze sa ovim gostom.')
+            ->heading(__('No additional companions'))
+            ->description(__('messages.add_companion_description'))
             ->contained(false)
             ->icon(Heroicon::UserCircle)
             ->footer([

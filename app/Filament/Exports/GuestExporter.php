@@ -24,24 +24,24 @@ class GuestExporter extends Exporter
                 ->label('ID')
                 ->enabledByDefault(false),
             ExportColumn::make('first_name')
-                ->label('Ime'),
+                ->label(__('First Name')),
             ExportColumn::make('last_name')
-                ->label('Prezime'),
+                ->label(__('Last Name')),
             ExportColumn::make('group.name')
-                ->label('Grupa'),
+                ->label(__('Group')),
             ExportColumn::make('parent.fullName')
-                ->label('Pratilac za'),
+                ->label(__('Companion for')),
             ExportColumn::make('notes')
-                ->label('Napomene'),
+                ->label(__('Notes')),
             ExportColumn::make('age_label')
-                ->label('Uzrast'),
+                ->label(__('Age')),
             ExportColumn::make('gender_label')
-                ->label('Pol'),
+                ->label(__('Gender')),
             ExportColumn::make('created_at')
-                ->label('Kreirano')
+                ->label(__('Created At'))
                 ->enabledByDefault(false),
             ExportColumn::make('updated_at')
-                ->label('Ažurirano')
+                ->label(__('Updated At'))
                 ->enabledByDefault(false),
         ];
     }
@@ -51,10 +51,10 @@ class GuestExporter extends Exporter
      */
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Eksport gostiju je završen i '.Number::format($export->successful_rows).' '.str('red')->plural($export->successful_rows).' je uspešno izvezeno.';
+        $body = __('Guest export has finished and ').Number::format($export->successful_rows).' '.__($export->successful_rows === 1 ? 'red' : 'red').' '.__('was successfully exported.');
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' '.Number::format($failedRowsCount).' '.str('red')->plural($failedRowsCount).' nije uspelo da se izveze.';
+            $body .= ' '.Number::format($failedRowsCount).' '.__($failedRowsCount === 1 ? 'red' : 'red').' '.__('failed to export.');
         }
 
         return $body;

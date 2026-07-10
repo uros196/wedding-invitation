@@ -20,9 +20,9 @@ enum GuestStatus: string implements HasColor, HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Pending => 'Na čekanju',
-            self::Confirmed => 'Potvrđeno',
-            self::Declined => 'Odbijeno',
+            self::Pending => __('Pending'),
+            self::Confirmed => __('Confirmed'),
+            self::Declined => __('Declined'),
         };
     }
 

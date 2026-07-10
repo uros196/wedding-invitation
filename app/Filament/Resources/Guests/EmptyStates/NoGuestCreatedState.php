@@ -16,7 +16,8 @@ class NoGuestCreatedState
     public static function make(): EmptyState
     {
         return EmptyState::make('No content')
-            ->description('Kreirajte gosta i dodajte posetioce koji dolaze sa njim.')
+            ->heading(__('No guest information'))
+            ->description(__('messages.create_guest_description'))
             ->contained(false)
             ->icon(Heroicon::UserCircle)
             ->visible(fn (?Guest $record) => is_null($record));

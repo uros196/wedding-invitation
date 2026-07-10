@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Widgets;
 
 use App\Services\GuestService;
@@ -19,18 +21,18 @@ class GuestStatusWidget extends StatsOverviewWidget
         $data = app(GuestService::class)->getStatusCounts();
 
         return [
-            Stat::make('Potvrđeno', $data->confirmedGuestsCount)
-                ->description('Gosti koji dolaze')
+            Stat::make(__('widgets.guest_status.confirmed.label'), $data->confirmedGuestsCount)
+                ->description(__('widgets.guest_status.confirmed.description'))
                 ->descriptionIcon(Heroicon::CheckCircle)
                 ->color('success'),
 
-            Stat::make('Odbijeno', $data->declinedGuestsCount)
-                ->description('Gosti koji ne dolaze')
+            Stat::make(__('widgets.guest_status.declined.label'), $data->declinedGuestsCount)
+                ->description(__('widgets.guest_status.declined.description'))
                 ->descriptionIcon(Heroicon::XCircle)
                 ->color('danger'),
 
-            Stat::make('Na čekanju', $data->pendingGuestsCount)
-                ->description('Gosti koji se još nisu izjasnili')
+            Stat::make(__('widgets.guest_status.pending.label'), $data->pendingGuestsCount)
+                ->description(__('widgets.guest_status.pending.description'))
                 ->descriptionIcon(Heroicon::Clock)
                 ->color('warning'),
         ];

@@ -22,11 +22,11 @@ test('guest demographics widget displays correct stats', function () {
     Guest::factory()->count(1)->create(['age' => Age::Baby, 'gender' => Gender::Female]);
 
     Livewire::test(GuestDemographicsWidget::class)
-        ->assertSee('Ukupno gostiju')
+        ->assertSee(__('widgets.guest_demographics.total_guests.label'))
         ->assertSee('6')
-        ->assertSee('Struktura po uzrastu')
+        ->assertSee(__('widgets.guest_demographics.age_structure.label'))
         ->assertSee('3 / 2 / 1')
-        ->assertSee('Struktura po polu')
+        ->assertSee(__('widgets.guest_demographics.gender_structure.label'))
         ->assertSee('3 / 3');
 });
 
@@ -38,11 +38,11 @@ test('guest status widget displays correct stats', function () {
     Guest::factory()->count(1)->create(['status' => GuestStatus::Pending]);
 
     Livewire::test(GuestStatusWidget::class)
-        ->assertSee('Potvrđeno')
+        ->assertSee(__('widgets.guest_status.confirmed.label'))
         ->assertSee('3')
-        ->assertSee('Odbijeno')
+        ->assertSee(__('widgets.guest_status.declined.label'))
         ->assertSee('2')
-        ->assertSee('Na čekanju')
+        ->assertSee(__('widgets.guest_status.pending.label'))
         ->assertSee('1');
 });
 
@@ -54,9 +54,9 @@ test('guest age chart widget displays correct data', function () {
     Guest::factory()->count(1)->create(['age' => null]);
 
     Livewire::test(GuestAgeChartWidget::class)
-        ->assertSee('Odrasli')
-        ->assertSee('Dete')
-        ->assertSee('Nepoznato')
+        ->assertSee(Age::Adult->getLabel())
+        ->assertSee(Age::Child->getLabel())
+        ->assertSee(__('widgets.guest_age_chart.unknown'))
         ->assertSee('3')
         ->assertSee('2')
         ->assertSee('1');
@@ -69,8 +69,8 @@ test('guest gender chart widget displays correct data', function () {
     Guest::factory()->count(1)->create(['gender' => null]);
 
     Livewire::test(GuestGenderChartWidget::class)
-        ->assertSee('Muški')
-        ->assertSee('Nepoznato')
+        ->assertSee(Gender::Male->getLabel())
+        ->assertSee(__('widgets.guest_gender_chart.unknown'))
         ->assertSee('3')
         ->assertSee('1');
 });

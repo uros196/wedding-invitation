@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Groups\Schemas;
 
 use App\Filament\Resources\Groups\Schemas\Components\DescriptionTextarea;
@@ -24,8 +26,8 @@ class GroupForm
     {
         return $schema
             ->components([
-                Section::make('Osnovne informacije')
-                    ->description('Unesite naziv grupe i personalizovanu poruku.')
+                Section::make(__('messages.basic_info'))
+                    ->description(__('messages.group_basic_info_description'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -33,7 +35,7 @@ class GroupForm
                                     ->columnSpan(1),
 
                                 TextInput::make('uuid')
-                                    ->label('UUID (Link za pozivnicu)')
+                                    ->label(__('UUID (Invitation Link)'))
                                     ->disabled()
                                     ->dehydrated(false)
                                     ->visible(fn (?Group $record): bool => app(GroupService::class)->isRecordExists($record))
@@ -44,15 +46,15 @@ class GroupForm
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('Status pozivnice')
+                Section::make(__('messages.invitation_status'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 Toggle::make('is_sent')
-                                    ->label('Pozivnica poslata'),
+                                    ->label(__('Invitation Sent')),
 
                                 TextInput::make('views_count')
-                                    ->label('Broj pregleda')
+                                    ->label(__('Views Count'))
                                     ->numeric()
                                     ->minValue(0)
                                     ->disabled()

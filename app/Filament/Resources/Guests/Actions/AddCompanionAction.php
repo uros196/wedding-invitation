@@ -22,15 +22,15 @@ class AddCompanionAction
         $guestService = resolve(GuestService::class);
 
         return Action::make('addCompanion')
-            ->label('Dodaj kompanjona')
-            ->modalHeading('Dodaj kompanjona')
-            ->modalDescription('Izaberite postojećeg gosta ili kreirajte novog.')
-            ->modalSubmitActionLabel('Dodaj')
+            ->label(__('Add companion'))
+            ->modalHeading(__('Add companion'))
+            ->modalDescription(__('Select an existing guest or create a new one.'))
+            ->modalSubmitActionLabel(__('Add'))
             ->icon(Heroicon::Plus)
             ->schema([
                 Select::make('guest_id')
-                    ->label('Gost')
-                    ->placeholder('Pretraži goste...')
+                    ->label(__('Guest'))
+                    ->placeholder(__('Search guests...'))
                     ->relationship('parent', 'full_name')
                     ->options(fn (?Guest $record) => $guestService->getCompanionOptions($record))
                     ->searchable()

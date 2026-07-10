@@ -19,9 +19,9 @@ enum Age: string implements HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Adult => 'Odrasli',
-            self::Child => 'Dete',
-            self::Baby => 'Beba',
+            self::Adult => __('Adult'),
+            self::Child => __('Child'),
+            self::Baby => __('Baby'),
         };
     }
 }

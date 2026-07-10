@@ -18,8 +18,8 @@ enum Gender: string implements HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Male => 'Muški',
-            self::Female => 'Ženski',
+            self::Male => __('Male'),
+            self::Female => __('Female'),
         };
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Guests\Schemas;
 
 use App\Filament\Resources\Guests\Actions\AddCompanionAction;
@@ -29,7 +31,7 @@ class GuestForm
     {
         return $schema
             ->components([
-                Section::make('Informacije o gostu')
+                Section::make(__('messages.guest_info'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -53,9 +55,9 @@ class GuestForm
                     ])
                     ->columnSpan(1),
 
-                Section::make('Kompanjoni')
+                Section::make(__('messages.companions'))
                     ->key('companions_section')
-                    ->description('Osobe koje dolaze sa ovim gostom.')
+                    ->description(__('messages.companions_description'))
                     ->headerActions([
                         AddCompanionAction::make(),
                     ])

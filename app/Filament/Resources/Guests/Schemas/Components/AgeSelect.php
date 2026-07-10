@@ -13,7 +13,7 @@ class AgeSelect
     public static function make(): Select
     {
         return Select::make('age')
-            ->label('Uzrast')
+            ->label(__('Age'))
             ->options(Age::class)
             ->default(Age::Adult);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Groups\RelationManagers;
 
 use App\Filament\Resources\Guests\Schemas\Grids\ModalGrid;
@@ -41,7 +43,7 @@ class GuestsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('first_name')
+            ->recordTitleAttribute('full_name')
             ->columns([
                 FirstNameColumn::make(),
                 LastNameColumn::make(),
@@ -57,7 +59,7 @@ class GuestsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->icon(Heroicon::Plus)
-                    ->label('Dodaj gosta'),
+                    ->label(__('Add Guest')),
             ])
             ->recordActions([
                 EditAction::make(),

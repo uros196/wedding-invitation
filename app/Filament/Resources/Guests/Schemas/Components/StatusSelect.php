@@ -13,7 +13,7 @@ class StatusSelect
     public static function make(): Select
     {
         return Select::make('status')
-            ->label('Status prisustva')
+            ->label(__('Attendance Status'))
             ->options(GuestStatus::class)
             ->default(GuestStatus::Pending)
             ->required()

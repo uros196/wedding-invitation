@@ -25,6 +25,22 @@ class GroupResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     /**
+     * Get a translatable model name.
+     */
+    public static function getModelLabel(): string
+    {
+        return __('Group');
+    }
+
+    /**
+     * Get a translatable plural model name.
+     */
+    public static function getPluralModelLabel(): string
+    {
+        return __('Groups');
+    }
+
+    /**
      * Configure the form schema.
      */
     public static function form(Schema $schema): Schema
@@ -42,8 +58,6 @@ class GroupResource extends Resource
 
     /**
      * Get the relationship managers for the resource.
-     *
-     * @return array<int, string>
      */
     public static function getRelations(): array
     {

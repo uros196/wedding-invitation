@@ -12,7 +12,7 @@ class LastNameColumn
     public static function make(): TextColumn
     {
         return TextColumn::make('last_name')
-            ->label('Prezime')
+            ->label(__('Last Name'))
             ->searchable()
             ->sortable();
     }

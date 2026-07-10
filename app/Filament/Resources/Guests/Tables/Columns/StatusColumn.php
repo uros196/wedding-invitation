@@ -12,7 +12,7 @@ class StatusColumn
     public static function make(): TextColumn
     {
         return TextColumn::make('status')
-            ->label('Status')
+            ->label(__('Attendance Status'))
             ->badge()
             ->sortable();
     }

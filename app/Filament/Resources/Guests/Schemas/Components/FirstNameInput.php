@@ -12,7 +12,7 @@ class FirstNameInput
     public static function make(): TextInput
     {
         return TextInput::make('first_name')
-            ->label('Ime')
+            ->label(__('First Name'))
             ->required()
             ->string()
             ->maxLength(255);

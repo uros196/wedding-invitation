@@ -12,8 +12,8 @@ class NotesTextArea
     public static function make(): Textarea
     {
         return Textarea::make('notes')
-            ->label('Napomene')
-            ->placeholder('npr. Alergije, posebne želje...')
+            ->label(__('Notes'))
+            ->placeholder(__('e.g. Allergies, special wishes...'))
             ->rows(3)
             ->string()
             ->nullable()

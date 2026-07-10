@@ -12,7 +12,7 @@ class AgeColumn
     public static function make(): TextColumn
     {
         return TextColumn::make('age')
-            ->label('Uzrast')
+            ->label(__('Age'))
             ->placeholder('-')
             ->badge()
             ->sortable();

@@ -7,12 +7,12 @@ use Filament\Tables\Columns\TextColumn;
 class CreatedAtColumn
 {
     /**
-     * Generate 'Created at' column.
+     * Generate the 'Created at' column.
      */
     public static function make(): TextColumn
     {
         return TextColumn::make('created_at')
-            ->label('Kreirano')
+            ->label(__('Created'))
             ->dateTime()
             ->sortable()
             ->toggleable(isToggledHiddenByDefault: true);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Pages;
 
 use App\Services\WeddingService;
@@ -18,20 +20,35 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class ManageWedding extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
     protected string $view = 'filament.pages.manage-wedding';
 
     protected static ?string $title = 'Detalji venčanja';
 
-    protected static ?string $navigationLabel = 'Detalji venčanja';
-
     public ?array $data = [];
+
+    /**
+     * Get the navigation label.
+     */
+    public static function getNavigationLabel(): string
+    {
+        return __('Wedding Details');
+    }
+
+    /**
+     * Get the page title.
+     */
+    public function getTitle(): string
+    {
+        return __('Wedding Details');
+    }
 
     /**
      * Mount the page data.
@@ -48,55 +65,55 @@ class ManageWedding extends Page implements HasForms
     {
         return $schema
             ->components([
-                Section::make('Osnovne informacije')
+                Section::make(__('messages.basic_info'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('bride_name')
-                                    ->label('Ime mlade')
+                                    ->label(__('Bride\'s Name'))
                                     ->required(),
                                 TextInput::make('groom_name')
-                                    ->label('Ime mladoženje')
+                                    ->label(__('Groom\'s Name'))
                                     ->required(),
                             ]),
                         Grid::make(2)
                             ->schema([
                                 DatePicker::make('wedding_date')
-                                    ->label('Datum i vreme venčanja')
+                                    ->label(__('Wedding Date and Time'))
                                     ->required(),
                                 DateTimePicker::make('rsvp_deadline')
-                                    ->label('Rok za prijavu gostiju')
+                                    ->label(__('RSVP Deadline'))
                                     ->required(),
                             ]),
                     ]),
 
-                Section::make('Tekst pozivnice')
+                Section::make(__('Invitation Text'))
                     ->schema([
                         Textarea::make('welcome_text')
-                            ->label('Glavni tekst')
+                            ->label(__('Main Text'))
                             ->rows(5)
                             ->required(),
                     ]),
 
-                Section::make('Satnica')
+                Section::make(__('Schedule'))
                     ->schema([
                         Repeater::make('schedules')
-                            ->label('Događaji')
+                            ->label(__('Events'))
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
                                         TextInput::make('name')
-                                            ->label('Naziv događaja')
+                                            ->label(__('Event Name'))
                                             ->required(),
                                         TimePicker::make('time')
-                                            ->label('Vreme'),
+                                            ->label(__('Time')),
                                     ]),
                                 Grid::make(2)
                                     ->schema([
                                         TextInput::make('location')
-                                            ->label('Lokacija'),
+                                            ->label(__('Location')),
                                         Toggle::make('enabled')
-                                            ->label('Vidljivo')
+                                            ->label(__('Visible'))
                                             ->default(true),
                                     ]),
                             ])
@@ -114,7 +131,7 @@ class ManageWedding extends Page implements HasForms
     {
         return [
             Action::make('save')
-                ->label('Sačuvaj izmene')
+                ->label(__('Save Changes'))
                 ->submit('save'),
         ];
     }
@@ -129,7 +146,7 @@ class ManageWedding extends Page implements HasForms
         app(WeddingService::class)->saveWeddingData($data);
 
         Notification::make()
-            ->title('Uspešno sačuvano')
+            ->title(__('Saved Successfully'))
             ->success()
             ->send();
     }

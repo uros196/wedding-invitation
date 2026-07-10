@@ -14,7 +14,7 @@ class GroupSelect
     public static function make(): Select
     {
         return Select::make('group_id')
-            ->label('Grupa')
+            ->label(__('Group'))
             ->relationship('group', 'name')
             ->required()
             ->exists('groups', 'id')

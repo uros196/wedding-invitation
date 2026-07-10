@@ -13,7 +13,7 @@ class GenderSelect
     public static function make(): Select
     {
         return Select::make('gender')
-            ->label('Pol')
+            ->label(__('Gender'))
             ->options(Gender::class);
     }
 }

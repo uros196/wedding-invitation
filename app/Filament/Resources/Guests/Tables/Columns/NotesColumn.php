@@ -12,7 +12,7 @@ class NotesColumn
     public static function make(): TextColumn
     {
         return TextColumn::make('notes')
-            ->label('Napomene')
+            ->label(__('Notes'))
             ->limit(30)
             ->toggleable();
     }

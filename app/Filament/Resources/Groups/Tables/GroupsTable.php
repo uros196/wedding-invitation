@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Groups\Tables;
 
 use App\Filament\Columns\CreatedAtColumn;
@@ -34,10 +36,10 @@ class GroupsTable
             ])
             ->filters([
                 TernaryFilter::make('is_sent')
-                    ->label('Status slanja')
-                    ->placeholder('Sve grupe')
-                    ->trueLabel('Poslate pozivnice')
-                    ->falseLabel('Neposlate pozivnice'),
+                    ->label(__('Sending Status'))
+                    ->placeholder(__('All Groups'))
+                    ->trueLabel(__('Sent Invitations'))
+                    ->falseLabel(__('Unsent Invitations')),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Widgets;
 
 use App\Services\GroupService;
@@ -13,9 +15,12 @@ use Filament\Widgets\TableWidget;
 class GroupViewsWidget extends TableWidget
 {
     /**
-     * The title of the widget.
+     * Get the widget heading.
      */
-    protected static ?string $heading = 'Pregledi po grupama';
+    public function getHeading(): string
+    {
+        return __('widgets.group_views.heading');
+    }
 
     /**
      * The sort order of the widget on the dashboard.
@@ -33,10 +38,10 @@ class GroupViewsWidget extends TableWidget
             )
             ->columns([
                 TextColumn::make('name')
-                    ->label('Grupa'),
+                    ->label(__('widgets.group_views.columns.name')),
 
                 TextColumn::make('views_count')
-                    ->label('Broj pregleda')
+                    ->label(__('widgets.group_views.columns.views_count'))
                     ->numeric()
                     ->alignEnd(),
             ])

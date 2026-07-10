@@ -43,19 +43,19 @@ class GuestsTable
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Status prisustva')
+                    ->label(__('Attendance Status'))
                     ->options(GuestStatus::class),
 
                 SelectFilter::make('group')
-                    ->label('Grupa')
+                    ->label(__('Group'))
                     ->relationship('group', 'name'),
 
                 SelectFilter::make('age')
-                    ->label('Uzrast')
+                    ->label(__('Age'))
                     ->options(Age::class),
 
                 SelectFilter::make('gender')
-                    ->label('Pol')
+                    ->label(__('Gender'))
                     ->options(Gender::class),
             ])
             ->recordActions([

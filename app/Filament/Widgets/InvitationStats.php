@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Widgets;
 
 use App\Services\WeddingService;
@@ -28,13 +30,13 @@ class InvitationStats extends StatsOverviewWidget
         $data = app(WeddingService::class)->getInvitationStats();
 
         $stats = [
-            Stat::make('Poslate pozivnice', $data->sentInvitationsCount)
-                ->description('Ukupan broj grupa kojima je poslata pozivnica')
+            Stat::make(__('widgets.invitation_stats.sent_invitations.label'), $data->sentInvitationsCount)
+                ->description(__('widgets.invitation_stats.sent_invitations.description'))
                 ->descriptionIcon(Heroicon::PaperAirplane)
                 ->color('info'),
 
-            Stat::make('Ukupno pregleda', $data->totalViews)
-                ->description('Koliko puta su sve pozivnice ukupno otvorene')
+            Stat::make(__('widgets.invitation_stats.total_views.label'), $data->totalViews)
+                ->description(__('widgets.invitation_stats.total_views.description'))
                 ->descriptionIcon(Heroicon::Eye)
                 ->color('warning'),
         ];

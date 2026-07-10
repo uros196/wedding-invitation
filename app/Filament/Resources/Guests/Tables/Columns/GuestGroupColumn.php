@@ -12,7 +12,7 @@ class GuestGroupColumn
     public static function make(): TextColumn
     {
         return TextColumn::make('group.name')
-            ->label('Grupa')
+            ->label(__('Group'))
             ->searchable()
             ->sortable();
     }

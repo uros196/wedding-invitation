@@ -12,7 +12,7 @@ class LastNameInput
     public static function make(): TextInput
     {
         return TextInput::make('last_name')
-            ->label('Prezime')
+            ->label(__('Last Name'))
             ->required()
             ->string()
             ->maxLength(255);

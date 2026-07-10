@@ -12,7 +12,7 @@ class GenderColumn
     public static function make(): TextColumn
     {
         return TextColumn::make('gender')
-            ->label('Pol')
+            ->label(__('Gender'))
             ->placeholder('-')
             ->badge()
             ->sortable();
