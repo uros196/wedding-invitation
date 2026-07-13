@@ -10,4 +10,5 @@ return [
     'group_basic_info_description' => 'Enter group name and personalized message.',
     'invitation_status' => 'Invitation Status',
     'personalized_message_placeholder' => 'This message will be displayed at the top of their invitation...',
+    'attendence_confirmation_success' => 'Attendance confirmed successfully.',
 ];

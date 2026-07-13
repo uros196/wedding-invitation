@@ -59,5 +59,12 @@
     "Guest export has finished and ": "Guest export has finished and ",
     "failed to export.": "failed to export.",
     "was successfully exported.": "was successfully exported.",
-    "row": "row"
+    "row": "row",
+    "Messages": "Messages",
+    "Message": "Message",
+    "Attendance Confirmed": "Attendance Confirmed",
+    "View Group": "View Group",
+    "View Message": "View Message",
+    "The selected guest does not belong to this group.": "The selected guest does not belong to this group.",
+    "Full name": "Full name"
 }

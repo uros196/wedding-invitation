@@ -10,4 +10,5 @@ return [
     'group_basic_info_description' => 'Unesite naziv grupe i personalizovanu poruku.',
     'invitation_status' => 'Status pozivnice',
     'personalized_message_placeholder' => 'Ova poruka će biti prikazana na vrhu njihove pozivnice...',
+    'attendence_confirmation_success' => 'Dolazak je uspešno potvrđen.'
 ];

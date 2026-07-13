@@ -59,5 +59,12 @@
     "Guest export has finished and ": "Eksport gostiju je završen i ",
     "failed to export.": "nije uspelo da se izveze.",
     "was successfully exported.": "je uspešno izvezeno.",
-    "row": "red"
+    "row": "red",
+    "Messages": "Poruke",
+    "Message": "Poruka",
+    "Attendance Confirmed": "Dolazak potvrđen",
+    "View Group": "Pogledaj grupu",
+    "View Message": "Pogledaj poruku",
+    "The selected guest does not belong to this group.": "Izabrani gost ne pripada ovoj grupi.",
+    "Full name": "Ime i prezime"
 }
