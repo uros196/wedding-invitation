@@ -5,9 +5,13 @@ namespace App\Models;
 use App\Support\Countdown;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Wedding extends Model
+class Wedding extends Model implements HasMedia
 {
+    use InteractsWithMedia;
+
     /**
      * The attributes that are mass-assignable.
      *
@@ -20,6 +24,8 @@ class Wedding extends Model
         'rsvp_deadline',
         'welcome_text',
         'schedules',
+        'meta_title',
+        'meta_description',
     ];
 
     /**
@@ -32,6 +38,25 @@ class Wedding extends Model
         'rsvp_deadline' => 'datetime',
         'schedules' => 'array',
     ];
+
+    /**
+     * Register the media collections for the wedding.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('hero')->singleFile();
+        $this->addMediaCollection('meta_image')->singleFile();
+    }
+
+    /**
+     * Get the URL of the image used for meta tags.
+     * Falls back to the hero image when no dedicated meta image is set.
+     */
+    public function getMetaImageUrl(): ?string
+    {
+        return $this->getFirstMediaUrl('meta_image')
+            ?: ($this->getFirstMediaUrl('hero') ?: null);
+    }
 
     /**
      * Get the wedding countdown.

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Models\Wedding;
 use App\Services\WeddingService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
@@ -34,6 +37,8 @@ class ManageWedding extends Page implements HasForms
 
     public ?array $data = [];
 
+    public ?Wedding $record = null;
+
     /**
      * Get the navigation label.
      */
@@ -55,7 +60,11 @@ class ManageWedding extends Page implements HasForms
      */
     public function mount(): void
     {
-        $this->form->fill(app(WeddingService::class)->getWeddingData());
+        $service = app(WeddingService::class);
+
+        $this->record = $service->getWedding();
+
+        $this->form->fill($service->getWeddingData($this->record));
     }
 
     /**
@@ -64,34 +73,53 @@ class ManageWedding extends Page implements HasForms
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->model($this->record)
             ->components([
-                Section::make(__('messages.basic_info'))
+                Grid::make(3)
                     ->schema([
-                        Grid::make(2)
+                        Section::make(__('messages.basic_info'))
+                            ->columnSpan(2)
                             ->schema([
-                                TextInput::make('bride_name')
-                                    ->label(__('Bride\'s Name'))
-                                    ->required(),
-                                TextInput::make('groom_name')
-                                    ->label(__('Groom\'s Name'))
-                                    ->required(),
+                                Grid::make(1)
+                                    ->schema([
+                                        TextInput::make('bride_name')
+                                            ->label(__('Bride\'s Name'))
+                                            ->required(),
+                                        TextInput::make('groom_name')
+                                            ->label(__('Groom\'s Name'))
+                                            ->required(),
+                                    ]),
+                                Grid::make(2)
+                                    ->schema([
+                                        DatePicker::make('wedding_date')
+                                            ->label(__('Wedding Date and Time'))
+                                            ->required(),
+                                        DateTimePicker::make('rsvp_deadline')
+                                            ->label(__('RSVP Deadline'))
+                                            ->required(),
+                                    ]),
                             ]),
-                        Grid::make(2)
+
+                        Section::make(__('Main Image'))
+                            ->description(__('This image is displayed at the top of the invitation.'))
+                            ->columnSpan(1)
                             ->schema([
-                                DatePicker::make('wedding_date')
-                                    ->label(__('Wedding Date and Time'))
-                                    ->required(),
-                                DateTimePicker::make('rsvp_deadline')
-                                    ->label(__('RSVP Deadline'))
-                                    ->required(),
+                                SpatieMediaLibraryFileUpload::make('hero')
+                                    ->hiddenLabel()
+                                    ->collection('hero')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->columnSpanFull(),
                             ]),
                     ]),
 
+
+
                 Section::make(__('Invitation Text'))
                     ->schema([
-                        Textarea::make('welcome_text')
+                        RichEditor::make('welcome_text')
                             ->label(__('Main Text'))
-                            ->rows(5)
+                            ->extraInputAttributes(['style' => 'min-height: 300px;'])
                             ->required(),
                     ]),
 
@@ -120,6 +148,35 @@ class ManageWedding extends Page implements HasForms
                             ->columns(1)
                             ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
                     ]),
+
+                Section::make(__('Meta Data'))
+                    ->description(__('Used to generate the link preview when the invitation is shared.'))
+                    ->columns(3)
+                    ->schema([
+                        Grid::make(1)
+                            ->columnSpan(2)
+                            ->schema([
+                                TextInput::make('meta_title')
+                                    ->label(__('Meta Title'))
+                                    ->placeholder(__(config('wedding.meta.title')))
+                                    ->maxLength(255),
+
+                                Textarea::make('meta_description')
+                                    ->label(__('Meta Description'))
+                                    ->placeholder(__(config('wedding.meta.description')))
+                                    ->rows(3)
+                            ]),
+
+                        Grid::make(1)
+                            ->schema([
+                                SpatieMediaLibraryFileUpload::make('meta_image')
+                                    ->label(__('Meta Image'))
+                                    ->helperText(__('Optional. If left empty, the main image above will be used.'))
+                                    ->collection('meta_image')
+                                    ->image()
+                                    ->imageEditor(),
+                            ]),
+                    ]),
             ])
             ->statePath('data');
     }
@@ -143,7 +200,9 @@ class ManageWedding extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        app(WeddingService::class)->saveWeddingData($data);
+        app(WeddingService::class)->saveWeddingData($this->record, $data);
+
+        $this->form->model($this->record)->saveRelationships();
 
         Notification::make()
             ->title(__('Saved Successfully'))

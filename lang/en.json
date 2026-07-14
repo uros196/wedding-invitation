@@ -66,5 +66,14 @@
     "View Group": "View Group",
     "View Message": "View Message",
     "The selected guest does not belong to this group.": "The selected guest does not belong to this group.",
-    "Full name": "Full name"
+    "Full name": "Full name",
+    "Main Image": "Main Image",
+    "This image is displayed at the top of the invitation.": "This image is displayed at the top of the invitation.",
+    "Meta Data": "Meta Data",
+    "Used to generate the link preview when the invitation is shared.": "Used to generate the link preview when the invitation is shared.",
+    "Meta Title": "Meta Title",
+    "Meta Description": "Meta Description",
+    "Meta Image": "Meta Image",
+    "Optional. If left empty, the main image above will be used.": "Optional. If left empty, the main image above will be used.",
+    "Optional. If left empty, the wedding meta data will be used.": "Optional. If left empty, the wedding meta data will be used."
 }

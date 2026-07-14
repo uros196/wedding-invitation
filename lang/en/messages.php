@@ -11,4 +11,5 @@ return [
     'invitation_status' => 'Invitation Status',
     'personalized_message_placeholder' => 'This message will be displayed at the top of their invitation...',
     'attendence_confirmation_success' => 'Attendance confirmed successfully.',
+    'group_meta_description' => 'Personalize the link preview for this group. If left empty, the wedding meta data will be used.',
 ];

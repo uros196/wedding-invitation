@@ -18,27 +18,37 @@ class WeddingService
     }
 
     /**
-     * Get wedding data.
-     * Returns default values if data does not exist.
+     * Get the single wedding record, creating it if it does not exist yet.
      */
-    public function getWeddingData(): array
+    public function getWedding(): Wedding
     {
-        $wedding = Wedding::first();
+        return Wedding::firstOrCreate([]);
+    }
 
-        if ($wedding) {
-            return $wedding->toArray();
+    /**
+     * Get wedding data for filling the management form.
+     * Applies default schedules when none are set.
+     *
+     * @return array<string, mixed>
+     */
+    public function getWeddingData(Wedding $wedding): array
+    {
+        $data = $wedding->attributesToArray();
+
+        if (blank($data['schedules'] ?? null)) {
+            $data['schedules'] = config('wedding.schedules');
         }
 
-        return [
-            'schedules' => config('wedding.schedules'),
-        ];
+        return $data;
     }
 
     /**
      * Save or update wedding data.
+     *
+     * @param  array<string, mixed>  $data
      */
-    public function saveWeddingData(array $data): void
+    public function saveWeddingData(Wedding $wedding, array $data): void
     {
-        Wedding::updateOrCreate([], $data);
+        $wedding->update($data);
     }
 }

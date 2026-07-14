@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Support\MetaFactory;
 use BezhanSalleh\LanguageSwitch\Enums\TriggerStyle;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Carbon\CarbonImmutable;
@@ -27,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->singleton(MetaFactory::class, function () {
+            return new MetaFactory();
+        });
+
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch->locales(['sr_Latn', 'en'])
                 ->trigger(style: TriggerStyle::Avatar);

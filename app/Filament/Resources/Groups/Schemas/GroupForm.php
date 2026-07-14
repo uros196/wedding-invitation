@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Groups\Schemas;
 
 use App\Filament\Resources\Groups\Schemas\Components\DescriptionTextarea;
+use App\Filament\Resources\Groups\Schemas\Components\MetaDescriptionTextarea;
+use App\Filament\Resources\Groups\Schemas\Components\MetaImageFileUpload;
+use App\Filament\Resources\Groups\Schemas\Components\MetaTitleInput;
 use App\Filament\Resources\Groups\Schemas\Components\NameInput;
+use App\Filament\Resources\Groups\Schemas\Components\UuidInput;
 use App\Models\Group;
-use App\Services\GroupService;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
@@ -31,15 +34,8 @@ class GroupForm
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                NameInput::make()
-                                    ->columnSpan(1),
-
-                                TextInput::make('uuid')
-                                    ->label(__('UUID (Invitation Link)'))
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->visible(fn (?Group $record): bool => app(GroupService::class)->isRecordExists($record))
-                                    ->columnSpan(1),
+                                NameInput::make()->columnSpan(1),
+                                UuidInput::make(),
                             ]),
 
                         DescriptionTextarea::make()
@@ -61,6 +57,16 @@ class GroupForm
                                     ->dehydrated(false)
                                     ->columnSpan(1),
                             ]),
+                    ]),
+
+                Section::make(__('Meta Data'))
+                    ->description(__('messages.group_meta_description'))
+                    ->collapsible()
+                    ->collapsed(fn (?Group $record): bool => !$record?->hasAnyMeta())
+                    ->schema([
+                        MetaTitleInput::make(),
+                        MetaDescriptionTextarea::make(),
+                        MetaImageFileUpload::make(),
                     ]),
             ]);
     }

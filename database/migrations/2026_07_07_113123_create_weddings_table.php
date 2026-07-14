@@ -19,6 +19,8 @@ return new class extends Migration
             $table->datetime('rsvp_deadline')->nullable();
             $table->text('welcome_text')->nullable();
             $table->json('schedules')->nullable();
+            $table->string('meta_title')->nullable()->after('welcome_text');
+            $table->text('meta_description')->nullable()->after('meta_title');
             $table->timestamps();
         });
     }

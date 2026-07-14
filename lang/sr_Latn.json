@@ -66,5 +66,14 @@
     "View Group": "Pogledaj grupu",
     "View Message": "Pogledaj poruku",
     "The selected guest does not belong to this group.": "Izabrani gost ne pripada ovoj grupi.",
-    "Full name": "Ime i prezime"
+    "Full name": "Ime i prezime",
+    "Main Image": "Glavna slika",
+    "This image is displayed at the top of the invitation.": "Ova slika se prikazuje na vrhu pozivnice.",
+    "Meta Data": "Meta podaci",
+    "Used to generate the link preview when the invitation is shared.": "Koristi se za generisanje pregleda linka pri deljenju pozivnice.",
+    "Meta Title": "Meta naslov",
+    "Meta Description": "Meta opis",
+    "Meta Image": "Meta slika",
+    "Optional. If left empty, the main image above will be used.": "Opciono. Ako se ostavi prazno, koristiće se glavna slika iznad.",
+    "Optional. If left empty, the wedding meta data will be used.": "Opciono. Ako se ostavi prazno, koristiće se meta podaci venčanja."
 }

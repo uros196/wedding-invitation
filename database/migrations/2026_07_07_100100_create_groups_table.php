@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->boolean('is_sent')->default(false);
             $table->unsignedInteger('views_count')->default(0);
+            $table->string('meta_title')->nullable()->after('description');
+            $table->text('meta_description')->nullable()->after('meta_title');
             $table->timestamps();
         });
     }
