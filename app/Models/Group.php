@@ -29,6 +29,7 @@ class Group extends Model implements HasMedia
         'name',
         'description',
         'is_sent',
+        'has_plus_one',
         'views_count',
         'meta_title',
         'meta_description',
@@ -43,6 +44,7 @@ class Group extends Model implements HasMedia
     {
         return [
             'is_sent' => 'boolean',
+            'has_plus_one' => 'boolean',
             'views_count' => 'integer',
         ];
     }
@@ -95,5 +97,13 @@ class Group extends Model implements HasMedia
         return filled($this->meta_title)
             || filled($this->meta_description)
             || $this->getMetaImageUrl();
+    }
+
+    /**
+     * Determine if the group has only one guest.
+     */
+    public function hasOnlyOneGuest(): bool
+    {
+        return $this->guests()->count() === 1;
     }
 }

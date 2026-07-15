@@ -8,6 +8,7 @@ use App\DTOs\ConfirmAttendanceData;
 use App\Models\Group;
 use App\Rules\GuestInGroupRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ConfirmAttendanceRequest extends FormRequest
 {
@@ -23,6 +24,12 @@ class ConfirmAttendanceRequest extends FormRequest
             'confirmed_guest_ids' => ['array'],
             'confirmed_guest_ids.*' => ['exists:guests,id', new GuestInGroupRule($group)],
             'message' => ['nullable', 'string', 'max:5000'],
+            'plus_one' => [
+                Rule::when($group->has_plus_one, ['nullable', 'array']),
+                Rule::when(! $group->has_plus_one, ['prohibited']),
+            ],
+            'plus_one.first_name' => ['required_with:plus_one', 'string', 'max:255'],
+            'plus_one.last_name' => ['required_with:plus_one', 'string', 'max:255'],
         ];
     }
 

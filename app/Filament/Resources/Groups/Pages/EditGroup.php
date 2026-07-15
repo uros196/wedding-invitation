@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Groups\Pages;
 
+use App\Filament\Resources\Groups\Actions\ShareGroupAction;
 use App\Filament\Resources\Groups\GroupResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -13,6 +14,7 @@ class EditGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            ShareGroupAction::make(),
             DeleteAction::make(),
         ];
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Groups\Schemas;
 
 use App\Filament\Resources\Groups\Schemas\Components\DescriptionTextarea;
+use App\Filament\Resources\Groups\Schemas\Components\HasPlusOneToggle;
 use App\Filament\Resources\Groups\Schemas\Components\MetaDescriptionTextarea;
 use App\Filament\Resources\Groups\Schemas\Components\MetaImageFileUpload;
 use App\Filament\Resources\Groups\Schemas\Components\MetaTitleInput;
@@ -49,6 +50,8 @@ class GroupForm
                                 Toggle::make('is_sent')
                                     ->label(__('Invitation Sent')),
 
+                                HasPlusOneToggle::make(),
+
                                 TextInput::make('views_count')
                                     ->label(__('Views Count'))
                                     ->numeric()
@@ -62,7 +65,7 @@ class GroupForm
                 Section::make(__('Meta Data'))
                     ->description(__('messages.group_meta_description'))
                     ->collapsible()
-                    ->collapsed(fn (?Group $record): bool => !$record?->hasAnyMeta())
+                    ->collapsed(fn (?Group $record): bool => ! $record?->hasAnyMeta())
                     ->schema([
                         MetaTitleInput::make(),
                         MetaDescriptionTextarea::make(),

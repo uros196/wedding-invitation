@@ -11,6 +11,7 @@ final readonly class ConfirmAttendanceData
     public function __construct(
         public array $confirmedGuestIds,
         public ?string $message = null,
+        public ?array $plusOne = null,
     ) {}
 
     /**
@@ -21,6 +22,7 @@ final readonly class ConfirmAttendanceData
         return new self(
             (array) $request->validated('confirmed_guest_ids', []),
             $request->validated('message'),
+            $request->validated('plus_one'),
         );
     }
 }

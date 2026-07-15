@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Groups\Tables;
 
 use App\Filament\Columns\CreatedAtColumn;
+use App\Filament\Resources\Groups\Actions\ShareGroupAction;
 use App\Filament\Resources\Groups\Tables\Columns\GroupNameColumn;
 use App\Filament\Resources\Groups\Tables\Columns\GuestsCountColumn;
 use App\Filament\Resources\Groups\Tables\Columns\IsSentColumn;
@@ -42,6 +43,7 @@ class GroupsTable
                     ->falseLabel(__('Unsent Invitations')),
             ])
             ->recordActions([
+                ShareGroupAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
