@@ -110,6 +110,14 @@ class Guest extends Model
     }
 
     /**
+     * Determine if the status is accepted.
+     */
+    public function isAccepted(): Attribute
+    {
+        return Attribute::get(fn () => $this->status->isAccepted());
+    }
+
+    /**
      * Determine if the entity has companions.
      */
     public function hasCompanions(): bool

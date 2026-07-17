@@ -38,7 +38,7 @@ class AddCompanionAction
                     ->required()
                     ->exists('guests', 'id')
                     ->validationMessages([
-                        'required' => 'Morate izabrati gosta ili kreirati novog.',
+                        'required' => __('You must select a guest or create a new one.'),
                     ])
                     ->createOptionForm(ModalGrid::make()),
             ])

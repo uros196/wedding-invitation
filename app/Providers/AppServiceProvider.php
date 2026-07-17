@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->app->singleton(MetaFactory::class, function () {
-            return new MetaFactory();
+            return new MetaFactory;
         });
 
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {

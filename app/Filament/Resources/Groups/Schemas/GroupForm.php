@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Groups\Schemas;
 
+use App\Filament\Pages\MenageWedding\EmptyStates\NoTimelineDefinedState;
 use App\Filament\Resources\Groups\Schemas\Components\DescriptionTextarea;
 use App\Filament\Resources\Groups\Schemas\Components\HasPlusOneToggle;
 use App\Filament\Resources\Groups\Schemas\Components\MetaDescriptionTextarea;
@@ -11,7 +12,9 @@ use App\Filament\Resources\Groups\Schemas\Components\MetaImageFileUpload;
 use App\Filament\Resources\Groups\Schemas\Components\MetaTitleInput;
 use App\Filament\Resources\Groups\Schemas\Components\NameInput;
 use App\Filament\Resources\Groups\Schemas\Components\UuidInput;
+use App\Filament\Resources\Groups\Schemas\Components\WeddingTimelineList;
 use App\Models\Group;
+use App\Models\WeddingTimeline;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
@@ -41,6 +44,15 @@ class GroupForm
 
                         DescriptionTextarea::make()
                             ->columnSpanFull(),
+                    ]),
+
+                Section::make(__('Timeline'))
+                    ->description(__('Manage which timeline items are visible for this group.'))
+                    ->schema([
+                        NoTimelineDefinedState::make()
+                            ->visible(fn () => ! WeddingTimeline::exists()),
+
+                        WeddingTimelineList::make(),
                     ]),
 
                 Section::make(__('messages.invitation_status'))

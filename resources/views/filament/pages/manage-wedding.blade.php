@@ -2,7 +2,7 @@
     <form wire:submit="save">
         {{ $this->form }}
 
-        <div class="mt-4">
+        <div class="mt-4" style="margin-top: 20px;">
             @foreach($this->getFormActions() as $action)
                 {{ $action }}
             @endforeach

@@ -30,10 +30,12 @@ class CompanionsList
                     Text::make($companion->full_name)
                         ->icon(Heroicon::User)
                         ->grow(),
+
                     Text::make($companion->age?->getLabel())
                         ->badge()
                         ->color('gray')
                         ->visible(fn () => $companion->age !== null),
+
                     RemoveCompanionAction::make("removeCompanion_{$companion->id}")
                         ->record($companion)
                         ->link(),

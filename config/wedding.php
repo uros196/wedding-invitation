@@ -16,11 +16,6 @@ return [
         ],
     ],
 
-    'schedules' => [
-        ['name' => 'Crkva', 'enabled' => true],
-        ['name' => 'Opština', 'enabled' => true],
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | Meta (Open Graph) Defaults

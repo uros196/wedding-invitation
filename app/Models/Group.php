@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -50,19 +51,11 @@ class Group extends Model implements HasMedia
     }
 
     /**
-     * Register the media collections for the group.
+     * Get the timeline items that are hidden for this group.
      */
-    public function registerMediaCollections(): void
+    public function hiddenTimelineItems(): BelongsToMany
     {
-        $this->addMediaCollection('meta_image')->singleFile();
-    }
-
-    /**
-     * Get the URL of the image used for meta tags, if any.
-     */
-    public function getMetaImageUrl(): ?string
-    {
-        return $this->getFirstMediaUrl('meta_image') ?: null;
+        return $this->belongsToMany(WeddingTimeline::class, 'group_hidden_timeline_items');
     }
 
     /**
@@ -87,6 +80,22 @@ class Group extends Model implements HasMedia
     public function url(): Attribute
     {
         return Attribute::get(fn () => route('group.show', $this));
+    }
+
+    /**
+     * Register the media collections for the group.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('meta_image')->singleFile();
+    }
+
+    /**
+     * Get the URL of the image used for meta tags, if any.
+     */
+    public function getMetaImageUrl(): ?string
+    {
+        return $this->getFirstMediaUrl('meta_image') ?: null;
     }
 
     /**

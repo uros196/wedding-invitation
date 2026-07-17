@@ -1,0 +1,72 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Pages\MenageWedding\Schemas\Components;
+
+use Filament\Actions\Action;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Support\Icons\Heroicon;
+
+class TimelineRepeater
+{
+    /**
+     * Generate the repeater for the wedding timeline.
+     */
+    public static function make(): Repeater
+    {
+        return Repeater::make('timelines')
+            ->relationship('timelines')
+            ->label(__('Timeline'))
+            ->addActionLabel(__('Add Timeline'))
+            ->schema([
+                Grid::make(3)
+                    ->schema([
+                        TextInput::make('title')
+                            ->label(__('Event Name'))
+                            ->required(),
+
+                        TimePicker::make('time')
+                            ->label(__('Time'))
+                            ->seconds(false)
+                            ->required(),
+
+                        TextInput::make('icon')
+                            ->label(__('Icon'))
+                            ->placeholder(__('e.g. heroicon-o-cake')),
+                    ]),
+                Grid::make(2)
+                    ->schema([
+                        TextInput::make('address')
+                            ->label(__('Address')),
+
+                        TextInput::make('map_url')
+                            ->label(__('Map Link'))
+                            ->url()
+                            ->suffixAction(
+                                Action::make('open_map')
+                                    ->icon(Heroicon::ArrowTopRightOnSquare)
+                                    ->url(fn (?string $state): ?string => $state)
+                                    ->openUrlInNewTab()
+                                    ->visible(fn (?string $state): bool => filled($state)),
+                            ),
+                    ]),
+                Grid::make(2)
+                    ->schema([
+                        Toggle::make('is_visible')
+                            ->label(__('Visible'))
+                            ->default(true),
+                    ]),
+            ])
+            ->columns(1)
+            ->reorderable()
+            ->orderColumn('sort_order')
+            ->defaultItems(0)
+            ->live()
+            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null);
+    }
+}

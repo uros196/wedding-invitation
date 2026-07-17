@@ -37,4 +37,12 @@ enum GuestStatus: string implements HasColor, HasLabel
             self::Declined => 'danger',
         };
     }
+
+    /**
+     * Determines if the current instance represents a confirmed state.
+     */
+    public function isAccepted(): bool
+    {
+        return $this === self::Confirmed;
+    }
 }

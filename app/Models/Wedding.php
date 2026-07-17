@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Support\Countdown;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Wedding extends Model implements HasMedia
 {
+    use HasFactory;
     use InteractsWithMedia;
 
     /**
@@ -23,21 +28,20 @@ class Wedding extends Model implements HasMedia
         'wedding_date',
         'rsvp_deadline',
         'welcome_text',
-        'schedules',
         'meta_title',
         'meta_description',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array
+     * Get the attributes that should be cast.
      */
-    protected $casts = [
-        'wedding_date' => 'date',
-        'rsvp_deadline' => 'datetime',
-        'schedules' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'wedding_date' => 'date',
+            'rsvp_deadline' => 'datetime',
+        ];
+    }
 
     /**
      * Register the media collections for the wedding.
@@ -50,7 +54,7 @@ class Wedding extends Model implements HasMedia
 
     /**
      * Get the URL of the image used for meta tags.
-     * Falls back to the hero image when no dedicated meta image is set.
+     * Falls back to the hero image when no dedicated meta-image is set.
      */
     public function getMetaImageUrl(): ?string
     {
@@ -67,6 +71,14 @@ class Wedding extends Model implements HasMedia
             get: fn () => filled($this) ? new Countdown($this->wedding_date)
                 ->setFormat(config('wedding.widgets.countdown.wedding_format')) : null,
         );
+    }
+
+    /**
+     * Get the timeline entries for the wedding.
+     */
+    public function timelines(): HasMany
+    {
+        return $this->hasMany(WeddingTimeline::class)->orderBy('sort_order');
     }
 
     /**

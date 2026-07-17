@@ -18,13 +18,13 @@ class RemoveCompanionAction
     public static function make(?string $name = null): Action
     {
         return Action::make($name ?? 'removeCompanion')
-            ->label('Ukloni')
+            ->label(__('Remove'))
             ->icon(Heroicon::XMark)
             ->color('danger')
             ->requiresConfirmation()
-            ->modalHeading('Ukloni kompanjona')
-            ->modalDescription('Da li ste sigurni da želite da uklonite ovog kompanjona iz liste?')
-            ->modalSubmitActionLabel('Ukloni')
+            ->modalHeading(__('Remove companion'))
+            ->modalDescription(__('Are you sure you want to remove this companion from the list?'))
+            ->modalSubmitActionLabel(__('Remove'))
             ->action(function (Guest $record) {
                 $parent = $record->parent;
 

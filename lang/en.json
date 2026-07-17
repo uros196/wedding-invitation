@@ -75,5 +75,18 @@
     "Meta Description": "Meta Description",
     "Meta Image": "Meta Image",
     "Optional. If left empty, the main image above will be used.": "Optional. If left empty, the main image above will be used.",
-    "Optional. If left empty, the wedding meta data will be used.": "Optional. If left empty, the wedding meta data will be used."
+    "Optional. If left empty, the wedding meta data will be used.": "Optional. If left empty, the wedding meta data will be used.",
+    "Timeline": "Timeline",
+    "Manage which timeline items are visible for this group.": "Manage which timeline items are visible for this group.",
+    "Timeline is not defined yet.": "Timeline is not defined yet.",
+    "Add Timeline": "Add Timeline",
+    "Timeline Items": "Timeline Items",
+    "Address": "Address",
+    "Map Link": "Map Link",
+    "Icon": "Icon",
+    "e.g. heroicon-o-cake": "e.g. heroicon-o-cake",
+    "Remove": "Remove",
+    "Remove companion": "Remove companion",
+    "Are you sure you want to remove this companion from the list?": "Are you sure you want to remove this companion from the list?",
+    "You must select a guest or create a new one.": "You must select a guest or create a new one."
 }

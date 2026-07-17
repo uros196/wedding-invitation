@@ -27,19 +27,12 @@ class WeddingService
 
     /**
      * Get wedding data for filling the management form.
-     * Applies default schedules when none are set.
      *
      * @return array<string, mixed>
      */
     public function getWeddingData(Wedding $wedding): array
     {
-        $data = $wedding->attributesToArray();
-
-        if (blank($data['schedules'] ?? null)) {
-            $data['schedules'] = config('wedding.schedules');
-        }
-
-        return $data;
+        return $wedding->load('timelines')->attributesToArray();
     }
 
     /**
