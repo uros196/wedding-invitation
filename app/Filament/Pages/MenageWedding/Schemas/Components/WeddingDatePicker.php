@@ -15,6 +15,7 @@ class WeddingDatePicker
     {
         return DatePicker::make('wedding_date')
             ->label(__('Wedding Date and Time'))
+            ->live()
             ->required();
     }
 }

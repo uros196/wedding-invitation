@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\MenageWedding\Schemas\Components;
 
+use App\Rules\ChronologicalOrderRule;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
@@ -23,6 +24,7 @@ class TimelineRepeater
             ->relationship('timelines')
             ->label(__('Timeline'))
             ->addActionLabel(__('Add Timeline'))
+            ->rules([new ChronologicalOrderRule])
             ->schema([
                 Grid::make(3)
                     ->schema([

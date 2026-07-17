@@ -184,6 +184,9 @@ return [
         ],
     ],
 
+    // Custom validation messages.
+    'chronological_order' => 'The :attribute events must be in chronological order.',
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Attributes
@@ -195,6 +198,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'timelines' => 'timeline',
+    ],
 
 ];

@@ -184,6 +184,9 @@ return [
         ],
     ],
 
+    // Custom validation messages.
+    'chronological_order' => 'Događaji u :attribute moraju biti u hronološkom redosledu.',
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Attributes
@@ -195,6 +198,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'timelines' => 'rasporedu',
+    ],
 
 ];
