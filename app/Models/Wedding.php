@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Support\Countdown;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +45,36 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
+     * Get the timeline entries for the wedding.
+     */
+    public function timelines(): HasMany
+    {
+        return $this->hasMany(WeddingTimeline::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get the wedding countdown.
+     */
+    public function weddingCountdown(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => filled($this) ? new Countdown($this->wedding_date)
+                ->setFormat(config('wedding.widgets.countdown.wedding_format')) : null,
+        );
+    }
+
+    /**
+     * Get the RSVP countdown.
+     */
+    public function rsvpCountdown(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => filled($this) ? new Countdown($this->rsvp_deadline)
+                ->setFormat(config('wedding.widgets.countdown.rsvp_format')) : null,
+        );
+    }
+
+    /**
      * Register the media collections for the wedding.
      */
     public function registerMediaCollections(): void
@@ -63,32 +94,14 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
-     * Get the wedding countdown.
+     * Load the default relationships for the model.
      */
-    public function weddingCountdown(): Attribute
+    public function loadDefaultRelationships(): self
     {
-        return Attribute::make(
-            get: fn () => filled($this) ? new Countdown($this->wedding_date)
-                ->setFormat(config('wedding.widgets.countdown.wedding_format')) : null,
-        );
-    }
-
-    /**
-     * Get the timeline entries for the wedding.
-     */
-    public function timelines(): HasMany
-    {
-        return $this->hasMany(WeddingTimeline::class)->orderBy('sort_order');
-    }
-
-    /**
-     * Get the RSVP countdown.
-     */
-    public function rsvpCountdown(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => filled($this) ? new Countdown($this->rsvp_deadline)
-                ->setFormat(config('wedding.widgets.countdown.rsvp_format')) : null,
-        );
+        return $this->load([
+            'timelines' => function (Builder $query) {
+                $query->visible();
+            },
+        ]);
     }
 }

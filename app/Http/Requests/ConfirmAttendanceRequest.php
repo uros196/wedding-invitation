@@ -28,8 +28,8 @@ class ConfirmAttendanceRequest extends FormRequest
                 Rule::when($group->has_plus_one, ['nullable', 'array']),
                 Rule::when(! $group->has_plus_one, ['prohibited']),
             ],
-            'plus_one.first_name' => ['required_with:plus_one', 'string', 'max:255'],
-            'plus_one.last_name' => ['required_with:plus_one', 'string', 'max:255'],
+            'plus_one.first_name' => ['required_with:plus_one', 'string', 'max:50'],
+            'plus_one.last_name' => ['required_with:plus_one', 'string', 'max:50'],
         ];
     }
 

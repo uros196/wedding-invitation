@@ -15,6 +15,9 @@ class ConfirmAttendanceController extends Controller
         protected GroupService $groupService
     ) {}
 
+    /**
+     * Submit RSVP request.
+     */
     public function __invoke(ConfirmAttendanceRequest $request, Group $group): RedirectResponse
     {
         $group->load('guests');
