@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Wedding;
 use App\Models\WeddingTimeline;
+use CodeWithDennis\FilamentLucideIcons\Enums\LucideIcon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,7 +26,7 @@ class WeddingTimelineFactory extends Factory
             'time' => $this->faker->time('H:i'),
             'map_url' => $this->faker->url(),
             'is_visible' => true,
-            'icon' => 'heroicon-o-cake',
+            'icon' => $this->faker->randomElement(LucideIcon::cases())->value,
             'sort_order' => 0,
         ];
     }

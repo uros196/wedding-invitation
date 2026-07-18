@@ -9,7 +9,6 @@ return [
     'basic_info' => 'Basic Information',
     'group_basic_info_description' => 'Enter group name and personalized message.',
     'invitation_status' => 'Invitation Status',
-    'personalized_message_placeholder' => 'This message will be displayed at the top of their invitation...',
     'attendence_confirmation_success' => 'Attendance confirmed successfully.',
     'group_meta_description' => 'Personalize the link preview for this group. If left empty, the wedding meta data will be used.',
     'has_plus_one' => 'Has Plus One',
@@ -17,4 +16,8 @@ return [
     'has_plus_one_disabled_helper' => 'This option is only available for groups with one guest.',
     'share' => 'Share',
     'link_copied' => 'Link copied to clipboard.',
+    'invitation_link' => 'Invitation Link',
+    'personalized_title' => 'Personalized Title',
+    'personalized_message' => 'Personalized Message',
+    'personalized_message_placeholder' => 'This message will be displayed at the top of their invitation...',
 ];

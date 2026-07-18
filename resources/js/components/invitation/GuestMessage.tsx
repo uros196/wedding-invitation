@@ -1,8 +1,19 @@
 import { motion } from 'framer-motion';
 
-export default function GuestMessage() {
+import { fonts, palette } from './theme';
+
+interface GuestMessageProps {
+    title: string;
+    message: string;
+}
+
+/**
+ * A heartfelt note addressed to the guests. Text is customisable but falls
+ * back to a warm default when nothing is provided.
+ */
+export default function GuestMessage({ title, message }: GuestMessageProps) {
     return (
-        <div className="relative z-20 bg-[#EEF1F5]">
+        <div className="relative z-20" style={{ backgroundColor: palette.background }}>
             <motion.div
                 className="px-8 py-12 text-center"
                 initial={{ opacity: 0, y: 30 }}
@@ -10,27 +21,16 @@ export default function GuestMessage() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.9, ease: 'easeOut' }}
             >
-                <p
-                    className="mb-4 text-2xl"
-                    style={{
-                        color: '#9875A6',
-                        fontFamily: "'Great Vibes', cursive",
-                    }}
-                >
-                    Dragim gostima
-                </p>
+                {title && (
+                    <p className="mb-4 text-2xl" style={{ color: palette.dawn, fontFamily: fonts.script }}>
+                        {title}
+                    </p>
+                )}
                 <p
                     className="text-sm leading-relaxed font-light sm:text-base"
-                    style={{
-                        color: '#433A66',
-                        fontFamily: "'Playfair Display', serif",
-                    }}
+                    style={{ color: palette.celestial, fontFamily: fonts.serif }}
                 >
-                    Svaki ljubavni put je jedinstven, a naš je vodio do ovog
-                    trenutka. Vaše prisustvo čini naš dan potpunijim i lepšim.
-                    Hvala vam što ste deo naše priče, što ste tu da podelite
-                    radost, suze i osmehe sa nama. Ovo je početak jednog novog
-                    poglavlja, a vi ste nam dragocena podrška na tom putu.
+                    {message}
                 </p>
             </motion.div>
         </div>

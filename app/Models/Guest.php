@@ -86,7 +86,7 @@ class Guest extends Model
     /**
      * Get the guest's full name.
      */
-    public function fullName(): Attribute
+    protected function fullName(): Attribute
     {
         return Attribute::make(
             get: fn () => "{$this->first_name} {$this->last_name}",
@@ -96,7 +96,7 @@ class Guest extends Model
     /**
      * Get the age label of the guest.
      */
-    public function ageLabel(): Attribute
+    protected function ageLabel(): Attribute
     {
         return Attribute::get(fn () => $this->age?->getLabel());
     }
@@ -104,7 +104,7 @@ class Guest extends Model
     /**
      * Get the label for the guest's gender.
      */
-    public function genderLabel(): Attribute
+    protected function genderLabel(): Attribute
     {
         return Attribute::get(fn () => $this->gender?->getLabel());
     }
@@ -112,7 +112,7 @@ class Guest extends Model
     /**
      * Determine if the status is accepted.
      */
-    public function isAccepted(): Attribute
+    protected function isAccepted(): Attribute
     {
         return Attribute::get(fn () => $this->status->isAccepted());
     }

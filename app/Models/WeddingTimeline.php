@@ -70,7 +70,7 @@ class WeddingTimeline extends Model
     /**
      * Get the formatted list name attribute combining time and title.
      */
-    public function listName(): Attribute
+    protected function listName(): Attribute
     {
         return Attribute::get(fn () => "{$this->time->format('H:i')} - {$this->title}");
     }

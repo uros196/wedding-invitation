@@ -8,6 +8,7 @@ use App\Support\MetaFactory;
 use BezhanSalleh\LanguageSwitch\Enums\TriggerStyle;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Carbon\CarbonImmutable;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -28,10 +29,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Turn off wrapping of JSON resources into 'data'.
+        JsonResource::withoutWrapping();
+
+        // Create MetaFactory singleton.
         $this->app->singleton(MetaFactory::class, function () {
             return new MetaFactory;
         });
 
+        // Define Filament language switcher.
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch->locales(['sr_Latn', 'en'])
                 ->trigger(style: TriggerStyle::Avatar);

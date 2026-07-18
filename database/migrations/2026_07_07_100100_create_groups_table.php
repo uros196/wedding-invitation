@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->uuid()->unique();
             $table->string('name');
-            $table->text('description')->nullable();
             $table->boolean('is_sent')->default(false);
             $table->boolean('has_plus_one')->default(false);
             $table->unsignedInteger('views_count')->default(0);
+            $table->string('invitation_title')->nullable();
+            $table->text('invitation_message')->nullable();
             $table->string('meta_title')->nullable()->after('description');
             $table->text('meta_description')->nullable()->after('meta_title');
             $table->timestamps();

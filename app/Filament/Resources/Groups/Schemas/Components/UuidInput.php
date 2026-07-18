@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Groups\Schemas\Components;
 use App\Models\Group;
 use App\Services\GroupService;
 use Filament\Forms\Components\TextInput;
+use Webbingbrasil\FilamentCopyActions\Actions\CopyAction;
 
 class UuidInput
 {
@@ -18,6 +19,7 @@ class UuidInput
             ->disabled()
             ->dehydrated(false)
             ->visible(fn (?Group $record): bool => app(GroupService::class)->isRecordExists($record))
+            ->suffixAction(CopyAction::make())
             ->columnSpan(1);
     }
 }

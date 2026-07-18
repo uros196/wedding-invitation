@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Groups\Schemas;
 
 use App\Filament\Pages\MenageWedding\EmptyStates\NoTimelineDefinedState;
-use App\Filament\Resources\Groups\Schemas\Components\DescriptionTextarea;
 use App\Filament\Resources\Groups\Schemas\Components\HasPlusOneToggle;
+use App\Filament\Resources\Groups\Schemas\Components\InvitationMessageTextarea;
+use App\Filament\Resources\Groups\Schemas\Components\InvitationTitleInput;
 use App\Filament\Resources\Groups\Schemas\Components\MetaDescriptionTextarea;
 use App\Filament\Resources\Groups\Schemas\Components\MetaImageFileUpload;
 use App\Filament\Resources\Groups\Schemas\Components\MetaTitleInput;
@@ -42,8 +43,8 @@ class GroupForm
                                 UuidInput::make(),
                             ]),
 
-                        DescriptionTextarea::make()
-                            ->columnSpanFull(),
+                        InvitationTitleInput::make(),
+                        InvitationMessageTextarea::make(),
                     ]),
 
                 Section::make(__('Timeline'))

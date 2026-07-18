@@ -28,10 +28,11 @@ class Group extends Model implements HasMedia
     protected $fillable = [
         'uuid',
         'name',
-        'description',
         'is_sent',
         'has_plus_one',
         'views_count',
+        'invitation_title',
+        'invitation_message',
         'meta_title',
         'meta_description',
     ];
@@ -77,7 +78,7 @@ class Group extends Model implements HasMedia
     /**
      * Define an attribute for generating the URL of the group.
      */
-    public function url(): Attribute
+    protected function url(): Attribute
     {
         return Attribute::get(fn () => route('group.show', $this));
     }

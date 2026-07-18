@@ -21,7 +21,8 @@ class GroupResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
-            'description' => $this->description,
+            'invitation_title' => $this->invitation_title,
+            'invitation_message' => $this->invitation_message,
             'has_plus_one' => $this->has_plus_one,
             'guests_count' => $this->guests_count,
             'guests' => GuestResource::collection($this->whenLoaded('guests')),

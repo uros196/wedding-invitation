@@ -1,61 +1,45 @@
 import { motion } from 'framer-motion';
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            delayChildren: 1.3, 
-            staggerChildren: 0.03,
-        },
-    },
-};
+import { fonts, palette } from './theme';
 
-const letterVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-};
-export default function WelcomeMessage() {
+interface WelcomeMessageProps {
+    /** Rich-text (HTML) welcome message coming from the backend. */
+    welcomeText?: string | null;
+    weddingDay: string;
+    weddingDate: string;
+}
+
+/**
+ * The introductory greeting and the wedding date, sitting on the perforated
+ * edge that reveals the sticky hero image above it.
+ */
+export default function WelcomeMessage({ welcomeText, weddingDay, weddingDate }: WelcomeMessageProps) {
     return (
         <>
+            {/* Perforated (ticket-like) top edge */}
             <div
                 className="relative z-30 -mt-[20px] h-[30px] w-full"
                 style={{
-                    background:
-                        'radial-gradient(circle at 25px -10px, transparent 28px, #EEF1F5 29px)',
+                    background: `radial-gradient(circle at 25px -10px, transparent 28px, ${palette.background} 29px)`,
                     backgroundSize: '50px 100%',
                     backgroundRepeat: 'repeat-x',
                     backgroundPosition: 'top',
                 }}
             />
-            <div className="relative z-20 w-full overflow-visible bg-[#EEF1F5] pb-10">
-                <motion.div
-                    className="px-8 pt-10 pb-6 text-center"
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.3 }}
-                >
-                    <p
-                        className="text-base leading-relaxed font-light italic sm:text-lg"
-                        style={{
-                            color: '#433A66',
-                            fontFamily: "'Playfair Display', serif",
-                        }}
-                    >
-                        {'Dragi naši, s ljubavlju vas pozivamo da budete deo našeg venčanja.'
-                            .split('')
-                            .map((char, index) => (
-                                <motion.span
-                                    key={index}
-                                    variants={letterVariants}
-                                >
-                                    {char}
-                                </motion.span>
-                            ))}
-                    </p>
-                </motion.div>
-                {/* Animirani datum */}
+            <div className="relative z-20 w-full overflow-visible pb-10" style={{ backgroundColor: palette.background }}>
+                {welcomeText && (
+                    <motion.div
+                        className="px-8 pt-10 pb-6 text-center text-base leading-relaxed font-light italic sm:text-lg [&_p]:m-0"
+                        style={{ color: palette.celestial, fontFamily: fonts.serif }}
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                        dangerouslySetInnerHTML={{ __html: welcomeText }}
+                    />
+                )}
+
+                {/* Wedding date */}
                 <motion.div
                     className="px-6 pb-2 text-center"
                     initial={{ opacity: 0, x: 60 }}
@@ -63,22 +47,14 @@ export default function WelcomeMessage() {
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                 >
-                    <p
-                        className="text-sm tracking-[0.3em] uppercase"
-                        style={{ color: '#9875A6' }}
-                    >
-                        Subota
+                    <p className="text-sm tracking-[0.3em] uppercase" style={{ color: palette.dawn }}>
+                        {weddingDay}
                     </p>
                     <p
                         className="mt-1 text-3xl sm:text-5xl"
-                        style={{
-                            color: '#0B2F5B',
-                            fontFamily: "'Playfair Display', serif",
-                            fontWeight: 100,
-                        }}
+                        style={{ color: palette.deep, fontFamily: fonts.serif, fontWeight: 100 }}
                     >
-                        19. 09. 2026. 
-                        {/* ovde dodati datum iz back-a  */}
+                        {weddingDate}
                     </p>
                 </motion.div>
             </div>

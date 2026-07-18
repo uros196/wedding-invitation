@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Guests\Schemas\Components;
 
-use App\Filament\Resources\Groups\Schemas\Components\DescriptionTextarea;
 use App\Filament\Resources\Groups\Schemas\Components\NameInput;
 use Filament\Forms\Components\Select;
 
@@ -23,7 +24,6 @@ class GroupSelect
             ->live()
             ->createOptionForm([
                 NameInput::make(),
-                DescriptionTextarea::make(),
             ]);
     }
 }

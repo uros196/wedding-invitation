@@ -55,7 +55,7 @@ class Wedding extends Model implements HasMedia
     /**
      * Get the wedding countdown.
      */
-    public function weddingCountdown(): Attribute
+    protected function weddingCountdown(): Attribute
     {
         return Attribute::make(
             get: fn () => filled($this) ? new Countdown($this->wedding_date)
@@ -66,12 +66,28 @@ class Wedding extends Model implements HasMedia
     /**
      * Get the RSVP countdown.
      */
-    public function rsvpCountdown(): Attribute
+    protected function rsvpCountdown(): Attribute
     {
         return Attribute::make(
             get: fn () => filled($this) ? new Countdown($this->rsvp_deadline)
                 ->setFormat(config('wedding.widgets.countdown.rsvp_format')) : null,
         );
+    }
+
+    /**
+     * Get the attribute for the countdown due date and time.
+     */
+    protected function countdownDueDatetime(): Attribute
+    {
+        return Attribute::get(function () {
+            $time = $this->timelines()->visible()->first()?->time;
+
+            if ($time) {
+                return $this->wedding_date->setTimeFrom($time);
+            }
+
+            return $this->wedding_date->startOfDay();
+        });
     }
 
     /**
@@ -81,6 +97,14 @@ class Wedding extends Model implements HasMedia
     {
         $this->addMediaCollection('hero')->singleFile();
         $this->addMediaCollection('meta_image')->singleFile();
+    }
+
+    /**
+     * Get the URL of the hero image displayed on the invitation.
+     */
+    public function getHeroImageUrl(): ?string
+    {
+        return $this->getFirstMediaUrl('hero') ?: null;
     }
 
     /**

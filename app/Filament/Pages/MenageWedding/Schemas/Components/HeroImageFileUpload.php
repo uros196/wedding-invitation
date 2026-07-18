@@ -18,6 +18,7 @@ class HeroImageFileUpload
             ->collection('hero')
             ->image()
             ->imageEditor()
+            ->required()
             ->columnSpanFull();
     }
 }

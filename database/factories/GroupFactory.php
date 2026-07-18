@@ -19,9 +19,10 @@ class GroupFactory extends Factory
     {
         return [
             'name' => $this->faker->lastName().' '.$this->faker->randomElement(['Porodica', 'Par']),
-            'description' => $this->faker->sentence(),
             'is_sent' => false,
             'views_count' => 0,
+            'invitation_title' => $this->faker->sentence(),
+            'invitation_message' => $this->faker->paragraph(),
         ];
     }
 }
