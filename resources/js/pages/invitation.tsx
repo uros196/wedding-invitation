@@ -18,6 +18,7 @@ export default function Invitation({ wedding, group, metaData }: InvitationPageP
         <>
             <Head title={metaData.title}>
                 <meta name="description" content={metaData.description} />
+                <meta name="robots" content="noindex,nofollow" />
                 <meta property="og:title" content={metaData.title} />
                 <meta property="og:description" content={metaData.description} />
                 <meta property="og:type" content="website" />

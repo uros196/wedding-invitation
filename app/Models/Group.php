@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\HasCounts;
+use App\Models\Concerns\Countable;
 use App\Observers\GroupObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -15,8 +17,9 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[ObservedBy(GroupObserver::class)]
-class Group extends Model implements HasMedia
+class Group extends Model implements HasCounts, HasMedia
 {
+    use Countable;
     use HasFactory;
     use InteractsWithMedia;
 

@@ -102,19 +102,19 @@ class Wedding extends Model implements HasMedia
     /**
      * Get the URL of the hero image displayed on the invitation.
      */
-    public function getHeroImageUrl(): ?string
+    public function getHeroImageUrl(): string
     {
-        return $this->getFirstMediaUrl('hero') ?: null;
+        return $this->getFirstMediaUrl('hero');
     }
 
     /**
      * Get the URL of the image used for meta tags.
      * Falls back to the hero image when no dedicated meta-image is set.
      */
-    public function getMetaImageUrl(): ?string
+    public function getMetaImageUrl(): string
     {
         return $this->getFirstMediaUrl('meta_image')
-            ?: ($this->getFirstMediaUrl('hero') ?: null);
+            ?: $this->getHeroImageUrl();
     }
 
     /**

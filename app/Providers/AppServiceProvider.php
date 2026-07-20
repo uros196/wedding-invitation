@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Support\MetaFactory;
 use BezhanSalleh\LanguageSwitch\Enums\TriggerStyle;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
+use BladeUI\Icons\Factory;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
@@ -40,7 +41,16 @@ class AppServiceProvider extends ServiceProvider
         // Define Filament language switcher.
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch->locales(['sr_Latn', 'en'])
+                ->userPreferredLocale(config('app.locale'))
                 ->trigger(style: TriggerStyle::Avatar);
+        });
+
+        // Expand SVG factory with a new path
+        $this->callAfterResolving(Factory::class, function (Factory $factory) {
+            $factory->add('default', [
+                'path' => resource_path('svg'),
+                'prefix' => '',
+            ]);
         });
 
         $this->configureDefaults();
