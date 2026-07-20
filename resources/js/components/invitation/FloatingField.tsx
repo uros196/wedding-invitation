@@ -9,11 +9,9 @@ import { cn } from '@/lib/utils';
  * border line behind the label text.
  */
 const floatingLabelBase =
-    'pointer-events-none absolute left-3 z-10 bg-[#EEF1F5] px-1 text-[#9875A6] transition-all duration-200 ease-out';
+    'pointer-events-none absolute left-3 z-10 bg-[#EEF1F5]  tracking-wider px-1  text-[#0B2F5B] transition-all duration-200 ease-out';
 
-const fieldBase =
-    'peer w-full rounded-lg border border-[#433A66] bg-[#EEF1F5] text-base text-[#433A66] outline-none transition-colors focus:border-[#9875A6]';
-
+const fieldBase = 'peer w-full rounded-lg text-sm outline-none transition-colors border border-[rgba(67,58,102,0.2)] bg-white/50 text-base text-[#0B2F5B] focus:border-[#0B2F5B]';
 interface FloatingLabelInputProps extends Omit<React.ComponentProps<'input'>, 'placeholder'> {
     id: string;
     label: string;
@@ -43,9 +41,10 @@ export function FloatingLabelInput({ id, label, error, className, ...props }: Fl
                     htmlFor={id}
                     className={cn(
                         floatingLabelBase,
-                        'top-1/2 -translate-y-1/2 text-base',
-                        'peer-focus:top-0 peer-focus:text-xs',
-                        'peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs',
+                        'backdrop-blur-sm bg-#EEF1F5 px-1 rounded',
+                        'top-1/2 -translate-y-1/2 text-sm',
+                        'peer-focus:top-0 peer-focus:bg-[#F3F5F8]',
+                        'peer-[:not(:placeholder-shown)]:top-0 ',
                     )}
                 >
                     {label}
@@ -85,9 +84,10 @@ export function FloatingLabelTextarea({ id, label, error, className, ...props }:
                     htmlFor={id}
                     className={cn(
                         floatingLabelBase,
-                        'top-3 text-base',
-                        'peer-focus:-top-2 peer-focus:text-xs',
-                        'peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs',
+                        'backdrop-blur-sm bg-#EEF1F5 px-1 rounded',
+                        'top-3 text-sm',
+                        'peer-focus:-top-2 peer-focus:text-sm peer-focus:bg-[#F3F5F8]',
+                        'peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-sm',
                     )}
                 >
                     {label}

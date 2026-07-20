@@ -18,6 +18,8 @@ export const palette = {
 export const fonts = {
     /** Calligraphic display font for names and titles. */
     script: "'Great Vibes', cursive",
+    
     /** Elegant serif for body copy and dates. */
-    serif: "'Playfair Display', serif",
+    serif: "'Instrument Serif', serif",
+    numbers: "'Lora', serif",
 } as const;

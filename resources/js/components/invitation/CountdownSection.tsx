@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion'; 
 
 import { fonts, palette } from './theme';
 
@@ -10,17 +11,12 @@ interface TimeLeft {
 }
 
 interface CountdownSectionProps {
-    /** ISO 8601 datetime the countdown counts down to. */
     targetDate: string;
 }
 
 function getTimeLeft(target: number): TimeLeft {
     const diff = target - Date.now();
-
-    if (diff <= 0) {
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    }
-
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     return {
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -29,16 +25,12 @@ function getTimeLeft(target: number): TimeLeft {
     };
 }
 
-/**
- * Live countdown to the wedding, rendered as four heart-framed numbers.
- */
 export default function CountdownSection({ targetDate }: CountdownSectionProps) {
     const target = useMemo(() => new Date(targetDate).getTime(), [targetDate]);
     const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => getTimeLeft(target));
 
     useEffect(() => {
         const interval = setInterval(() => setTimeLeft(getTimeLeft(target)), 1000);
-
         return () => clearInterval(interval);
     }, [target]);
 
@@ -51,7 +43,14 @@ export default function CountdownSection({ targetDate }: CountdownSectionProps) 
 
     return (
         <div className="relative z-20 flex w-full justify-center px-6 py-12" style={{ backgroundColor: palette.background }}>
-            <div className="flex items-start justify-center gap-2 sm:gap-4">
+           
+            <motion.div 
+                className="flex items-start justify-center gap-2 sm:gap-4"
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }}  
+                viewport={{ once: true, amount: 0.5 }} 
+                transition={{ duration: 1.5, ease: 'easeOut' }}
+            >
                 {units.map((unit) => (
                     <div key={unit.label} className="relative flex flex-col items-center">
                         <div className="relative flex h-20 w-20 items-center justify-center">
@@ -75,6 +74,7 @@ export default function CountdownSection({ targetDate }: CountdownSectionProps) 
                                     transform: 'translateY(-3px)',
                                 }}
                             >
+                            
                                 {String(unit.value).padStart(2, '0')}
                             </span>
                         </div>
@@ -83,7 +83,7 @@ export default function CountdownSection({ targetDate }: CountdownSectionProps) 
                         </span>
                     </div>
                 ))}
-            </div>
+            </motion.div>
         </div>
     );
 }

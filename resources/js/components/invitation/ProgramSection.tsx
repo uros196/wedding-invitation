@@ -24,7 +24,7 @@ export default function ProgramSection({ timelines }: ProgramSectionProps) {
             <div className="relative mx-auto max-w-sm">
                 {/* Vertical center line */}
                 <motion.div
-                    className="absolute top-4 bottom-4 left-1/2 w-px -translate-x-1/2"
+                    className="absolute top-4 bottom-4 left-2/5 w-px -translate-x-1/2"
                     style={{ backgroundColor: 'rgba(152, 117, 166, 0.25)' }}
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
@@ -39,7 +39,7 @@ export default function ProgramSection({ timelines }: ProgramSectionProps) {
                         <div key={i} className="relative mb-12 flex items-baseline last:mb-0">
                             {/* Left side: time */}
                             <motion.div
-                                className="flex w-1/2 flex-col items-end pr-5"
+                                className="flex w-2/5 flex-col items-end pr-5"
                                 initial={{ opacity: 0, x: -50 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true, amount: 0.5 }}
@@ -48,7 +48,7 @@ export default function ProgramSection({ timelines }: ProgramSectionProps) {
                                 {event.time && (
                                     <p
                                         className="text-2xl font-light sm:text-3xl"
-                                        style={{ color: palette.deep, fontFamily: fonts.serif }}
+                                        style={{ color: palette.deep, fontFamily: fonts.numbers }}
                                     >
                                         {event.time}
                                     </p>
@@ -57,7 +57,7 @@ export default function ProgramSection({ timelines }: ProgramSectionProps) {
 
                             {/* Center: heart node */}
                             <motion.div
-                                className="absolute top-2 left-1/2 z-10 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full"
+                                className="absolute top-2 left-2/5 z-10 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full"
                                 style={{ backgroundColor: palette.background }}
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}

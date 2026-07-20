@@ -52,7 +52,7 @@ export default function WelcomeMessage({ welcomeText, weddingDay, weddingDate }:
                     </p>
                     <p
                         className="mt-1 text-3xl sm:text-5xl"
-                        style={{ color: palette.deep, fontFamily: fonts.serif, fontWeight: 100 }}
+                        style={{ color: palette.deep, fontFamily: fonts.numbers, fontWeight: 100 }}
                     >
                         {weddingDate}
                     </p>
