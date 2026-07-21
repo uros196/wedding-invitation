@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Groups\Schemas\Components;
+namespace App\Filament\Resources\Groups\Schemas\Components\Form;
 
 use App\Enums\AspectRatio;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;

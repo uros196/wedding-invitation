@@ -38,12 +38,15 @@ class IconService
         $isCustom = CustomIcon::tryFrom($value) !== null;
         $iconName = $isCustom ? $value : "lucide-$value";
 
-        return '<span class="flex items-center gap-2">'
+        return '<span class="flex flex-row items-center gap-2 whitespace-nowrap">'
             .svg($iconName, 'h-4 w-4 shrink-0', ['style' => 'width: 24px;'])->toHtml()
-            .'<span class="truncate">'.Str::headline($value).'</span>'
+            .'<span class="truncate" style="margin-left: 10px;">'.Str::headline($value).'</span>'
             .'</span>';
     }
 
+    /**
+     * Retrieve a Lucide or Custom icon based on the given icon name.
+     */
     public function getIcon(?string $icon): CustomIcon|LucideIcon|null
     {
         return filled($icon)

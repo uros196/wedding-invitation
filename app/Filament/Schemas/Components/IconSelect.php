@@ -26,7 +26,6 @@ class IconSelect
             ->native(false)
             ->searchable()
             ->allowHtml()
-            ->options(fn (): Collection => $service->getOptions())
             ->getSearchResultsUsing(fn (string $search): Collection => $service->getOptions($search))
             ->getOptionLabelUsing(fn (?string $value): ?string => filled($value) ? Str::headline($value) : null)
             ->live()

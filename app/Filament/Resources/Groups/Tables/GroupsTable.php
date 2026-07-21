@@ -14,6 +14,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
@@ -43,9 +44,10 @@ class GroupsTable
                     ->falseLabel(__('Unsent Invitations')),
             ])
             ->recordActions([
-                ShareGroupAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                ShareGroupAction::make()->iconButton(),
+                ViewAction::make()->iconButton(),
+                EditAction::make()->iconButton(),
+                DeleteAction::make()->iconButton(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

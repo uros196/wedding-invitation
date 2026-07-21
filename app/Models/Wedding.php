@@ -75,6 +75,14 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
+     * Determine if the RSVP is currently open based on the RSVP deadline.
+     */
+    protected function isRsvpOpen(): Attribute
+    {
+        return Attribute::get(fn () => $this->rsvp_deadline->isFuture());
+    }
+
+    /**
      * Get the attribute for the countdown due date and time.
      */
     protected function countdownDueDatetime(): Attribute

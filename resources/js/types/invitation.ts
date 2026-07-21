@@ -35,6 +35,8 @@ export interface Wedding {
     wedding_date: string;
     /** Formatted RSVP deadline (e.g. `01.09.2026 20:00`). */
     rsvp_deadline: string;
+    /** Whether RSVPs are still open. */
+    is_rsvp_open: boolean;
     /** ISO 8601 datetime used by the countdown. */
     countdown_due_datetime: string;
     /** Rich-text (HTML) welcome message. */

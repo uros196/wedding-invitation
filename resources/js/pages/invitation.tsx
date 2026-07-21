@@ -25,8 +25,7 @@ export default function Invitation({ wedding, group, metaData }: InvitationPageP
                 <meta property="og:image" content={metaData.image ?? wedding.hero_image} />
             </Head>
 
-            <div
-                className="flex min-h-screen w-full flex-col items-center"
+            <div className="flex min-h-screen w-full flex-col items-center"
                 style={{ backgroundColor: palette.background }}
             >
                 <div className="mx-auto w-full max-w-lg">
@@ -44,9 +43,7 @@ export default function Invitation({ wedding, group, metaData }: InvitationPageP
 
                     <ProgramSection timelines={wedding.timelines} />
 
-                    <CountdownSection
-                        targetDate={wedding.countdown_due_datetime}
-                    />
+                    <CountdownSection targetDate={wedding.countdown_due_datetime} />
 
                     {group.invitation_title && group.invitation_message && (
                         <GuestMessage
@@ -55,10 +52,12 @@ export default function Invitation({ wedding, group, metaData }: InvitationPageP
                         />
                     )}
 
-                    <RSVPForm
-                        group={group}
-                        rsvpDeadline={wedding.rsvp_deadline}
-                    />
+                    {wedding.is_rsvp_open && (
+                        <RSVPForm
+                            group={group}
+                            rsvpDeadline={wedding.rsvp_deadline}
+                        />
+                    )}
 
                     {/* Footer */}
                     <div

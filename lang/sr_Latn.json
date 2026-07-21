@@ -4,6 +4,7 @@
     "Add": "Dodaj",
     "First Name": "Ime",
     "Last Name": "Prezime",
+    "Name": "Ime",
     "Group": "Grupa",
     "Status": "Status",
     "Age": "Uzrast",
@@ -88,5 +89,9 @@
     "Remove": "Ukloni",
     "Remove companion": "Ukloni kompanjona",
     "Are you sure you want to remove this companion from the list?": "Da li ste sigurni da želite da uklonite ovog kompanjona iz liste?",
-    "You must select a guest or create a new one.": "Morate izabrati gosta ili kreirati novog."
+    "You must select a guest or create a new one.": "Morate izabrati gosta ili kreirati novog.",
+    "Select an icon": "Izaberite ikonicu",
+    "Visibility": "Vidljivost",
+    "Custom": "Prilagođeno",
+    "Not set": "Nije podešeno"
 }

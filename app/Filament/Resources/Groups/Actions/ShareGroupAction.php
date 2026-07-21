@@ -21,7 +21,7 @@ class ShareGroupAction
             ->color('gray')
             ->alpineClickHandler(fn (Group $record) => "
                 (async () => {
-                    const url = '{$record->url}';
+                    const url = '".addslashes($record->url)."';
                     const title = '".addslashes($record->name)."';
 
                     if (navigator.share) {

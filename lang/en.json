@@ -4,6 +4,7 @@
     "Add": "Add",
     "First Name": "First Name",
     "Last Name": "Last Name",
+    "Name": "Name",
     "Group": "Group",
     "Status": "Status",
     "Age": "Age",
@@ -88,5 +89,9 @@
     "Remove": "Remove",
     "Remove companion": "Remove companion",
     "Are you sure you want to remove this companion from the list?": "Are you sure you want to remove this companion from the list?",
-    "You must select a guest or create a new one.": "You must select a guest or create a new one."
+    "You must select a guest or create a new one.": "You must select a guest or create a new one.",
+    "Select an icon": "Select an icon",
+    "Visibility": "Visibility",
+    "Custom": "Custom",
+    "Not set": "Not set"
 }

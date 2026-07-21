@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Groups\Schemas\Components;
+namespace App\Filament\Resources\Groups\Schemas\Components\Form;
 
 use App\Models\Group;
 use App\Models\WeddingTimeline;

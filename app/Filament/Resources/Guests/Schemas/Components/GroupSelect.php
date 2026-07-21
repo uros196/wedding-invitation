@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Guests\Schemas\Components;
 
-use App\Filament\Resources\Groups\Schemas\Components\NameInput;
+use App\Filament\Resources\Groups\Schemas\Components\Form\NameInput;
 use Filament\Forms\Components\Select;
 
 class GroupSelect

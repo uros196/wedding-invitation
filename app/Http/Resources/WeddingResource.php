@@ -25,6 +25,7 @@ class WeddingResource extends JsonResource
             'wedding_day' => $this->wedding_date->dayName,
             'wedding_date' => $this->wedding_date->format(config('wedding.invitation.countdown.wedding_format')),
             'rsvp_deadline' => $this->rsvp_deadline->format(config('wedding.invitation.countdown.rsvp_format')),
+            'is_rsvp_open' => $this->is_rsvp_open,
             'countdown_due_datetime' => $this->countdown_due_datetime,
             'welcome_text' => $this->welcome_text,
             'timelines_count' => $this->timelines_count,
