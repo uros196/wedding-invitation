@@ -94,5 +94,16 @@
     "Select an icon": "Izaberite ikonicu",
     "Visibility": "Vidljivost",
     "Custom": "Prilagođeno",
-    "Not set": "Nije podešeno"
+    "Not set": "Nije podešeno",
+    "Memory Wall": "Zid uspomena",
+    "Enable Memory Wall": "Omogući zid uspomena",
+    "Memory Wall Open Until": "Zid uspomena otvoren do",
+    "QR Code": "QR kod",
+    "Memory Wall URL": "URL zida uspomena",
+    "Download": "Preuzmi",
+    "Files uploaded successfully.": "Fajlovi su uspešno otpremljeni.",
+    "Bride": "Mlada",
+    "Groom": "Mladoženja",
+    "Users": "Korisnici",
+    "Format": "Format"
 }

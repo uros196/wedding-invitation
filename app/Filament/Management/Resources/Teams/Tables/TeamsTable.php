@@ -8,6 +8,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 /**
@@ -26,15 +27,17 @@ class TeamsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('wedding.bride_name')
-                    ->label('Bride')
+                    ->label(__('Bride'))
                     ->searchable(),
                 TextColumn::make('wedding.groom_name')
-                    ->label('Groom')
+                    ->label(__('Groom'))
                     ->searchable(),
                 TextColumn::make('users_count')
                     ->counts('users')
-                    ->label('Users')
+                    ->label(__('Users'))
                     ->sortable(),
+                ToggleColumn::make('has_memory_wall')
+                    ->label(__('Memory Wall')),
             ])
             ->filters([
                 //

@@ -16,6 +16,13 @@ return [
             'wedding_format' => 'd.m.Y',
             'rsvp_format' => 'd.m.Y H:i',
         ],
+
+        'memory_wall' => [
+            // Default value for memory wall form open duration.
+            // Wedding day will be used in the calculation.
+            // Value expressed in days
+            'form_open_for' => 1,
+        ],
     ],
 
     /*

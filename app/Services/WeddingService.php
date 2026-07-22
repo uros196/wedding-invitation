@@ -84,4 +84,5 @@ class WeddingService
     {
         return $wedding?->timelines()->visible()->get() ?? collect();
     }
+
 }

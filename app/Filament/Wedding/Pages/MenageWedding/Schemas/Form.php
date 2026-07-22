@@ -8,6 +8,10 @@ use App\Filament\Wedding\Pages\MenageWedding\EmptyStates\NoTimelineDefinedState;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\BrideNameInput;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\GroomNameInput;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\HeroImageFileUpload;
+use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallOpenUntilPicker;
+use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallQrCode;
+use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallToggle;
+use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallUrlInput;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MetaDescriptionTextarea;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MetaImageFileUpload;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MetaTitleInput;
@@ -15,6 +19,7 @@ use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\RSVPDeadlinePick
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\TimelineRepeater;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\WeddingDatePicker;
 use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\WelcomeTextRichEditor;
+use App\Models\Wedding;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -62,6 +67,18 @@ class Form
                     ->schema([
                         NoTimelineDefinedState::make(false),
                         TimelineRepeater::make(),
+                    ]),
+
+                Section::make(__('Memory Wall'))
+                    ->visible(fn () => auth()->user()->can('enableMemoryWall', Wedding::class))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                MemoryWallToggle::make(),
+                                MemoryWallOpenUntilPicker::make(),
+                            ]),
+                        MemoryWallQrCode::make(),
+                        MemoryWallUrlInput::make(),
                     ]),
 
                 Section::make(__('Meta Data'))

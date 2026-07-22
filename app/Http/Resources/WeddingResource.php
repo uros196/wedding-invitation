@@ -19,6 +19,7 @@ class WeddingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'uuid' => $this->uuid,
             'bride_name' => $this->bride_name,
             'groom_name' => $this->groom_name,
             'hero_image' => $this->getHeroImageUrl(),
@@ -28,8 +29,12 @@ class WeddingResource extends JsonResource
             'is_rsvp_open' => $this->is_rsvp_open,
             'countdown_due_datetime' => $this->countdown_due_datetime,
             'welcome_text' => $this->welcome_text,
-            'timelines_count' => $this->timelines_count,
-            'timelines' => WeddingTimelineResource::collection($this->timelines),
+            'timelines_count' => $this->whenCounted('timelines'),
+            'timelines' => WeddingTimelineResource::collection($this->whenLoaded('timelines')),
+
+            // Memory Wall
+            'has_memory_wall' => $this->has_memory_wall,
+            'is_memory_wall_form_open' => $this->is_memory_wall_form_open,
         ];
     }
 }

@@ -1,41 +1,27 @@
 import { Head } from '@inertiajs/react';
-
 import CountdownSection from '@/components/invitation/CountdownSection';
+import EventMemories from '@/components/invitation/EventMemories';
 import GuestMessage from '@/components/invitation/GuestMessage';
 import HeroSection from '@/components/invitation/HeroSection';
 import ProgramSection from '@/components/invitation/ProgramSection';
 import RSVPForm from '@/components/invitation/RSVP/RSVPForm';
 import { fonts, palette } from '@/components/invitation/theme';
 import WelcomeMessage from '@/components/invitation/WelcomeMessage';
-import EventMemories from '@/components/invitation/EventMemories';
-
 import type { InvitationPageProps } from '@/types';
-import { Import } from 'lucide-react';
 
 /**
  * The dynamic wedding invitation. Every piece of content is provided by the
  * server (`GroupController::show`); this page only composes the sections.
  */
-export default function Invitation({
-    wedding,
-    group,
-    metaData,
-}: InvitationPageProps) {
-    console.log(wedding);
+export default function Invitation({ wedding, group, metaData, }: InvitationPageProps) {
     return (
         <>
             <Head title={metaData.title}>
                 <meta name="description" content={metaData.description} />
                 <meta property="og:title" content={metaData.title} />
-                <meta
-                    property="og:description"
-                    content={metaData.description}
-                />
+                <meta property="og:description" content={metaData.description} />
                 <meta property="og:type" content="website" />
-                <meta
-                    property="og:image"
-                    content={metaData.image ?? wedding.hero_image}
-                />
+                <meta property="og:image" content={metaData.image ?? wedding.hero_image} />
             </Head>
 
             <div
@@ -73,10 +59,10 @@ export default function Invitation({
                             rsvpDeadline={wedding.rsvp_deadline}
                         />
                     )}
-{/* 
-                    {!wedding.is_rsvp_open && (
+
+                    {!wedding.is_rsvp_open && wedding.has_memory_wall && (
                         <EventMemories wedding={wedding} />
-                    )} */}
+                    )}
 
                     {/* Footer */}
                     <div

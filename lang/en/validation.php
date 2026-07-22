@@ -187,6 +187,13 @@ return [
     // Custom validation messages.
     'chronological_order' => 'The :attribute events must be in chronological order.',
     'full_name' => 'This field may only contain letters, spaces, hyphens, and apostrophes.',
+    'media_size' => ':Type may not be larger than :limit.',
+
+    'media_types' => [
+        'image' => 'Images',
+        'video' => 'Videos',
+        'file' => 'Files',
+    ],
 
     /*
     |--------------------------------------------------------------------------

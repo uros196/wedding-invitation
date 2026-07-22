@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('has_memory_wall')->default(true);
             $table->timestamps();
         });
     }

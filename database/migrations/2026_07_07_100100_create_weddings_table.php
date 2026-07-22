@@ -15,12 +15,15 @@ return new class extends Migration
     {
         Schema::create('weddings', function (Blueprint $table) {
             $table->id();
+            $table->uuid()->unique();
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->string('bride_name')->nullable();
             $table->string('groom_name')->nullable();
             $table->date('wedding_date')->nullable();
             $table->datetime('rsvp_deadline')->nullable();
             $table->text('welcome_text')->nullable();
+            $table->boolean('has_memory_wall')->default(true);
+            $table->dateTime('memory_wall_open_until')->nullable();
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->timestamps();

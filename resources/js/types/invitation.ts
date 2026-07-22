@@ -26,6 +26,7 @@ export interface WeddingTimelineItem {
  * The wedding details shared across the whole invitation.
  */
 export interface Wedding {
+    uuid: string;
     bride_name: string;
     groom_name: string;
     hero_image: string;
@@ -43,6 +44,26 @@ export interface Wedding {
     welcome_text: string;
     timelines_count: number | null;
     timelines: WeddingTimelineItem[];
+    /** Memory wall related data */
+    has_memory_wall: boolean;
+    is_memory_wall_form_open: boolean;
+}
+
+/**
+ * Represents a media object with details about its file properties and metadata.
+ */
+export interface Media {
+    id: number,
+    uuid: string,
+    name: string,
+    file_name: string,
+    mime_type: string,
+    type: string,
+    extension: string,
+    human_readable_size: string,
+    preview_url: string,
+    original_url: string,
+    size: number,
 }
 
 /**
@@ -74,7 +95,7 @@ export interface Group {
 export interface MetaData {
     title: string;
     description: string;
-    image: string | null;
+    image: string;
 }
 
 /**
@@ -85,4 +106,10 @@ export interface InvitationPageProps {
     group: Group;
     metaData: MetaData;
     [key: string]: unknown;
+}
+
+export interface MemoryWallPageProps {
+    wedding: Wedding;
+    metaData: MetaData;
+    media: Media[];
 }

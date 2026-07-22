@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Observers\WeddingObserver;
+use App\Policies\WeddingPolicy;
+use App\Services\MemoryWallService;
 use App\Support\Countdown;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,9 +17,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+#[ObservedBy(WeddingObserver::class)]
+#[UsePolicy(WeddingPolicy::class)]
 class Wedding extends Model implements HasMedia
 {
     use HasFactory;
@@ -32,6 +41,8 @@ class Wedding extends Model implements HasMedia
         'wedding_date',
         'rsvp_deadline',
         'welcome_text',
+        'has_memory_wall',
+        'memory_wall_open_until',
         'meta_title',
         'meta_description',
     ];
@@ -44,6 +55,8 @@ class Wedding extends Model implements HasMedia
         return [
             'wedding_date' => 'date',
             'rsvp_deadline' => 'datetime',
+            'has_memory_wall' => 'boolean',
+            'memory_wall_open_until' => 'datetime',
         ];
     }
 
@@ -134,12 +147,35 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
+     * Determine if the memory wall form is currently open.
+     */
+    protected function isMemoryWallFormOpen(): Attribute
+    {
+        return Attribute::get(fn () => resolve(MemoryWallService::class)->isFormOpen($this));
+    }
+
+    /**
+     * Define an accessor to retrieve the URL for the memory wall of the wedding.
+     */
+    protected function memoryWallUrl(): Attribute
+    {
+        return Attribute::get(fn () => route('memory-wall.show', ['wedding' => $this]));
+    }
+
+    /**
      * Register the media collections for the wedding.
      */
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('hero')->singleFile();
         $this->addMediaCollection('meta_image')->singleFile();
+
+        // Declare the MemoryWall media collection
+        $this->addMediaCollection('MemoryWall')
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Contain, 368, 235);
+            });
     }
 
     /**

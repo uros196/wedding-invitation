@@ -187,6 +187,13 @@ return [
     // Custom validation messages.
     'chronological_order' => 'Događaji u :attribute moraju biti u hronološkom redosledu.',
     'full_name' => 'Ovo polje može sadržati samo slova, razmake, crtice i apostrofe.',
+    'media_size' => ':Type ne mogu biti veći od :limit.',
+
+    'media_types' => [
+        'image' => 'Slike',
+        'video' => 'Video snimci',
+        'file' => 'Fajlovi',
+    ],
 
     /*
     |--------------------------------------------------------------------------

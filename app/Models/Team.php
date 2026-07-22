@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Observers\TeamObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-/**
- * Represents a team of users who manage a wedding.
- */
+#[ObservedBy(TeamObserver::class)]
 class Team extends Model
 {
     use HasFactory;
@@ -23,7 +23,18 @@ class Team extends Model
      */
     protected $fillable = [
         'name',
+        'has_memory_wall',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'has_memory_wall' => 'boolean',
+        ];
+    }
 
     /**
      * Get the related wedding.
