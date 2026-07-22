@@ -31,7 +31,7 @@ export default function HeroSection({ brideName, groomName, imageUrl }: HeroSect
             {/* Names layered over the image */}
             <div className="absolute top-0 right-0 left-0 flex flex-col items-center pt-4 sm:pt-6">
                 <motion.h1
-                    className="text-4xl drop-shadow-lg sm:text-5xl md:text-6xl"
+                    className="text-5xl drop-shadow-lg sm:text-6xl md:text-7xl"
                     style={{ fontFamily: fonts.script, color: palette.celestial }}
                     initial={{ opacity: 0, x: -80 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -51,7 +51,7 @@ export default function HeroSection({ brideName, groomName, imageUrl }: HeroSect
                 </motion.span>
 
                 <motion.h1
-                    className="text-4xl drop-shadow-lg sm:text-5xl md:text-6xl"
+                    className="text-5xl drop-shadow-lg sm:text-6xl md:text-7xl"
                     style={{ fontFamily: fonts.script, color: palette.celestial }}
                     initial={{ opacity: 0, x: 80 }}
                     animate={{ opacity: 1, x: 0 }}

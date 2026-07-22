@@ -47,7 +47,7 @@ export default function ProgramSection({ timelines }: ProgramSectionProps) {
                             >
                                 {event.time && (
                                     <p
-                                        className="text-2xl font-light sm:text-3xl"
+                                        className="text-xl font-light sm:text-2xl"
                                         style={{ color: palette.deep, fontFamily: fonts.numbers }}
                                     >
                                         {event.time}

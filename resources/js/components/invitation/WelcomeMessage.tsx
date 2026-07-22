@@ -26,7 +26,7 @@ export default function WelcomeMessage({ welcomeText, weddingDay, weddingDate }:
                     backgroundPosition: 'top',
                 }}
             />
-            <div className="relative z-20 w-full overflow-visible pb-10" style={{ backgroundColor: palette.background }}>
+            <div className="relative z-20 w-full overflow-visible pb-5" style={{ backgroundColor: palette.background }}>
                 {welcomeText && (
                     <motion.div
                         className="px-8 pt-10 pb-6 text-center text-base leading-relaxed font-light italic sm:text-lg [&_p]:m-0"
@@ -51,7 +51,7 @@ export default function WelcomeMessage({ welcomeText, weddingDay, weddingDate }:
                         {weddingDay}
                     </p>
                     <p
-                        className="mt-1 text-3xl sm:text-5xl"
+                        className="mt-1 text-2xl sm:text-4xl"
                         style={{ color: palette.deep, fontFamily: fonts.numbers, fontWeight: 100 }}
                     >
                         {weddingDate}
