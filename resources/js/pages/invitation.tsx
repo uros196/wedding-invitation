@@ -7,24 +7,39 @@ import ProgramSection from '@/components/invitation/ProgramSection';
 import RSVPForm from '@/components/invitation/RSVP/RSVPForm';
 import { fonts, palette } from '@/components/invitation/theme';
 import WelcomeMessage from '@/components/invitation/WelcomeMessage';
+import EventMemories from '@/components/invitation/EventMemories';
+
 import type { InvitationPageProps } from '@/types';
+import { Import } from 'lucide-react';
 
 /**
  * The dynamic wedding invitation. Every piece of content is provided by the
  * server (`GroupController::show`); this page only composes the sections.
  */
-export default function Invitation({ wedding, group, metaData }: InvitationPageProps) {
+export default function Invitation({
+    wedding,
+    group,
+    metaData,
+}: InvitationPageProps) {
+    console.log(wedding);
     return (
         <>
             <Head title={metaData.title}>
                 <meta name="description" content={metaData.description} />
                 <meta property="og:title" content={metaData.title} />
-                <meta property="og:description" content={metaData.description} />
+                <meta
+                    property="og:description"
+                    content={metaData.description}
+                />
                 <meta property="og:type" content="website" />
-                <meta property="og:image" content={metaData.image ?? wedding.hero_image} />
+                <meta
+                    property="og:image"
+                    content={metaData.image ?? wedding.hero_image}
+                />
             </Head>
 
-            <div className="flex min-h-screen w-full flex-col items-center"
+            <div
+                className="flex min-h-screen w-full flex-col items-center"
                 style={{ backgroundColor: palette.background }}
             >
                 <div className="mx-auto w-full max-w-lg">
@@ -41,8 +56,9 @@ export default function Invitation({ wedding, group, metaData }: InvitationPageP
                     />
 
                     <ProgramSection timelines={wedding.timelines} />
-
-                    <CountdownSection targetDate={wedding.countdown_due_datetime} />
+                    <CountdownSection
+                        targetDate={wedding.countdown_due_datetime}
+                    />
 
                     {group.invitation_title && group.invitation_message && (
                         <GuestMessage
@@ -57,6 +73,10 @@ export default function Invitation({ wedding, group, metaData }: InvitationPageP
                             rsvpDeadline={wedding.rsvp_deadline}
                         />
                     )}
+{/* 
+                    {!wedding.is_rsvp_open && (
+                        <EventMemories wedding={wedding} />
+                    )} */}
 
                     {/* Footer */}
                     <div
