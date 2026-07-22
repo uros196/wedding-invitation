@@ -7,16 +7,21 @@ namespace App\Models;
 use App\Contracts\HasCounts;
 use App\Models\Concerns\Countable;
 use App\Observers\GroupObserver;
+use App\Policies\GroupPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[ObservedBy(GroupObserver::class)]
+#[UsePolicy(GroupPolicy::class)]
+
 class Group extends Model implements HasCounts, HasMedia
 {
     use Countable;
@@ -29,6 +34,7 @@ class Group extends Model implements HasCounts, HasMedia
      * @var array<int, string>
      */
     protected $fillable = [
+        'wedding_id',
         'uuid',
         'name',
         'is_sent',
@@ -55,11 +61,22 @@ class Group extends Model implements HasCounts, HasMedia
     }
 
     /**
+     * Get related wedding.
+     */
+    public function wedding(): BelongsTo
+    {
+        return $this->belongsTo(Wedding::class);
+    }
+
+    /**
      * Get the timeline items that are hidden for this group.
      */
     public function hiddenTimelineItems(): BelongsToMany
     {
-        return $this->belongsToMany(WeddingTimeline::class, 'group_hidden_timeline_items');
+        return $this->belongsToMany(WeddingTimeline::class, 'group_hidden_timeline_items')
+            ->where('group_hidden_timeline_items.wedding_id', $this->wedding_id)
+            ->withPivot('wedding_id')
+            ->withTimestamps();
     }
 
     /**
@@ -100,6 +117,14 @@ class Group extends Model implements HasCounts, HasMedia
     public function getMetaImageUrl(): ?string
     {
         return $this->getFirstMediaUrl('meta_image') ?: null;
+    }
+
+    /**
+     * Determine if the related wedding exists.
+     */
+    public function hasWedding(): bool
+    {
+        return $this->wedding()->exists();
     }
 
     /**

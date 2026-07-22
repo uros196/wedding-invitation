@@ -27,17 +27,16 @@ class GroupController
      */
     public function show(Group $group): Response
     {
-        $group->load('guests');
-        $wedding = $this->weddingService->getWedding();
+        $group->load('guests', 'wedding');
 
         // Get available timelines for the group and attach them to the wedding
-        $wedding->setRelation('timelines', $this->groupService->getAvailableTimeline($group, $wedding));
+        $group->wedding->setRelation('timelines', $this->groupService->getAvailableTimeline($group));
 
         $metaData = $this->metaFactory->forGroup($group);
 
         return Inertia::render('invitation', [
             'metaData' => MetaDataResource::make($metaData),
-            'wedding' => WeddingResource::make($wedding),
+            'wedding' => WeddingResource::make($group->wedding),
             'group' => GroupResource::make($group),
         ]);
     }

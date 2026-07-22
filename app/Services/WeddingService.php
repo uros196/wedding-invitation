@@ -5,43 +5,83 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\DTOs\InvitationStatsData;
+use App\Models\Group;
+use App\Models\User;
 use App\Models\Wedding;
+use App\Models\WeddingTimeline;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
+/**
+ * Provides wedding data for public and authenticated application flows.
+ */
 class WeddingService
 {
     /**
      * Get invitation statistics.
      */
-    public function getInvitationStats(): InvitationStatsData
+    public function getInvitationStats(User $user): InvitationStatsData
     {
-        return InvitationStatsData::make();
+        $wedding = $this->getWeddingForUser($user)
+            ?->loadSum('groups', 'views_count')
+            ?->loadCount([
+                'groups as sent_invitations_count' => fn (Builder $query): Builder => $query
+                    ->where('is_sent', true),
+            ]);
+
+        return InvitationStatsData::make($wedding);
     }
 
     /**
-     * Get the single wedding record, creating it if it does not exist yet.
+     * Resolve the wedding associated with a guest group.
      */
-    public function getWedding(): Wedding
+    public function getWeddingForGroup(Group $group): Wedding
     {
-        return Wedding::firstOrCreate([]);
+        return $group->wedding()->firstOrFail();
+    }
+
+    /**
+     * Resolve the wedding associated with a user's team, if it exists.
+     */
+    public function getWeddingForUser(User $user): ?Wedding
+    {
+        return $user->loadMissing('team.wedding')->team?->wedding;
     }
 
     /**
      * Get wedding data for filling the management form.
-     *
-     * @return array<string, mixed>
      */
-    public function getWeddingData(Wedding $wedding): array
+    public function getWeddingData(?Wedding $wedding): array
     {
-        return $wedding->load('timelines')->attributesToArray();
+        return $wedding?->load('timelines')->attributesToArray() ?? [];
     }
 
     /**
      * Save or update wedding data.
-     *
-     * @param  array<string, mixed>  $data
      */
-    public function saveWeddingData(Wedding $wedding, array $data): void
+    public function saveWeddingData(?Wedding $wedding, User $user, array $data): Wedding
     {
-        $wedding->update($data);
+        $wedding ??= Wedding::make();
+        $wedding->fill($data);
+
+        $team = $user->team()->firstOrFail();
+
+        if ($wedding->team_id !== $team->id) {
+            $wedding->team()->associate($team);
+        }
+
+        $wedding->save();
+
+        return $wedding;
+    }
+
+    /**
+     * Retrieves a collection of visible timelines associated with the given wedding.
+     *
+     * @return Collection<WeddingTimeline>
+     */
+    public function timelineList(?Wedding $wedding): Collection
+    {
+        return $wedding?->timelines()->visible()->get() ?? collect();
     }
 }

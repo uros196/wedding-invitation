@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Filament\Wedding\Resources\Groups\Schemas\Components\Form;
+
+use App\Models\Group;
+use App\Services\GroupService;
+use Filament\Forms\Components\TextInput;
+use Webbingbrasil\FilamentCopyActions\Actions\CopyAction;
+
+class UuidInput
+{
+    /**
+     * Generate a UUID input field component.
+     */
+    public static function make(): TextInput
+    {
+        return TextInput::make('uuid')
+            ->label(__('UUID (Invitation Link)'))
+            ->disabled()
+            ->dehydrated(false)
+            ->visible(fn (?Group $record): bool => app(GroupService::class)->isRecordExists($record))
+            ->suffixAction(CopyAction::make())
+            ->columnSpan(1);
+    }
+}

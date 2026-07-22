@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
-use App\Filament\Resources\Groups\Pages\EditGroup;
+use App\Filament\Wedding\Resources\Groups\Pages\EditGroup;
 use App\Models\Group;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;

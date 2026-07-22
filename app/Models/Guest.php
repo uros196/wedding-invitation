@@ -7,8 +7,12 @@ namespace App\Models;
 use App\Enums\Age;
 use App\Enums\Gender;
 use App\Enums\GuestStatus;
+use App\Models\Scopes\UserWeddingGuestScope;
 use App\Observers\GuestObserver;
+use App\Policies\GuestPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +21,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ObservedBy(GuestObserver::class)]
+#[ScopedBy(UserWeddingGuestScope::class)]
+#[UsePolicy(GuestPolicy::class)]
+
 class Guest extends Model
 {
     use HasFactory;
@@ -29,6 +36,7 @@ class Guest extends Model
     protected $fillable = [
         'group_id',
         'parent_id',
+        'team_id',
         'first_name',
         'last_name',
         'status',
@@ -73,6 +81,14 @@ class Guest extends Model
     public function companions(): HasMany
     {
         return $this->hasMany(Guest::class, 'parent_id');
+    }
+
+    /**
+     * Get the related user's team.
+     */
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
     }
 
     /**

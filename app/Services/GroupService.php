@@ -7,6 +7,7 @@ namespace App\Services;
 use App\DTOs\ConfirmAttendanceData;
 use App\Enums\GuestStatus;
 use App\Models\Group;
+use App\Models\Message;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Models\WeddingTimeline;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Notification;
 
 class GroupService
 {
+    public function __construct(protected WeddingService $weddingService) {}
+
     /**
      * Check if the record exists (for field visibility).
      */
@@ -29,31 +32,33 @@ class GroupService
     /**
      * Get the most viewed groups.
      */
-    public function getMostViewedGroups(int $limit = 5): Builder
+    public function getMostViewedGroups(User $user, int $limit = 5): Builder
     {
-        return Group::query()->orderByDesc('views_count')->limit($limit);
+        $user->loadMissing('team.wedding');
+        $weddingId = $user->team?->wedding?->id;
+
+        return Group::query()
+            ->when(
+                $weddingId,
+                fn (Builder $query): Builder => $query->where('wedding_id', $weddingId),
+                fn (Builder $query): Builder => $query->whereKey(-1),
+            )
+            ->orderByDesc('views_count')
+            ->limit($limit);
     }
 
     /**
-     * Retrieve the available timeline for a given group, optionally scoped to a specified wedding.
-     *
-     * If no wedding is provided, the function will retrieve the first wedding in the database.
+     * Retrieve the available timeline for a given group.
      * Any timeline items that are marked as hidden for the group will be excluded from the result.
      *
-     * @return Collection<WeddingTimeline>
+     * @return Collection<int, WeddingTimeline>
      */
-    public function getAvailableTimeline(?Group $group, ?Wedding $wedding = null): Collection
+    public function getAvailableTimeline(?Group $group): Collection
     {
-        $wedding ??= Wedding::first();
+        $timeline = $this->weddingService->timelineList($group?->wedding);
 
-        if (! $wedding) {
+        if (blank($timeline)) {
             return collect();
-        }
-
-        $timeline = $wedding->timelines()->visible()->get();
-
-        if (! $group) {
-            return $timeline;
         }
 
         $hiddenIds = $group->hiddenTimelineItems()->pluck('wedding_timeline_id')->toArray();
@@ -70,9 +75,12 @@ class GroupService
      */
     public function syncTimeline(Group $group, ?array $state): void
     {
-        $allVisibleIds = resolve(WeddingTimelineService::class)->getAvailableList();
+        $allVisibleIds = $this->weddingService->timelineList($group->wedding)->pluck('id')->toArray();
         $hiddenIds = array_values(array_diff($allVisibleIds, $state ?? []));
-        $group->hiddenTimelineItems()->sync($hiddenIds);
+
+        $group->hiddenTimelineItems()->syncWithPivotValues($hiddenIds, [
+            'wedding_id' => $group->wedding_id,
+        ]);
     }
 
     /**
@@ -129,7 +137,7 @@ class GroupService
      */
     protected function notifyAdminsAboutConfirmation(Group $group, array $confirmedGuestIds): void
     {
-        $admins = User::all();
+        $admins = $this->getWeddingUsers($group->wedding);
 
         Notification::send(
             $admins,
@@ -140,10 +148,24 @@ class GroupService
     /**
      * Notify administrators about a new message.
      */
-    protected function notifyAdminsAboutMessage(Group $group, $message): void
+    protected function notifyAdminsAboutMessage(Group $group, Message $message): void
     {
-        $admins = User::all();
+        $admins = $this->getWeddingUsers($group->wedding);
 
         Notification::send($admins, new NewMessageReceived($group, $message));
+    }
+
+    /**
+     * Get users assigned to teams for the group's wedding.
+     *
+     * @return Collection<int, User>
+     */
+    protected function getWeddingUsers(?Wedding $wedding): Collection
+    {
+        if (! $wedding) {
+            return collect();
+        }
+
+        return $wedding->users()->get();
     }
 }

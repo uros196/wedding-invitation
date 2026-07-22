@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
-use App\Filament\Resources\Messages\MessageResource;
+use App\Filament\Wedding\Resources\Messages\MessageResource;
 use App\Models\Group;
 use App\Models\Message;
 use Filament\Actions\Action;

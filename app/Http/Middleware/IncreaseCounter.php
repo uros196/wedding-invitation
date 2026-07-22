@@ -6,6 +6,8 @@ namespace App\Http\Middleware;
 
 use App\Contracts\HasCounts;
 use Closure;
+use Filament\Exceptions\NoDefaultPanelSetException;
+use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,10 +28,14 @@ class IncreaseCounter
      * Handle an incoming request.
      *
      * @param  Closure(Request): (Response)  $next
+     *
+     * @throws NoDefaultPanelSetException
      */
     public function handle(Request $request, Closure $next, ?string $routeModel = null): Response
     {
-        $this->model($request, $routeModel)->increaseCount();
+        if ($this->increaseCountAllowed($request)) {
+            $this->model($request, $routeModel)->increaseCount();
+        }
 
         return $next($request);
     }
@@ -57,5 +63,16 @@ class IncreaseCounter
     {
         /** @var HasCounts */
         return $request->route($routeModel ?? $this->modelRouteKey());
+    }
+
+    /**
+     * Check if counts are allowed to increase.
+     *
+     * @throws NoDefaultPanelSetException
+     */
+    protected function increaseCountAllowed(Request $request): bool
+    {
+        // If the request holds authenticated Filament user, skip the count increase.
+        return ! ((bool) $request->user()?->canAccessPanel(Filament::getCurrentOrDefaultPanel()));
     }
 }

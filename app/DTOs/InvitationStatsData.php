@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DTOs;
 
-use App\Models\Group;
 use App\Models\Wedding;
 
 final readonly class InvitationStatsData
@@ -14,14 +15,14 @@ final readonly class InvitationStatsData
     ) {}
 
     /**
-     * Make data object using default queries/counts.
+     * Make an InvitationStatsData instance based on a given Wedding.
      */
-    public static function make(): self
+    public static function make(?Wedding $wedding = null): self
     {
         return new self(
-            sentInvitationsCount: Group::whereIsSent(true)->count(),
-            totalViews: (int) Group::sum('views_count'),
-            wedding: Wedding::first(),
+            sentInvitationsCount: $wedding?->sent_invitations_count ?? 0,
+            totalViews: $wedding?->groups_sum_views_count ?? 0,
+            wedding: $wedding,
         );
     }
 }

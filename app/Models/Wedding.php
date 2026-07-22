@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -24,6 +26,7 @@ class Wedding extends Model implements HasMedia
      * @var array<int, string>
      */
     protected $fillable = [
+        'team_id',
         'bride_name',
         'groom_name',
         'wedding_date',
@@ -50,6 +53,38 @@ class Wedding extends Model implements HasMedia
     public function timelines(): HasMany
     {
         return $this->hasMany(WeddingTimeline::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get related groups for the wedding.
+     */
+    public function groups(): HasMany
+    {
+        return $this->hasMany(Group::class);
+    }
+
+    /**
+     * Get the related guests for the wedding.
+     */
+    public function guests(): HasManyThrough
+    {
+        return $this->hasManyThrough(Guest::class, Group::class);
+    }
+
+    /**
+     * Get the team managing the wedding.
+     */
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    /**
+     * Get users assigned to the wedding's team.
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'team_id', 'team_id');
     }
 
     /**

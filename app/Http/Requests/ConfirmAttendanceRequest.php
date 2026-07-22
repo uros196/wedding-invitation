@@ -13,6 +13,17 @@ use Illuminate\Validation\Rule;
 class ConfirmAttendanceRequest extends FormRequest
 {
     /**
+     * Determine if the request is authorized.
+     */
+    public function authorize(): bool
+    {
+        /** @var Group $group */
+        $group = $this->route('group');
+
+        return (bool) $group->wedding?->is_rsvp_open;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array

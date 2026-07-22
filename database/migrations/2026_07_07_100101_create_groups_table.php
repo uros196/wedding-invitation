@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('groups', function (Blueprint $table) {
+            $table->id();
+            $table->uuid()->unique();
+            $table->foreignId('wedding_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->boolean('is_sent')->default(false);
+            $table->boolean('has_plus_one')->default(false);
+            $table->unsignedInteger('views_count')->default(0);
+            $table->string('invitation_title')->nullable();
+            $table->text('invitation_message')->nullable();
+            $table->string('meta_title')->nullable()->after('description');
+            $table->text('meta_description')->nullable()->after('meta_title');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('groups');
+    }
+};

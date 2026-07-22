@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('group_hidden_timeline_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('group_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('wedding_id')->constrained()->cascadeOnDelete();
             $table->foreignId('wedding_timeline_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

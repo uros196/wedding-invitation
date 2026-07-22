@@ -35,12 +35,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->databaseNotificationsPolling(null)
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverResources(in: app_path('Filament/Wedding/Resources'), for: 'App\Filament\Wedding\Resources')
+            ->discoverPages(in: app_path('Filament/Wedding/Pages'), for: 'App\Filament\Wedding\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Wedding/Widgets'), for: 'App\Filament\Wedding\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,

@@ -14,14 +14,6 @@ use App\Models\Wedding;
  */
 class MetaFactory
 {
-    protected ?Wedding $wedding;
-
-    public function __construct()
-    {
-        // Initialize first (and only) wedding from DB
-        $this->wedding = Wedding::first();
-    }
-
     /**
      * Build metadata from configuration defaults, allowing overrides.
      *
@@ -41,8 +33,6 @@ class MetaFactory
      */
     public function forWedding(?Wedding $wedding = null): MetaData
     {
-        $wedding ??= $this->wedding;
-
         return $this->make([
             'title' => $wedding?->meta_title,
             'description' => $wedding?->meta_description,
@@ -55,7 +45,8 @@ class MetaFactory
      */
     public function forGroup(?Group $group): MetaData
     {
-        $weddingMeta = $this->forWedding();
+        $wedding = $group?->wedding;
+        $weddingMeta = $this->forWedding($wedding);
 
         return new MetaData(
             title: (string) $this->firstFilled($group?->meta_title, $weddingMeta->title),
