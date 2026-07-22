@@ -25,6 +25,7 @@ class GroupResource extends JsonResource
             'invitation_message' => $this->invitation_message,
             'has_plus_one' => $this->has_plus_one,
             'guests_count' => $this->guests_count,
+            'has_single_guest' => $this->guests_count === 1,
             'guests' => GuestResource::collection($this->whenLoaded('guests')),
         ];
     }

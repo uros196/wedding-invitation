@@ -186,6 +186,7 @@ return [
 
     // Custom validation messages.
     'chronological_order' => 'Događaji u :attribute moraju biti u hronološkom redosledu.',
+    'full_name' => 'Ovo polje može sadržati samo slova, razmake, crtice i apostrofe.',
 
     /*
     |--------------------------------------------------------------------------

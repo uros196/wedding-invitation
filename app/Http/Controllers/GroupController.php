@@ -14,7 +14,7 @@ use App\Support\MetaFactory;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class GroupController
+class GroupController extends Controller
 {
     public function __construct(
         protected GroupService $groupService,
@@ -27,7 +27,9 @@ class GroupController
      */
     public function show(Group $group): Response
     {
-        $group->load('guests', 'wedding');
+        $group->load('guests', 'wedding')
+            ->loadCount('guests')
+            ->wedding->loadCount('timelines');
 
         // Get available timelines for the group and attach them to the wedding
         $group->wedding->setRelation('timelines', $this->groupService->getAvailableTimeline($group));

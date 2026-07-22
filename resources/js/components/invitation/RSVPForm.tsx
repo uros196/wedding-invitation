@@ -1,17 +1,8 @@
 import { useForm } from '@inertiajs/react';
-import {
-    Circle,
-    CircleCheckBig,
-    Heart,
-    Plus,
-    Send,
-    UserRoundPlus,
-} from 'lucide-react';
+import { Circle, CircleCheckBig, Heart, UserRoundPlus} from 'lucide-react';
 import { useState } from 'react';
-
 import { confirm } from '@/routes/group';
 import type { Group } from '@/types';
-
 import { FloatingLabelInput, FloatingLabelTextarea } from './FloatingField';
 import { fonts, palette } from './theme';
 
@@ -25,8 +16,7 @@ interface RSVPFormData {
     confirmed_guest_ids: number[];
     message: string;
     plus_one: {
-        first_name: string;
-        last_name: string;
+        full_name: string;
     };
 }
 
@@ -51,14 +41,11 @@ export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
             .filter((guest) => guest.is_accepted)
             .map((guest) => guest.id),
         message: '',
-        plus_one: { first_name: '', last_name: '' },
+        plus_one: { full_name: '' },
     });
 
-    const hasPlusOneData = Boolean(
-        data.plus_one.first_name || data.plus_one.last_name,
-    );
-    const includePlusOne =
-        group.has_plus_one && plusOneExpanded && hasPlusOneData;
+    const hasPlusOneData = Boolean(data.plus_one.full_name);
+    const includePlusOne = group.has_plus_one && plusOneExpanded && hasPlusOneData;
 
     transform((formData) => ({
         confirmed_guest_ids: formData.confirmed_guest_ids,
@@ -78,6 +65,10 @@ export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         post(confirm.url(group.uuid), { preserveScroll: true });
+    };
+
+    const singleGuestLabel = (selected: bool) => {
+        return selected ? 'Potvrdjeno' : 'Potvrdi dolazak';
     };
 
     if (wasSuccessful) {
@@ -139,8 +130,7 @@ export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
                         </label>
                         <div className="flex flex-col gap-3">
                             {group.guests.map((guest) => {
-                                const selected =
-                                    data.confirmed_guest_ids.includes(guest.id);
+                                const selected = data.confirmed_guest_ids.includes(guest.id);
 
                                 return (
                                     <button
@@ -149,34 +139,20 @@ export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
                                         onClick={() => toggleGuest(guest.id)}
                                         className="relative flex w-full items-center justify-center rounded-lg px-4 py-3.5 text-base font-medium tracking-wide transition-all duration-300"
                                         style={{
-                                            backgroundColor: selected
-                                                ? palette.deep
-                                                : 'rgba(255, 255, 255, 0.5)',
-                                            color: selected
-                                                ? palette.background
-                                                : palette.dawn,
+                                            backgroundColor: selected ? palette.deep : 'rgba(255, 255, 255, 0.5)',
+                                            color: selected ? palette.background : palette.dawn,
                                             border: '1px solid rgba(67, 58, 102, 0.2)',
                                         }}
                                     >
                                         <span className="absolute left-4 flex items-center">
                                             {selected ? (
-                                                <CircleCheckBig
-                                                    size={18}
-                                                    style={{
-                                                        color: palette.background,
-                                                    }}
-                                                />
+                                                <CircleCheckBig size={18} style={{ color: palette.background }} />
                                             ) : (
-                                                <Circle
-                                                    size={18}
-                                                    style={{
-                                                        color: palette.dawn,
-                                                    }}
-                                                />
+                                                <Circle size={18} style={{ color: palette.dawn }} />
                                             )}
                                         </span>
                                         <span className="truncate">
-                                            {guest.full_name}
+                                            {group.has_single_guest ? singleGuestLabel(selected) : guest.full_name}
                                         </span>
                                     </button>
                                 );
@@ -197,9 +173,8 @@ export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
                                 onClick={() =>
                                     setPlusOneExpanded((expanded) => !expanded)
                                 }
-                                // Sve klase su sada u jednom čistom stringu, bez cn() funkcije
-                                className="group mt-6 flex h-[60px] w-full cursor-pointer items-center justify-between rounded-[16px] border border-gray-200 bg-gray-100 px-6 transition-all duration-200 hover:border-gray-300 hover:bg-gray-200"
-                                style={{ color: palette.celestial }} // Boja teksta ostaje dinamička
+                                className="group mt-6 flex h-15 w-full cursor-pointer items-center justify-between rounded-2xl border border-gray-200 bg-gray-100 px-6 transition-all duration-200 hover:border-gray-300 hover:bg-gray-200"
+                                style={{ color: palette.celestial }}
                             >
                                 {/* Tekst */}
                                 <span className="text-lg font-medium select-none">
@@ -208,55 +183,23 @@ export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
 
                                 <UserRoundPlus
                                     size={30}
-
                                     className="text-#0B2F5B-100 group-hover:bg-#9875A6-50 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-none transition-transform duration-500 ease-in-out"
                                 />
                             </button>
-                            {/* <button
-                                type="button"
-                                onClick={() =>
-                                    setPlusOneExpanded((expanded) => !expanded)
-                                }
-                                className="flex items-center gap-2 self-start text-base font-medium transition-all duration-300"
-                                style={{ color: palette.celestial }}
-                            >
-                                Imaš pratnju?
-                                <Plus
-                                    size={14}
-                                    className="transition-transform duration-500"
-                                    style={{
-                                        transform: plusOneExpanded
-                                            ? 'rotate(45deg)'
-                                            : 'rotate(0deg)',
-                                    }}
-                                />
-                            </button> */}
 
                             {plusOneExpanded && (
                                 <div className="mt-2 flex animate-in flex-col gap-4 overflow-hidden pt-3 duration-500 fade-in slide-in-from-top-2">
                                     <FloatingLabelInput
                                         id="plus_one_first_name"
-                                        label="Ime pratnje"
-                                        value={data.plus_one.first_name}
+                                        label="Ime i prezime pratnje"
+                                        value={data.plus_one.full_name}
                                         onChange={(event) =>
                                             setData('plus_one', {
                                                 ...data.plus_one,
-                                                first_name: event.target.value,
+                                                full_name: event.target.value,
                                             })
                                         }
-                                        error={errors['plus_one.first_name']}
-                                    />
-                                    <FloatingLabelInput
-                                        id="plus_one_last_name"
-                                        label="Prezime pratnje"
-                                        value={data.plus_one.last_name}
-                                        onChange={(event) =>
-                                            setData('plus_one', {
-                                                ...data.plus_one,
-                                                last_name: event.target.value,
-                                            })
-                                        }
-                                        error={errors['plus_one.last_name']}
+                                        error={errors['plus_one.full_name']}
                                     />
                                 </div>
                             )}

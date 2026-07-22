@@ -6,8 +6,10 @@ namespace App\Http\Requests;
 
 use App\DTOs\ConfirmAttendanceData;
 use App\Models\Group;
+use App\Rules\FullNameRule;
 use App\Rules\GuestInGroupRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ConfirmAttendanceRequest extends FormRequest
@@ -34,14 +36,25 @@ class ConfirmAttendanceRequest extends FormRequest
         return [
             'confirmed_guest_ids' => ['array'],
             'confirmed_guest_ids.*' => ['exists:guests,id', new GuestInGroupRule($group)],
-            'message' => ['nullable', 'string', 'max:5000'],
+            'message' => ['nullable', 'string', 'max:1000'],
             'plus_one' => [
                 Rule::when($group->has_plus_one, ['nullable', 'array']),
                 Rule::when(! $group->has_plus_one, ['prohibited']),
             ],
-            'plus_one.first_name' => ['required_with:plus_one', 'string', 'max:50'],
-            'plus_one.last_name' => ['required_with:plus_one', 'string', 'max:50'],
+            'plus_one.full_name' => ['required_with:plus_one', 'string', 'max:50', new FullNameRule],
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (filled($fullName = $this->input('plus_one.full_name'))) {
+            $this->merge([
+                'plus_one.full_name' => Str::squish($fullName),
+            ]);
+        }
     }
 
     /**

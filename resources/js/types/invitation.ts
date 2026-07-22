@@ -64,6 +64,7 @@ export interface Group {
     invitation_message: string | null;
     has_plus_one: boolean;
     guests_count: number | null;
+    has_single_guest: boolean;
     guests: Guest[];
 }
 

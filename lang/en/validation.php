@@ -186,6 +186,7 @@ return [
 
     // Custom validation messages.
     'chronological_order' => 'The :attribute events must be in chronological order.',
+    'full_name' => 'This field may only contain letters, spaces, hyphens, and apostrophes.',
 
     /*
     |--------------------------------------------------------------------------

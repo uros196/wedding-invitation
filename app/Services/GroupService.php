@@ -96,10 +96,12 @@ class GroupService
             $parentGuest = $group->guests->first();
 
             if ($parentGuest) {
+                [$firstName, $lastName] = array_pad(explode(' ', $data->plusOne['full_name'], 2), 2, '');
+
                 $plusOneGuest = $group->guests()->create([
                     'parent_id' => $parentGuest->id,
-                    'first_name' => $data->plusOne['first_name'],
-                    'last_name' => $data->plusOne['last_name'],
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
                     'status' => GuestStatus::Confirmed,
                 ]);
 
