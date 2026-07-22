@@ -44,7 +44,7 @@ export function FloatingLabelInput({ id, label, error, className, ...props }: Fl
                         'backdrop-blur-sm bg-#EEF1F5 px-1 rounded',
                         'top-1/2 -translate-y-1/2 text-sm',
                         'peer-focus:top-0 peer-focus:bg-[#F3F5F8]',
-                        'peer-[:not(:placeholder-shown)]:top-0 ',
+                        'peer-not-placeholder-shown:top-0 ',
                     )}
                 >
                     {label}
@@ -87,7 +87,7 @@ export function FloatingLabelTextarea({ id, label, error, className, ...props }:
                         'backdrop-blur-sm bg-#EEF1F5 px-1 rounded',
                         'top-3 text-sm',
                         'peer-focus:-top-2 peer-focus:text-sm peer-focus:bg-[#F3F5F8]',
-                        'peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-sm',
+                        'peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-sm',
                     )}
                 >
                     {label}

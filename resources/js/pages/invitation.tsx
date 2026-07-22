@@ -4,7 +4,7 @@ import CountdownSection from '@/components/invitation/CountdownSection';
 import GuestMessage from '@/components/invitation/GuestMessage';
 import HeroSection from '@/components/invitation/HeroSection';
 import ProgramSection from '@/components/invitation/ProgramSection';
-import RSVPForm from '@/components/invitation/RSVPForm';
+import RSVPForm from '@/components/invitation/RSVP/RSVPForm';
 import { fonts, palette } from '@/components/invitation/theme';
 import WelcomeMessage from '@/components/invitation/WelcomeMessage';
 import type { InvitationPageProps } from '@/types';
