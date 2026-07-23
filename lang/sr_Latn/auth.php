@@ -17,4 +17,7 @@ return [
     'password' => 'Data lozinka nije ispravna.',
     'throttle' => 'Previše pokušaja prijave. Molimo pokušajte ponovo za :seconds sekundi.',
 
+    'login' => [
+        'management_heading' => 'Menadžment Prijava',
+    ],
 ];

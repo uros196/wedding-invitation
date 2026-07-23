@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Auth\ManagementLogin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,7 +29,7 @@ class ManagementPanelProvider extends PanelProvider
         return $panel
             ->id('management')
             ->path('management')
-            ->login()
+            ->login(ManagementLogin::class)
             ->colors([
                 'primary' => Color::Amber,
             ])
