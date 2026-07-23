@@ -23,8 +23,8 @@ return new class extends Migration
             $table->unsignedInteger('views_count')->default(0);
             $table->string('invitation_title')->nullable();
             $table->text('invitation_message')->nullable();
-            $table->string('meta_title')->nullable()->after('description');
-            $table->text('meta_description')->nullable()->after('meta_title');
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
             $table->timestamps();
         });
     }

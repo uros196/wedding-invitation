@@ -29,7 +29,7 @@ class MemoryWallQrCode
 
         return TextEntry::make('memory_wall_qr_code')
             ->label(__('QR Code'))
-            ->visible(fn (Get $get): bool => (bool) $get('has_memory_wall'))
+            ->visible(fn (Get $get, ?Wedding $wedding): bool => (bool) $get('has_memory_wall') && $wedding?->exists)
             ->state(function (?Wedding $record) use ($service): HtmlString {
                 $qrCode = $record?->exists
                     ? $service->generateQrCode($record, 100)
