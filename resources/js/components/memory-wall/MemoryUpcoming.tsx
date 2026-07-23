@@ -1,27 +1,29 @@
-import { Calendar, Camera } from 'lucide-react';
-import { fonts, palette } from '../invitation/theme'; 
+import { Calendar, Camera, ArrowLeft } from 'lucide-react';
+import { fonts, palette } from '../invitation/theme';
+import { Wedding } from '@/types';
 
 interface MemoryUpcomingProps {
-    eventDate: string; // npr. "19. septembar 2026."
+    wedding: Wedding;
 }
 
-export default function MemoryUpcoming({ eventDate }: MemoryUpcomingProps) {
+export default function MemoryUpcoming({ wedding }: MemoryUpcomingProps) {
     return (
         <div
-className="min-h-screen w-full flex flex-col items-center justify-start px-4 pt-16 sm:pt-24 pb-12"            style={{
+            className="flex min-h-screen w-full flex-col items-center justify-start px-4 pt-16 pb-12 sm:pt-24"
+            style={{
                 backgroundColor: palette.background,
                 fontFamily: fonts.serif,
             }}
         >
             <div
-                className="mx-auto max-w-md rounded-2xl p-6 sm:p-8 text-center"
+                className="mx-auto max-w-md rounded-2xl p-6 text-center sm:p-8"
                 style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.3)',
                     border: '1px solid rgba(67, 58, 102, 0.15)',
                 }}
             >
                 <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                    className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
                     style={{
                         backgroundColor: 'rgba(67, 58, 102, 0.08)',
                         color: palette.deep,
@@ -41,22 +43,44 @@ className="min-h-screen w-full flex flex-col items-center justify-start px-4 pt-
                     className="mb-6 text-base leading-relaxed"
                     style={{ color: palette.dawn }}
                 >
-                    Radujemo se danu koji je pred nama! Dok iščekujemo proslavu zakazanu za{' '}
-                    <span className="font-medium" style={{ color: palette.deep }}>
-                        {eventDate}
+                    Radujemo se danu koji je pred nama! Dok iščekujemo proslavu
+                    zakazanu za{' '}
+                    <span
+                        className="font-medium"
+                        style={{ color: palette.deep }}
+                    >
+                        {wedding.wedding_date}
                     </span>
-                    , ovde vredno spremamo mesto gde ćemo nakon svega zajedno sabrati sve uspomene i fotografije.
+                    , ovde vredno spremamo mesto gde ćemo nakon svega zajedno
+                    sabrati sve uspomene i fotografije.
                 </p>
 
                 <div
-                    className="rounded-xl p-4 text-xs sm:text-sm flex items-center justify-center gap-2"
+                    className="flex items-center justify-center gap-2 rounded-xl p-5 text-xs sm:text-sm"
                     style={{
                         backgroundColor: 'rgba(67, 58, 102, 0.05)',
                         color: palette.deep,
                     }}
                 >
-                    <Calendar size={16} className="flex-shrink-0" style={{ color: palette.celestial }} />
+                    <Calendar
+                        size={16}
+                        className="flex-shrink-0"
+                        style={{ color: palette.celestial }}
+                    />
                     <span>Stranica će se aktivirati na dan venčanja!</span>
+                </div>
+                <div className="flex justify-center pt-3">
+                    <a
+                        href="/" // Ovde cemo staviti rutu ili link do glavne pozivnice
+                        className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-medium shadow-sm transition-all duration-200 hover:opacity-90"
+                        style={{
+                            backgroundColor: palette.deep,
+                            color: palette.background,
+                        }}
+                    >
+                        <ArrowLeft size={16} />
+                        <span>Nazad na pozivnicu</span>
+                    </a>
                 </div>
             </div>
         </div>
