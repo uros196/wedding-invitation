@@ -1,12 +1,11 @@
-import { Calendar, Camera, ArrowLeft } from 'lucide-react';
+import { Calendar, Camera } from 'lucide-react';
 import { fonts, palette } from '../invitation/theme';
-import { Wedding } from '@/types';
 
 interface MemoryUpcomingProps {
-    wedding: Wedding;
+    weddingDate: string;
 }
 
-export default function MemoryUpcoming({ wedding }: MemoryUpcomingProps) {
+export default function MemoryUpcoming({ weddingDate }: MemoryUpcomingProps) {
     return (
         <div
             className="flex min-h-screen w-full flex-col items-center justify-start px-4 pt-16 pb-12 sm:pt-24"
@@ -32,24 +31,15 @@ export default function MemoryUpcoming({ wedding }: MemoryUpcomingProps) {
                     <Camera size={24} />
                 </div>
 
-                <h3
-                    className="mb-2 text-3xl font-medium tracking-wide"
-                    style={{ color: palette.deep }}
-                >
+                <h3 className="mb-2 text-3xl font-medium tracking-wide" style={{ color: palette.deep }}>
                     Uskoro: Naše uspomene
                 </h3>
 
-                <p
-                    className="mb-6 text-base leading-relaxed"
-                    style={{ color: palette.dawn }}
-                >
+                <p className="mb-6 text-base leading-relaxed" style={{ color: palette.dawn }}>
                     Radujemo se danu koji je pred nama! Dok iščekujemo proslavu
                     zakazanu za{' '}
-                    <span
-                        className="font-medium"
-                        style={{ color: palette.deep }}
-                    >
-                        {wedding.wedding_date}
+                    <span className="font-medium" style={{ color: palette.deep }}>
+                        {weddingDate}
                     </span>
                     , ovde vredno spremamo mesto gde ćemo nakon svega zajedno
                     sabrati sve uspomene i fotografije.
@@ -64,14 +54,15 @@ export default function MemoryUpcoming({ wedding }: MemoryUpcomingProps) {
                 >
                     <Calendar
                         size={16}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                         style={{ color: palette.celestial }}
                     />
                     <span>Stranica će se aktivirati na dan venčanja!</span>
                 </div>
-                <div className="flex justify-center pt-3">
-                    <a
-                        href="/" // Ovde cemo staviti rutu ili link do glavne pozivnice
+
+                {/*<div className="flex justify-center pt-3">
+                    <Link
+                        href="/"
                         className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-medium shadow-sm transition-all duration-200 hover:opacity-90"
                         style={{
                             backgroundColor: palette.deep,
@@ -80,8 +71,8 @@ export default function MemoryUpcoming({ wedding }: MemoryUpcomingProps) {
                     >
                         <ArrowLeft size={16} />
                         <span>Nazad na pozivnicu</span>
-                    </a>
-                </div>
+                    </Link>
+                </div>*/}
             </div>
         </div>
     );

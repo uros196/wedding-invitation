@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Wedding\Pages\MenageWedding\Schemas\Components;
+namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
 use App\Enums\AspectRatio;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -16,9 +16,9 @@ class HeroImageFileUpload
     {
         $aspectRatios = collect(AspectRatio::forHero())->map->value;
 
-        return SpatieMediaLibraryFileUpload::make('hero')
+        return SpatieMediaLibraryFileUpload::make('Hero')
             ->hiddenLabel()
-            ->collection('hero')
+            ->collection('Hero')
             ->image()
             ->imageEditor()
             ->imageAspectRatio($aspectRatios->toArray())

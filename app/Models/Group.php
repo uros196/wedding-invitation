@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -117,15 +118,22 @@ class Group extends Model implements HasCounts, HasMedia
      */
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('meta_image')->singleFile();
+        // Declare the MetaImage media collection
+        $this->addMediaCollection('MetaImage')
+            ->singleFile()
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('preview')
+                    ->fit(Fit::Contain, 600, 600)
+                    ->format('webp');
+            });
     }
 
     /**
      * Get the URL of the image used for meta tags, if any.
      */
-    public function getMetaImageUrl(): ?string
+    public function getMetaImageUrl(string $conversion = ''): ?string
     {
-        return $this->getFirstMediaUrl('meta_image') ?: null;
+        return $this->getFirstMediaUrl('MetaImage', $conversion) ?: null;
     }
 
     /**

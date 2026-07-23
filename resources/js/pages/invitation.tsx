@@ -57,6 +57,7 @@ export default function Invitation({ wedding, group, metaData, }: InvitationPage
                         <RSVPForm
                             group={group}
                             rsvpDeadline={wedding.rsvp_deadline}
+                            hasMemoryWall={wedding.has_memory_wall}
                         />
                     )}
 

@@ -36,7 +36,7 @@ class MetaFactory
         return $this->make([
             'title' => $wedding?->meta_title,
             'description' => $wedding?->meta_description,
-            'image' => $wedding?->getMetaImageUrl(),
+            'image' => $wedding?->getMetaImageUrl('preview'),
         ]);
     }
 
@@ -51,7 +51,7 @@ class MetaFactory
         return new MetaData(
             title: (string) $this->firstFilled($group?->meta_title, $weddingMeta->title),
             description: (string) $this->firstFilled($group?->meta_description, $weddingMeta->description),
-            image: $this->firstFilled($group?->getMetaImageUrl(), $weddingMeta->image),
+            image: $this->firstFilled($group?->getMetaImageUrl('preview'), $weddingMeta->image),
         );
     }
 

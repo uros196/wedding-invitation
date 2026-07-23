@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Wedding\Pages\MenageWedding\Schemas;
+namespace App\Filament\Wedding\Pages\ManageWedding\Schemas;
 
-use App\Filament\Wedding\Pages\MenageWedding\EmptyStates\NoTimelineDefinedState;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\BrideNameInput;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\GroomNameInput;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\HeroImageFileUpload;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallOpenUntilPicker;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallQrCode;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallToggle;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MemoryWallUrlInput;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MetaDescriptionTextarea;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MetaImageFileUpload;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\MetaTitleInput;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\RSVPDeadlinePicker;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\TimelineRepeater;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\WeddingDatePicker;
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Components\WelcomeTextRichEditor;
+use App\Filament\Wedding\Pages\ManageWedding\EmptyStates\NoTimelineDefinedState;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\BrideNameInput;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\GroomNameInput;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\HeroImageFileUpload;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\MemoryWallOpenUntilPicker;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\MemoryWallQrCode;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\MemoryWallToggle;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\MemoryWallUrlInput;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\MetaDescriptionTextarea;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\MetaImageFileUpload;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\MetaTitleInput;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\RSVPDeadlinePicker;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\TimelineRepeater;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\WeddingDatePicker;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\WelcomeTextRichEditor;
 use App\Models\Wedding;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;

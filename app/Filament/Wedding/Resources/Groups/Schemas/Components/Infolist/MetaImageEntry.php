@@ -14,9 +14,9 @@ class MetaImageEntry
      */
     public static function make(): ImageEntry
     {
-        return ImageEntry::make('meta_image')
+        return ImageEntry::make('MetaImage')
             ->label(__('messages.meta.image'))
-            ->state(fn (Group $record): ?string => $record->getMetaImageUrl())
-            ->height(180);
+            ->state(fn (Group $record): ?string => $record->getMetaImageUrl('preview'))
+            ->imageHeight(180);
     }
 }

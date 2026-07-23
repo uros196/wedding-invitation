@@ -17,7 +17,6 @@ export default function ShownAfter() {
                     border: '1px solid rgba(67, 58, 102, 0.15)',
                 }}
             >
-                {/* Ikonica umesto obične tačke - može simbola srca ili mlade i mladoženje */}
                 <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5"
                     style={{
@@ -28,17 +27,11 @@ export default function ShownAfter() {
                     <Heart size={24} className="fill-current" style={{ color: palette.celestial }} />
                 </div>
 
-                <h3
-                    className="mb-3 text-3xl font-medium tracking-wide"
-                    style={{ color: palette.deep }}
-                >
+                <h3 className="mb-3 text-3xl font-medium tracking-wide" style={{ color: palette.deep }}>
                     Hvala vam!
                 </h3>
 
-                <p
-                    className="mb-6 text-base leading-relaxed"
-                    style={{ color: palette.dawn }}
-                >
+                <p className="mb-6 text-base leading-relaxed" style={{ color: palette.dawn }}>
                     Hvala vam što ste bili deo našeg najlepšeg dana i što ste svojim prisustvom ulepšali svaku uspomenu. Nadamo se da ste uživali isto koliko i mi!
                 </p>
 
@@ -49,7 +42,7 @@ export default function ShownAfter() {
                         color: palette.deep,
                     }}
                 >
-                    <MessageCircleHeart size={18} className="flex-shrink-0" style={{ color: palette.celestial }} />
+                    <MessageCircleHeart size={18} className="shrink-0" style={{ color: palette.celestial }} />
                     <span>Ukoliko ste zaboravili da pošaljete neku fotografiju ili snimak, slobodno nas kontaktirajte!</span>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Wedding\Pages\MenageWedding\Schemas\Components;
+namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
 use App\Enums\QrCodeFormat;
 use App\Enums\QrCodeSize;
@@ -26,15 +26,11 @@ class MemoryWallQrCode
     {
         $service = resolve(MemoryWallService::class);
 
-
         return TextEntry::make('memory_wall_qr_code')
             ->label(__('QR Code'))
             ->visible(fn (Get $get, ?Wedding $wedding): bool => (bool) $get('has_memory_wall') && $wedding?->exists)
             ->state(function (?Wedding $record) use ($service): HtmlString {
-                $qrCode = $record?->exists
-                    ? $service->generateQrCode($record, 100)
-                    : '';
-
+                $qrCode = $record?->exists ? $service->generateQrCode($record, 100) : '';
                 return new HtmlString($qrCode);
             })
             ->hintAction(

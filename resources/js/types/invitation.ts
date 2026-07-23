@@ -32,8 +32,14 @@ export interface Wedding {
     hero_image: string;
     /** Localized day name (e.g. `subota`). */
     wedding_day: string;
-    /** Formatted wedding date (e.g. `19.09.2026`). */
+    /** Formatted wedding date (e.g. `10.09.2026`). */
     wedding_date: string;
+    /** Flag that marks whether the wedding is coming. */
+    is_wedding_coming: boolean;
+    /** Flag that marks whether the wedding is today. */
+    is_wedding_date: boolean;
+    /** Flag that marks whether the wedding is finished. */
+    is_finished: boolean;
     /** Formatted RSVP deadline (e.g. `01.09.2026 20:00`). */
     rsvp_deadline: string;
     /** Whether RSVPs are still open. */
@@ -47,6 +53,7 @@ export interface Wedding {
     /** Memory wall related data */
     has_memory_wall: boolean;
     is_memory_wall_form_open: boolean;
+    is_memory_wall_finished: boolean;
 }
 
 /**

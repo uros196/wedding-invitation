@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Resources\Groups\Schemas;
 
-use App\Filament\Wedding\Pages\MenageWedding\EmptyStates\NoTimelineDefinedState;
+use App\Filament\Wedding\Pages\ManageWedding\EmptyStates\NoTimelineDefinedState;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Form\HasPlusOneToggle;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Form\InvitationMessageTextarea;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Form\InvitationTitleInput;

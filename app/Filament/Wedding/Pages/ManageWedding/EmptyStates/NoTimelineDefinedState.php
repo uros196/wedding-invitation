@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Wedding\Pages\MenageWedding\EmptyStates;
+namespace App\Filament\Wedding\Pages\ManageWedding\EmptyStates;
 
-use App\Filament\Wedding\Pages\MenageWedding\ManageWedding;
+use App\Filament\Wedding\Pages\ManageWedding\ManageWedding;
 use Filament\Actions\Action;
 use Filament\Schemas\Components\EmptyState;
 use Filament\Schemas\Components\Utilities\Get;

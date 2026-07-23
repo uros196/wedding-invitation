@@ -170,33 +170,49 @@ class Wedding extends Model implements HasMedia
      */
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('hero')->singleFile();
-        $this->addMediaCollection('meta_image')->singleFile();
+        // Declare the Hero media collection
+        $this->addMediaCollection('Hero')
+            ->singleFile()
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('preview')
+                    ->fit(Fit::Contain, 1000, 1000)
+                    ->format('webp');
+            });
+
+        // Declare the MetaImage media collection
+        $this->addMediaCollection('MetaImage')
+            ->singleFile()
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('preview')
+                    ->fit(Fit::Contain, 500, 500)
+                    ->format('webp');
+            });
 
         // Declare the MemoryWall media collection
         $this->addMediaCollection('MemoryWall')
             ->registerMediaConversions(function (Media $media) {
-                $this->addMediaConversion('thumb')
-                    ->fit(Fit::Contain, 368, 235);
+                $this->addMediaConversion('preview')
+                    ->fit(Fit::Contain, 368, 235)
+                    ->format('webp');
             });
     }
 
     /**
      * Get the URL of the hero image displayed on the invitation.
      */
-    public function getHeroImageUrl(): string
+    public function getHeroImageUrl(string $conversion = ''): string
     {
-        return $this->getFirstMediaUrl('hero');
+        return $this->getFirstMediaUrl('Hero', $conversion);
     }
 
     /**
      * Get the URL of the image used for meta tags.
      * Falls back to the hero image when no dedicated meta-image is set.
      */
-    public function getMetaImageUrl(): string
+    public function getMetaImageUrl(string $conversion = ''): string
     {
-        return $this->getFirstMediaUrl('meta_image')
-            ?: $this->getHeroImageUrl();
+        return $this->getFirstMediaUrl('MetaImage', $conversion)
+            ?: $this->getHeroImageUrl($conversion);
     }
 
     /**

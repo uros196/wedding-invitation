@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Wedding\Pages\MenageWedding;
+namespace App\Filament\Wedding\Pages\ManageWedding;
 
-use App\Filament\Wedding\Pages\MenageWedding\Schemas\Form;
+use App\Filament\Wedding\Pages\ManageWedding\Schemas\Form;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Services\WeddingService;

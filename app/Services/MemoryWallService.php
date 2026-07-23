@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use function App\Enums\QrCodeFormat;
 
 class MemoryWallService
 {

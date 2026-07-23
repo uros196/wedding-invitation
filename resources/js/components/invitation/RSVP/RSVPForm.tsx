@@ -13,6 +13,7 @@ interface RSVPFormProps {
     group: Group;
     /** Formatted RSVP deadline shown in the intro copy. */
     rsvpDeadline: string;
+    hasMemoryWall: boolean;
 }
 
 /**
@@ -20,7 +21,7 @@ interface RSVPFormProps {
  * group allows it) and can leave a message for the couple. The data is posted
  * to the `group.confirm` route via Inertia.
  */
-export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
+export default function RSVPForm({ group, rsvpDeadline, hasMemoryWall }: RSVPFormProps) {
     const [confirmedGuestIds, setConfirmedGuestIds] = useState<number[]>(
         group.guests
             .filter((guest) => guest.is_accepted)
@@ -62,7 +63,7 @@ export default function RSVPForm({ group, rsvpDeadline }: RSVPFormProps) {
         >
             {({ errors, processing, wasSuccessful }) => {
                 if (wasSuccessful) {
-                    return <RSVPConfirmation />;
+                    return <RSVPConfirmation hasMemoryWall={hasMemoryWall} />;
                 }
 
                 return (

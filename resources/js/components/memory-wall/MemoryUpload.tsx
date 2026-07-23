@@ -1,8 +1,9 @@
+import { useForm } from '@inertiajs/react';
+import { Upload, Image as ImageIcon, Loader2, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
-import { useForm, Link } from '@inertiajs/react';
-import { Upload, ArrowLeft, Image as ImageIcon, Loader2, CheckCircle2 } from 'lucide-react';
+import { upload } from '@/actions/App/Http/Controllers/MemoryWallController';
+import type { Wedding } from '@/types';
 import { fonts, palette } from '../invitation/theme';
-import { Wedding } from '@/types';
 
 interface MemoryUploadProps {
     wedding: Wedding;
@@ -17,15 +18,15 @@ export default function MemoryUpload({wedding}: MemoryUploadProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // post(route('memory-wall.upload', myroute), {
-        //     forceFormData: true,
-        //     onSuccess: () => {
-        //         reset('media');
-        //         setSuccessMessage(true);
-        //         setTimeout(() => setSuccessMessage(false), 5000);
-        //     },
-        // });
+
+        post(upload(wedding.uuid).url, {
+            forceFormData: true,
+            onSuccess: () => {
+                reset('media');
+                setSuccessMessage(true);
+                setTimeout(() => setSuccessMessage(false), 5000);
+            },
+        });
     };
 
     return (
@@ -71,7 +72,7 @@ export default function MemoryUpload({wedding}: MemoryUploadProps) {
                 <form onSubmit={handleSubmit} className="space-y-4 mb-6">
                     {/* Naša custom zona za izbor fajlova */}
                     <label
-                        className="border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all hover:opacity-80 block"
+                        className="border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all hover:opacity-80"
                         style={{
                             borderColor: 'rgba(67, 58, 102, 0.25)',
                             backgroundColor: 'rgba(255, 255, 255, 0.5)',
@@ -147,7 +148,7 @@ export default function MemoryUpload({wedding}: MemoryUploadProps) {
                     )}
                 </form>
 
-            
+
             </div>
         </div>
     );

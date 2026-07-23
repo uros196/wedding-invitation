@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Wedding\Pages\MenageWedding\Schemas\Components;
+namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
 use Filament\Forms\Components\TextInput;
 

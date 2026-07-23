@@ -14,11 +14,12 @@ class MetaImageFileUpload
     {
         $aspectRatios = collect(AspectRatio::forMeta())->map->value;
 
-        return SpatieMediaLibraryFileUpload::make('meta_image')
+        return SpatieMediaLibraryFileUpload::make('MetaImage')
             ->label(__('Meta Image'))
             ->helperText(__('Optional. If left empty, the wedding meta data will be used.'))
-            ->collection('meta_image')
+            ->collection('MetaImage')
             ->image()
+            ->conversion('preview')
             ->imageEditor()
             ->imageAspectRatio($aspectRatios->toArray())
             ->imageEditorAspectRatioOptions($aspectRatios->toArray());
