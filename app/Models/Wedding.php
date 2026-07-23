@@ -159,7 +159,10 @@ class Wedding extends Model implements HasMedia
      */
     protected function memoryWallUrl(): Attribute
     {
-        return Attribute::get(fn () => route('memory-wall.show', ['wedding' => $this]));
+        return Attribute::get(fn () => $this->exists
+            ? route('memory-wall.show', $this)
+            : null
+        );
     }
 
     /**

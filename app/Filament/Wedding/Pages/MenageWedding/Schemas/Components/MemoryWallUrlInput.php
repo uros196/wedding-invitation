@@ -19,7 +19,7 @@ class MemoryWallUrlInput
         return TextInput::make('memory_wall_url')
             ->label(__('Memory Wall URL'))
             ->readonly()
-            ->visible(fn (Get $get, ?Wedding $wedding): bool => (bool) $get('has_memory_wall') && filled($wedding))
+            ->visible(fn (Get $get, ?Wedding $wedding): bool => (bool) $get('has_memory_wall') && $wedding?->exists)
             ->afterStateHydrated(function (TextInput $component, ?Wedding $record) {
                 if (filled($record)) {
                     $component->state($record->memory_wall_url);

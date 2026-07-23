@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\QrCodeFormat;
 use App\Models\Wedding;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use function App\Enums\QrCodeFormat;
 
 class MemoryWallService
 {
@@ -59,18 +63,32 @@ class MemoryWallService
     /**
      * Generate a QR code for the wedding's memory wall.
      */
-    public function generateQrCode(Wedding $wedding): string
+    public function generateQrCode(Wedding $wedding, int $size = 200): string
     {
-        return $this->getQrCode($wedding)->toHtml();
+        return $this->getQrCode($wedding, $size)->toHtml();
     }
 
     /**
      * Get the QR code instance for the wedding's memory wall.
      */
-    public function getQrCode(Wedding $wedding, string $format = 'svg'): \Illuminate\Support\HtmlString|string
+    public function getQrCode(Wedding $wedding, int $size = 200, ?QrCodeFormat $format = null): HtmlString|string
     {
-        return QrCode::format($format)
-            ->size(200)
+        return QrCode::format(($format ?? QrCodeFormat::default())->value)
+            ->size($size)
             ->generate($wedding->memory_wall_url);
+    }
+
+    /**
+     * Stream the QR code file for the specified wedding and download option.
+     */
+    public function downloadQrCode(Wedding $wedding, QrCodeFormat $option, int $size = 200): StreamedResponse
+    {
+        $qrCode = $this->getQrCode($wedding, $size, $option);
+
+        return response()->streamDownload(
+            fn () => print($qrCode),
+            "qr-code-{$wedding->uuid}.{$option->extension()}",
+            ['Content-Type' => $option->contentType()]
+        );
     }
 }
