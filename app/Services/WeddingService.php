@@ -25,8 +25,7 @@ class WeddingService
         $wedding = $this->getWeddingForUser($user)
             ?->loadSum('groups', 'views_count')
             ?->loadCount([
-                'groups as sent_invitations_count' => fn (Builder $query): Builder => $query
-                    ->where('is_sent', true),
+                'groups as sent_invitations_count' => fn (Builder $query): Builder => $query->sent(),
             ]);
 
         return InvitationStatsData::make($wedding);

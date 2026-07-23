@@ -20,8 +20,8 @@ final readonly class InvitationStatsData
     public static function make(?Wedding $wedding = null): self
     {
         return new self(
-            sentInvitationsCount: $wedding?->sent_invitations_count ?? 0,
-            totalViews: $wedding?->groups_sum_views_count ?? 0,
+            sentInvitationsCount: (int) ($wedding?->sent_invitations_count ?? 0),
+            totalViews: (int) ($wedding?->groups_sum_views_count ?? 0),
             wedding: $wedding,
         );
     }

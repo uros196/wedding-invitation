@@ -10,6 +10,7 @@ use App\Observers\GroupObserver;
 use App\Policies\GroupPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -93,6 +94,14 @@ class Group extends Model implements HasCounts, HasMedia
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
+    }
+
+    /**
+     * Scope a query to filter by sent status.
+     */
+    public function scopeSent(Builder $query, bool $sent = true): void
+    {
+        $query->where('is_sent', $sent);
     }
 
     /**
