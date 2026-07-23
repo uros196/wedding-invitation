@@ -1,6 +1,6 @@
+import MemoryUpcoming from '@/components/memory-wall/MemoryUpcoming';
 import { MemoryWallPageProps } from '@/types';
 import { Head } from '@inertiajs/react';
-
 /**
  * Renders the memory wall page.
  */
@@ -14,6 +14,7 @@ export default function MemoryWallPage({ wedding, metaData, media }: MemoryWallP
                 <meta property="og:type" content="website" />
                 <meta property="og:image" content={metaData.image} />
             </Head>
+            <MemoryUpcoming eventDate={wedding.wedding_date} ></MemoryUpcoming>
         </>
     );
 }
