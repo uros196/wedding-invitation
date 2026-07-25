@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\TeamType;
 use App\Observers\TeamObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,6 +25,7 @@ class Team extends Model
     protected $fillable = [
         'name',
         'has_memory_wall',
+        'type',
     ];
 
     /**
@@ -33,6 +35,7 @@ class Team extends Model
     {
         return [
             'has_memory_wall' => 'boolean',
+            'type' => TeamType::class,
         ];
     }
 

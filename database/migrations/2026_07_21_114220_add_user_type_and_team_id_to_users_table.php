@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table): void {
 
             $table->after('remember_token', function (Blueprint $table): void {
-                $table->string('user_type')->default(UserType::WeddingUser);
+                $table->string('user_type')->default(UserType::TeamMember);
                 $table->foreignId('team_id')->nullable()->constrained()->nullOnDelete();
             });
         });

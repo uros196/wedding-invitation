@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Management\Resources\Users\Tables;
 
-use App\Enums\UserType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -31,10 +30,6 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('user_type')
                     ->label('Type')
-                    ->formatStateUsing(fn (UserType $state): string => match ($state) {
-                        UserType::ManagementAdmin => 'Management administrator',
-                        UserType::WeddingUser => 'Wedding user',
-                    })
                     ->badge(),
                 TextColumn::make('team.name')
                     ->label('Team')

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers\Filament;
 
+use App\Enums\FilamentPanel;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -27,8 +30,9 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('admin')
-            ->path('admin')
+            ->id(FilamentPanel::Wedding->id())
+            ->path(FilamentPanel::Wedding->path())
+            ->authGuard(FilamentPanel::Wedding->guard())
             ->login()
             ->colors([
                 'primary' => Color::Amber,

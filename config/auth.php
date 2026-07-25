@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\FilamentPanel;
 use App\Models\User;
 
 return [
@@ -42,6 +43,8 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        ...FilamentPanel::buildGuardsConfig()->toArray(),
     ],
 
     /*
@@ -66,6 +69,8 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
         ],
+
+        ...FilamentPanel::buildProvidersConfig()->toArray(),
 
         // 'users' => [
         //     'driver' => 'database',

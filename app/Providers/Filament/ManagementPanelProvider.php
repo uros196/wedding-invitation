@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Enums\FilamentPanel;
 use App\Filament\Auth\ManagementLogin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -27,9 +28,10 @@ class ManagementPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('management')
-            ->path('management')
+            ->id(FilamentPanel::Management->id())
+            ->path(FilamentPanel::Management->path())
             ->login(ManagementLogin::class)
+            ->authGuard(FilamentPanel::Management->guard())
             ->colors([
                 'primary' => Color::Amber,
             ])

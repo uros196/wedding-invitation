@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\FilamentPanel;
 use App\Enums\UserType;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -38,11 +39,7 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return match ($panel->getId()) {
-            'management' => $this->user_type === UserType::ManagementAdmin,
-            'admin' => $this->user_type === UserType::WeddingUser && filled($this->team_id),
-            default => false,
-        };
+        return FilamentPanel::tryFrom($panel->getId())?->canAccess($this) ?? false;
     }
 
     /**

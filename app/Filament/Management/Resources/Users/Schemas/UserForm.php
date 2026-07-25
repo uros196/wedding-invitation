@@ -33,11 +33,8 @@ class UserForm
                     ->maxLength(255),
 
                 Select::make('user_type')
-                    ->options([
-                        UserType::ManagementAdmin->value => 'Management administrator',
-                        UserType::WeddingUser->value => 'Wedding user',
-                    ])
-                    ->default(UserType::WeddingUser->value)
+                    ->options(UserType::class)
+                    ->default(UserType::TeamMember->value)
                     ->required()
                     ->live(),
 
@@ -50,8 +47,8 @@ class UserForm
                             ->required()
                             ->maxLength(255),
                     ])
-                    ->visible(fn (Get $get): bool => $get('user_type') === UserType::WeddingUser->value)
-                    ->required(fn (Get $get): bool => $get('user_type') === UserType::WeddingUser->value)
+                    ->visible(fn (Get $get): bool => $get('user_type') === UserType::TeamMember->value)
+                    ->required(fn (Get $get): bool => $get('user_type') === UserType::TeamMember->value)
                     ->nullable(),
 
                 TextInput::make('password')

@@ -35,7 +35,7 @@ class UsersRelationManager extends RelationManager
         return $schema
             ->components([
                 Hidden::make('user_type')
-                    ->default(UserType::WeddingUser->value),
+                    ->default(UserType::TeamMember->value),
 
                 TextInput::make('name')
                     ->required()
