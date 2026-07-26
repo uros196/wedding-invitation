@@ -59,6 +59,14 @@ enum FilamentPanel: string
     }
 
     /**
+     * Get all available guards.
+     */
+    public static function guards(): array
+    {
+        return collect(self::cases())->map(fn (self $panel) => $panel->guard())->toArray();
+    }
+
+    /**
      * Get the Filament panel ID.
      */
     public function id(): string

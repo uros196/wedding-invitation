@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a7b736e61c89a8baf4aca75faee1bba",
+    "content-hash": "291224fc23ac2530e038c106ef2186f6",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -221,6 +221,82 @@
                 "source": "https://github.com/aws/aws-sdk-php/tree/3.388.12"
             },
             "time": "2026-07-22T18:05:00+00:00"
+        },
+        {
+            "name": "azgasim/filament-unsaved-changes-modal",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AzGasim/filament-unsaved-changes-modal.git",
+                "reference": "1df30efe2f964e0a11f35306e24fdb27e8feba47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AzGasim/filament-unsaved-changes-modal/zipball/1df30efe2f964e0a11f35306e24fdb27e8feba47",
+                "reference": "1df30efe2f964e0a11f35306e24fdb27e8feba47",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.3.5",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.7|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "AzGasim\\FilamentUnsavedChangesModal\\FilamentUnsavedChangesModalServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AzGasim\\FilamentUnsavedChangesModal\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aziz Gasim",
+                    "email": "104441723+AzGasim@users.noreply.github.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Filament plugin: unsaved-changes prompts as Filament modals instead of browser confirm dialogs.",
+            "homepage": "https://github.com/AzGasim/filament-unsaved-changes-modal",
+            "keywords": [
+                "AzGasim",
+                "filament",
+                "filament-plugin",
+                "filament-unsaved-changes-modal",
+                "filamentphp",
+                "laravel",
+                "livewire",
+                "modal",
+                "unsaved-changes",
+                "unsaved-changes-alert"
+            ],
+            "support": {
+                "issues": "https://github.com/AzGasim/filament-unsaved-changes-modal/issues",
+                "source": "https://github.com/AzGasim/filament-unsaved-changes-modal"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/AzGasim",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-04-14T21:01:12+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -5798,6 +5874,66 @@
                 "source": "https://github.com/bobthecow/psysh/tree/v0.12.24"
             },
             "time": "2026-06-29T15:41:09+00:00"
+        },
+        {
+            "name": "pusher/pusher-php-server",
+            "version": "7.2.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pusher/pusher-http-php.git",
+                "reference": "4aa139ed2a2a805cd265449b691198beee1309d2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/4aa139ed2a2a805cd265449b691198beee1309d2",
+                "reference": "4aa139ed2a2a805cd265449b691198beee1309d2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^7.2",
+                "php": "^7.3|^8.0",
+                "psr/log": "^1.0|^2.0|^3.0"
+            },
+            "require-dev": {
+                "overtrue/phplint": "^2.3",
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pusher\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Library for interacting with the Pusher REST API",
+            "keywords": [
+                "events",
+                "messaging",
+                "php-pusher-server",
+                "publish",
+                "push",
+                "pusher",
+                "real time",
+                "real-time",
+                "realtime",
+                "rest",
+                "trigger"
+            ],
+            "support": {
+                "issues": "https://github.com/pusher/pusher-http-php/issues",
+                "source": "https://github.com/pusher/pusher-http-php/tree/7.2.8"
+            },
+            "time": "2026-05-18T13:11:36+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

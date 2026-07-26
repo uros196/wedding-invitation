@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Contracts\HasCounts;
+use App\Enums\FilamentPanel;
 use Closure;
 use Filament\Exceptions\NoDefaultPanelSetException;
 use Filament\Facades\Filament;
@@ -72,7 +73,10 @@ class IncreaseCounter
      */
     protected function increaseCountAllowed(Request $request): bool
     {
+        $user = collect(FilamentPanel::guards())
+            ->firstWhere(fn ($guard) => $request->user($guard));
+
         // If the request holds authenticated Filament user, skip the count increase.
-        return ! ((bool) $request->user()?->canAccessPanel(Filament::getCurrentOrDefaultPanel()));
+        return blank($user);
     }
 }

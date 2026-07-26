@@ -7,12 +7,17 @@ namespace App\Notifications;
 use App\Filament\Wedding\Resources\Messages\MessageResource;
 use App\Models\Group;
 use App\Models\Message;
+use App\Models\User;
+use App\Traits\Broadcastable;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class NewMessageReceived extends Notification
 {
+    use Broadcastable;
+
     public function __construct(
         public Group $group,
         public Message $message
@@ -21,25 +26,47 @@ class NewMessageReceived extends Notification
     /**
      * Define notification channels.
      */
-    public function via(object $notifiable): array
+    public function via(User $notifiable): array
     {
-        return ['database'];
+        return ['database', /*'broadcast'*/];
+    }
+
+    /**
+     * Create a broadcast notification.
+     */
+    public function toBroadcast(): BroadcastMessage
+    {
+        return $this->makeNotification()
+            ->getBroadcastMessage();
     }
 
     /**
      * Create a database notification.
      */
-    public function toDatabase(object $notifiable): array
+    public function toDatabase(User $notifiable): array
     {
-        return FilamentNotification::make()
-            ->title(__('notification.new_message', ['group' => $this->group->name]))
-            ->body($this->message->content)
-            ->info()
+        $notification = $this->makeNotification();
+
+        // Manual broadcast notification
+        $this->inform($notifiable, $notification);
+
+        return $notification
             ->actions([
                 Action::make('view')
                     ->label(__('View Message'))
                     ->url(MessageResource::getUrl('view', ['record' => $this->message->id])),
             ])
             ->getDatabaseMessage();
+    }
+
+    /**
+     * Build and return a notification instance.
+     */
+    protected function makeNotification(): FilamentNotification
+    {
+        return FilamentNotification::make()
+            ->title(__('notification.new_message', ['group' => $this->group->name]))
+            ->body($this->message->content)
+            ->info();
     }
 }

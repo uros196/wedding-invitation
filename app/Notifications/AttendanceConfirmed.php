@@ -6,12 +6,17 @@ namespace App\Notifications;
 
 use App\Filament\Wedding\Resources\Groups\Pages\EditGroup;
 use App\Models\Group;
+use App\Models\User;
+use App\Traits\Broadcastable;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class AttendanceConfirmed extends Notification
 {
+    use Broadcastable;
+
     public function __construct(
         public Group $group,
         public int $confirmedCount,
@@ -21,15 +26,43 @@ class AttendanceConfirmed extends Notification
     /**
      * Define notification channels.
      */
-    public function via(object $notifiable): array
+    public function via(User $notifiable): array
     {
-        return ['database'];
+        return ['database', /*'broadcast'*/];
+    }
+
+    /**
+     * Create a broadcast notification.
+     */
+    public function toBroadcast(User $notifiable): BroadcastMessage
+    {
+        return $this->makeNotification()
+            ->getBroadcastMessage();
     }
 
     /**
      * Create a database notification.
      */
-    public function toDatabase(object $notifiable): array
+    public function toDatabase(User $notifiable): array
+    {
+        $notification = $this->makeNotification();
+
+        // Manual broadcast notification
+        $this->inform($notifiable, $notification);
+
+        return $notification
+            ->actions([
+                Action::make('view')
+                    ->label(__('View Group'))
+                    ->url(EditGroup::getUrl(['record' => $this->group->id])),
+            ])
+            ->getDatabaseMessage();
+    }
+
+    /**
+     * Compose a notification specific to attendance confirmation.
+     */
+    protected function makeNotification(): FilamentNotification
     {
         return FilamentNotification::make()
             ->title(__('Attendance Confirmed'))
@@ -38,12 +71,6 @@ class AttendanceConfirmed extends Notification
                 'total' => $this->totalCount,
                 'group' => $this->group->name,
             ]))
-            ->success()
-            ->actions([
-                Action::make('view')
-                    ->label(__('View Group'))
-                    ->url(EditGroup::getUrl(['record' => $this->group->id])),
-            ])
-            ->getDatabaseMessage();
+            ->success();
     }
 }
