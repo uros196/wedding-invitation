@@ -29,7 +29,6 @@ export interface Wedding {
     uuid: string;
     bride_name: string;
     groom_name: string;
-    hero_image: string;
     /** Localized day name (e.g. `subota`). */
     wedding_day: string;
     /** Formatted wedding date (e.g. `10.09.2026`). */
@@ -54,6 +53,7 @@ export interface Wedding {
     has_memory_wall: boolean;
     is_memory_wall_form_open: boolean;
     is_memory_wall_finished: boolean;
+    hero_image: HeroMedia;
 }
 
 /**
@@ -71,6 +71,25 @@ export interface Media {
     preview_url: string,
     original_url: string,
     size: number,
+}
+
+/**
+ * Represents a Hero media object with details about its file properties and metadata
+ * with additional srcset data.
+ */
+export interface HeroMedia {
+    id: number,
+    uuid: string,
+    name: string,
+    file_name: string,
+    mime_type: string,
+    type: string,
+    extension: string,
+    human_readable_size: string,
+    preview_url: string,
+    original_url: string,
+    size: number,
+    srcset: string,
 }
 
 /**

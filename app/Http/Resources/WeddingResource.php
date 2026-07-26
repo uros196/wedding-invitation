@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Media\HeroMediaResource;
 use App\Models\Wedding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -18,13 +19,13 @@ class WeddingResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $heroMedia = $this->getFirstMedia('Hero');
         $isWeddingFinished = $this->wedding_date->isPast();
 
         return [
             'uuid' => $this->uuid,
             'bride_name' => $this->bride_name,
             'groom_name' => $this->groom_name,
-            'hero_image' => $this->getHeroImageUrl('preview'),
             'wedding_day' => $this->wedding_date->dayName,
             'wedding_date' => $this->wedding_date->format(config('wedding.invitation.countdown.wedding_format')),
             'is_wedding_coming' => $this->wedding_date->isFuture(),
@@ -43,6 +44,9 @@ class WeddingResource extends JsonResource
             'has_memory_wall' => $this->has_memory_wall,
             'is_memory_wall_form_open' => $this->is_memory_wall_form_open,
             'is_memory_wall_finished' => $isWeddingFinished && !$this->is_memory_wall_form_open,
+
+            // Media
+            'hero_image' => HeroMediaResource::make($heroMedia),
         ];
     }
 }

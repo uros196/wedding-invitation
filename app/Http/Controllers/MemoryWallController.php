@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MemoryWallUploadRequest;
-use App\Http\Resources\MediaResource;
+use App\Http\Resources\Media\MediaResource;
 use App\Http\Resources\MetaDataResource;
 use App\Http\Resources\WeddingResource;
 use App\Models\Wedding;

@@ -176,6 +176,7 @@ class Wedding extends Model implements HasMedia
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('preview')
                     ->fit(Fit::Contain, 1000, 1000)
+                    ->withResponsiveImages()
                     ->format('webp');
             });
 

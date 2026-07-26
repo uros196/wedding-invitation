@@ -21,7 +21,7 @@ export default function Invitation({ wedding, group, metaData, }: InvitationPage
                 <meta property="og:title" content={metaData.title} />
                 <meta property="og:description" content={metaData.description} />
                 <meta property="og:type" content="website" />
-                <meta property="og:image" content={metaData.image ?? wedding.hero_image} />
+                <meta property="og:image" content={metaData.image ?? wedding.hero_image.preview_url} />
             </Head>
 
             <div
@@ -32,7 +32,7 @@ export default function Invitation({ wedding, group, metaData, }: InvitationPage
                     <HeroSection
                         brideName={wedding.bride_name}
                         groomName={wedding.groom_name}
-                        imageUrl={wedding.hero_image}
+                        image={wedding.hero_image}
                     />
 
                     <WelcomeMessage
