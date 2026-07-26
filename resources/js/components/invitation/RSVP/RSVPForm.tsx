@@ -88,7 +88,7 @@ export default function RSVPForm({ group, rsvpDeadline, hasMemoryWall }: RSVPFor
                                 Potvrda dolaska
                             </h3>
                             <p
-                                className="mb-8 text-center text-base"
+                                className="mb-8 text-center text-sm"
                                 style={{ color: palette.dawn }}
                             >
                                 Molimo vas da potvrdite do {rsvpDeadline}.

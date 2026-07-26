@@ -15,14 +15,14 @@ export default function GuestMessage({ title, message }: GuestMessageProps) {
     return (
         <div className="relative z-20" style={{ backgroundColor: palette.background }}>
             <motion.div
-                className="px-8 py-12 text-center"
+                className="px-8 py-6 text-center"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.9, ease: 'easeOut' }}
             >
                 {title && (
-                    <p className="mb-4 text-2xl" style={{ color: palette.dawn, fontFamily: fonts.script }}>
+                    <p className="mb-4 text-3xl [word-spacing:0.3rem]" style={{ color: palette.dawn, fontFamily: fonts.script }}>
                         {title}
                     </p>
                 )}
