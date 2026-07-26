@@ -77,6 +77,23 @@ class IncreaseCounter
             ->firstWhere(fn ($guard) => $request->user($guard));
 
         // If the request holds authenticated Filament user, skip the count increase.
-        return blank($user);
+        return blank($user) && ! $this->isAutomatedRequest($request);
+    }
+
+    /**
+     * Determine if the request was made by a crawler or another automated client.
+     */
+    protected function isAutomatedRequest(Request $request): bool
+    {
+        $userAgent = $request->userAgent();
+
+        if (blank($userAgent)) {
+            return true;
+        }
+
+        return preg_match(
+                '/bot|crawler|spider|slurp|headless|phantom|selenium|playwright|puppeteer|curl|wget|python-requests|httpclient|okhttp|go-http-client|scrapy|symfony|facebookexternalhit|facebookcatalog|bingpreview|google-inspectiontool|mediapartners-google|semrush|ahrefs|mj12bot|dotbot|bytespider|petalbot|applebot|baiduspider|yandexbot|perplexity|gptbot|chatgpt-user/i',
+                $userAgent,
+            ) === 1;
     }
 }

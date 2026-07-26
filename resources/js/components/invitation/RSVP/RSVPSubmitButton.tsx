@@ -25,7 +25,7 @@ export default function RSVPSubmitButton({
         >
             {processing ? processingText : children ?? (
                 <span className="inline-flex items-center gap-4">
-                    Pošalji <Send size={14} />
+                    Potvrdi <Send size={14} />
                 </span>
             )}
         </button>
