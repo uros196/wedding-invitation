@@ -129,6 +129,15 @@ export default function RSVPForm({ group, rsvpDeadline, hasMemoryWall }: RSVPFor
                                 />
 
                                 <RSVPSubmitButton processing={processing} />
+
+                                <div
+                                    className="px-4 text-center text-xs"
+                                    style={{
+                                        color: palette.dawn,
+                                    }}
+                                >
+                                    Obavezno kliknite na dugme kako biste poslali potvrdu dolaska ili poruku mladencima.
+                                </div>
                             </div>
                         </div>
                     </div>
