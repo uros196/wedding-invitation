@@ -13,6 +13,7 @@ class LastNameColumn
     {
         return TextColumn::make('last_name')
             ->label(__('Last Name'))
+            ->placeholder('-')
             ->searchable()
             ->sortable();
     }

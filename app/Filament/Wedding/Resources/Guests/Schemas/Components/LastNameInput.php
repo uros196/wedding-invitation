@@ -13,7 +13,6 @@ class LastNameInput
     {
         return TextInput::make('last_name')
             ->label(__('Last Name'))
-            ->required()
             ->string()
             ->maxLength(255);
     }
