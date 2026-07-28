@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Wedding\Resources\Groups\Schemas\Components\Form;
 
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Schmeits\FilamentCharacterCounter\Forms\Components\TextInput;
 
 class NameInput
 {
@@ -16,6 +19,8 @@ class NameInput
             ->placeholder(__('e.g. Petrović Family'))
             ->required()
             ->string()
-            ->maxLength(255);
+            ->live()
+            ->showCharacterCounter(fn (Get $get) => filled($get('name')))
+            ->maxLength(100);
     }
 }

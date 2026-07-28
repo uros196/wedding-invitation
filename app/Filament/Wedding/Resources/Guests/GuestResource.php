@@ -32,7 +32,7 @@ class GuestResource extends Resource
      */
     protected static ?string $model = Guest::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     /**
      * Get the name of the relationship to scope the resource by.

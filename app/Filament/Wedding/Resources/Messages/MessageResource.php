@@ -10,6 +10,7 @@ use App\Filament\Wedding\Resources\Messages\Pages\ViewMessage;
 use App\Filament\Wedding\Resources\Messages\Schemas\MessageInfolist;
 use App\Filament\Wedding\Resources\Messages\Tables\MessagesTable;
 use App\Models\Message;
+use App\Services\MessageService;
 use BackedEnum;
 use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
@@ -58,6 +59,25 @@ class MessageResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('Messages');
+    }
+
+    /**
+     * Retrieve the navigation badge value representing the unread message count for the authenticated user.
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        $user = auth()->user();
+        $count = resolve(MessageService::class)->getUnreadCount($user);
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    /**
+     * Retrieve the navigation badge tooltip for the unread message count.
+     */
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return __('Number of unread messages');
     }
 
     /**

@@ -39,13 +39,13 @@ class UsersRelationManager extends RelationManager
 
                 TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(80),
 
                 TextInput::make('email')
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->maxLength(100),
 
                 TextInput::make('password')
                     ->password()

@@ -14,7 +14,7 @@ use App\Support\MetaFactory;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class GroupController extends Controller
+final class GroupController extends Controller
 {
     public function __construct(
         protected GroupService $groupService,

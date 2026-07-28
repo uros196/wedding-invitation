@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Schmeits\FilamentCharacterCounter\Forms\Components\TextInput;
 
 class GroomNameInput
 {
@@ -15,6 +16,9 @@ class GroomNameInput
     {
         return TextInput::make('groom_name')
             ->label(__('Groom\'s Name'))
+            ->live()
+            ->showCharacterCounter(fn (Get $get) => filled($get('groom_name')))
+            ->maxLength(50)
             ->required();
     }
 }

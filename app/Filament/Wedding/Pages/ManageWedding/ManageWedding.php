@@ -22,7 +22,7 @@ class ManageWedding extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
-    protected string $view = 'filament.pages.manage-wedding';
+    protected string $view = 'filament.wedding.pages.manage-wedding';
 
     protected static ?string $title = 'Detalji venčanja';
 

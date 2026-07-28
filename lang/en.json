@@ -106,5 +106,7 @@
     "Groom": "Groom",
     "Users": "Users",
     "Format": "Format",
-    "Size": "Size"
+    "Size": "Size",
+    "Unread": "Unread",
+    "Number of unread messages": "Number of unread messages"
 }

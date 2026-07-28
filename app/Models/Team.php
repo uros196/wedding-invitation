@@ -54,4 +54,12 @@ class Team extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    /**
+     * Retrieve the broadcast channel name for the current instance.
+     */
+    public function broadcastChannelName(): string
+    {
+        return $this->type->broadcastChannelName($this);
+    }
 }

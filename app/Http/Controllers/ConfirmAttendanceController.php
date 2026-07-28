@@ -9,7 +9,7 @@ use App\Models\Group;
 use App\Services\GroupService;
 use Illuminate\Http\RedirectResponse;
 
-class ConfirmAttendanceController extends Controller
+final class ConfirmAttendanceController extends Controller
 {
     public function __construct(
         protected GroupService $groupService

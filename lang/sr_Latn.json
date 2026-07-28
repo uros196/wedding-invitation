@@ -106,5 +106,7 @@
     "Groom": "Mladoženja",
     "Users": "Korisnici",
     "Format": "Format",
-    "Size": "Veličina"
+    "Size": "Veličina",
+    "Unread": "Nepročitano",
+    "Number of unread messages": "Broj nepročitanih poruka"
 }

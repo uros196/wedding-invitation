@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -68,6 +69,21 @@ class Group extends Model implements HasCounts, HasMedia
     public function wedding(): BelongsTo
     {
         return $this->belongsTo(Wedding::class);
+    }
+
+    /**
+     * Get the related team through the wedding.
+     */
+    public function team(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            Team::class,
+            Wedding::class,
+            'team_id',
+            'id',
+            'wedding_id',
+            'id'
+        );
     }
 
     /**

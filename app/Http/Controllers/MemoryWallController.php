@@ -15,7 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class MemoryWallController extends Controller
+final class MemoryWallController extends Controller
 {
     public function __construct(
         protected MemoryWallService $service,

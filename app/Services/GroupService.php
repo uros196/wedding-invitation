@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\DTOs\ConfirmAttendanceData;
 use App\Enums\GuestStatus;
+use App\Events\MessageReceived;
 use App\Models\Group;
 use App\Models\Message;
 use App\Models\User;
@@ -130,7 +131,7 @@ class GroupService
                 'content' => $data->message,
             ]);
 
-            $this->notifyAdminsAboutMessage($group, $message);
+            MessageReceived::dispatch($message, $group);
         }
     }
 
@@ -145,16 +146,6 @@ class GroupService
             $admins,
             new AttendanceConfirmed($group, count($confirmedGuestIds), $group->guests->count())
         );
-    }
-
-    /**
-     * Notify administrators about a new message.
-     */
-    protected function notifyAdminsAboutMessage(Group $group, Message $message): void
-    {
-        $admins = $this->getWeddingUsers($group->wedding);
-
-        Notification::send($admins, new NewMessageReceived($group, $message));
     }
 
     /**

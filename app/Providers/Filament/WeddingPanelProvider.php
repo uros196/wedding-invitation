@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Enums\FilamentPanel;
+use App\Filament\Wedding\Plugins\EchoRegisterPlugin;
 use AzGasim\FilamentUnsavedChangesModal\FilamentUnsavedChangesModalPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -53,11 +54,13 @@ class WeddingPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentUnsavedChangesModalPlugin::make(),
+                EchoRegisterPlugin::make(),
             ])
             ->renderHook(
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('@livewire(\'global-export\')'),
             )
+            ->sidebarCollapsibleOnDesktop()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

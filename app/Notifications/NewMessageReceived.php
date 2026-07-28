@@ -11,12 +11,14 @@ use App\Models\User;
 use App\Traits\Broadcastable;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class NewMessageReceived extends Notification
+class NewMessageReceived extends Notification implements ShouldQueue
 {
-    use Broadcastable;
+    use Broadcastable, Queueable;
 
     public function __construct(
         public Group $group,
@@ -50,13 +52,18 @@ class NewMessageReceived extends Notification
         // Manual broadcast notification
         $this->inform($notifiable, $notification);
 
-        return $notification
+        $data = $notification
             ->actions([
                 Action::make('view')
                     ->label(__('View Message'))
                     ->url(MessageResource::getUrl('view', ['record' => $this->message->id])),
             ])
             ->getDatabaseMessage();
+
+        return [
+            ...$data,
+            'message_id' => $this->message->id,
+        ];
     }
 
     /**

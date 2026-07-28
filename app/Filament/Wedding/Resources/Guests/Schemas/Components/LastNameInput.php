@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Wedding\Resources\Guests\Schemas\Components;
 
 use Filament\Forms\Components\TextInput;
@@ -14,6 +16,6 @@ class LastNameInput
         return TextInput::make('last_name')
             ->label(__('Last Name'))
             ->string()
-            ->maxLength(255);
+            ->maxLength(50);
     }
 }

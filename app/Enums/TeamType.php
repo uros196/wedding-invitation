@@ -6,6 +6,7 @@ namespace App\Enums;
 
 use App\Auth\FilamentAuth\TeamDriver;
 use App\Contracts\FilamentAuth;
+use App\Models\Team;
 use Filament\Support\Contracts\HasLabel;
 
 enum TeamType: string implements HasLabel
@@ -38,6 +39,14 @@ enum TeamType: string implements HasLabel
     public function filamentAuthDriver(): FilamentAuth
     {
         return new TeamDriver($this);
+    }
+
+    /**
+     * Get broadcast channel name.
+     */
+    public function broadcastChannelName(?Team $team = null): string
+    {
+        return 'team'. ucfirst($this->name). (blank($team) ? '.{team}' : ".{$team->getKey()}");
     }
 
     /**

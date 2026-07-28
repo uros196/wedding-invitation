@@ -24,13 +24,13 @@ class UserForm
             ->components([
                 TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(80),
 
                 TextInput::make('email')
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->maxLength(100),
 
                 Select::make('user_type')
                     ->options(UserType::class)
@@ -45,7 +45,7 @@ class UserForm
                     ->createOptionForm([
                         TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(60),
                     ])
                     ->visible(fn (Get $get): bool => $get('user_type') === UserType::TeamMember->value)
                     ->required(fn (Get $get): bool => $get('user_type') === UserType::TeamMember->value)
