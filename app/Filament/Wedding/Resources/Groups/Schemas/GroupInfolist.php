@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Resources\Groups\Schemas;
 
-use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\ConfirmedGuestsEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\CreatedAtEntry;
-use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\DeclinedGuestsEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\GuestsCountEntry;
-use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\GuestsEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\HiddenTimelineItemsEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\InvitationMessageEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\InvitationSentEntry;
@@ -19,7 +16,6 @@ use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\MetaDescri
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\MetaImageEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\MetaTitleEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\NameEntry;
-use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\PendingGuestsEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\PlusOneAllowedEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\TimelineVisibilityEntry;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Infolist\UpdatedAtEntry;
@@ -90,19 +86,6 @@ class GroupInfolist
                                         HiddenTimelineItemsEntry::make(),
                                     ]),
                             ]),
-                    ]),
-
-                Grid::make(1)
-                    ->columnSpanFull()
-                    ->schema([
-                        Section::make(__('messages.guest_summary'))
-                            ->schema([
-                                ConfirmedGuestsEntry::make(),
-                                PendingGuestsEntry::make(),
-                                DeclinedGuestsEntry::make(),
-                                GuestsEntry::make(),
-                            ])
-                            ->columns(3),
                     ]),
             ]);
     }

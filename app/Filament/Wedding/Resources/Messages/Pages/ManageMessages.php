@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Wedding\Resources\Messages\Pages;
 
 use App\Filament\Wedding\Resources\Messages\MessageResource;
+use App\Traits\TableRefreshable;
 use Filament\Resources\Pages\ManageRecords;
 
 class ManageMessages extends ManageRecords
 {
+    use TableRefreshable;
+
     protected static string $resource = MessageResource::class;
 
     protected function getHeaderActions(): array
@@ -19,22 +22,10 @@ class ManageMessages extends ManageRecords
     }
 
     /**
-     * Define listeners for the Livewire component.
+     * Refresh the table when this broadcast event occurs.
      */
-    public function getListeners(): array
+    protected function refreshTableOn(): string|array
     {
-        $team = auth()->user()->team;
-
-        return [
-            "echo-private:{$team->broadcastChannelName()},.messageReceived" => 'refreshMessagesTable',
-        ];
-    }
-
-    /**
-     * Refresh the table when a new message is broadcast for the current wedding.
-     */
-    public function refreshMessagesTable(): void
-    {
-        $this->resetTable();
+        return '.messageReceived';
     }
 }

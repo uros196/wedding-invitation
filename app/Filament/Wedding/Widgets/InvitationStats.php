@@ -15,6 +15,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
  */
 class InvitationStats extends StatsOverviewWidget
 {
+    protected ?string $pollingInterval = null;
+
     /**
      * The sort order of the widget on the dashboard.
      */

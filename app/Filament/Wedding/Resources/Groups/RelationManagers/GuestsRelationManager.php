@@ -12,6 +12,7 @@ use App\Filament\Wedding\Resources\Guests\Tables\Columns\LastNameColumn;
 use App\Filament\Wedding\Resources\Guests\Tables\Columns\NotesColumn;
 use App\Filament\Wedding\Resources\Guests\Tables\Columns\ParentColumn;
 use App\Filament\Wedding\Resources\Guests\Tables\Columns\StatusColumn;
+use App\Traits\TableRefreshable;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -27,6 +28,8 @@ use Filament\Tables\Table;
  */
 class GuestsRelationManager extends RelationManager
 {
+    use TableRefreshable;
+
     protected static string $relationship = 'guests';
 
     /**
@@ -70,5 +73,13 @@ class GuestsRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Refresh the table when this broadcast event occurs.
+     */
+    protected function refreshTableOn(): string|array
+    {
+        return '.attendanceConfirmed';
     }
 }

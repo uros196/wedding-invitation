@@ -24,4 +24,16 @@ enum Age: string implements HasLabel
             self::Baby => __('Baby'),
         };
     }
+
+    /**
+     * Retrieves the chart color associated with the age category.
+     */
+    public function chartColor(): string
+    {
+        return match ($this) {
+            self::Adult => 'rgba(54, 162, 235, 0.6)',
+            self::Child => 'rgba(255, 206, 86, 0.6)',
+            self::Baby => 'rgba(255, 99, 132, 0.6)',
+        };
+    }
 }

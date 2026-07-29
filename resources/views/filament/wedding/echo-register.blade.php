@@ -16,6 +16,9 @@
                 .listen('.messageReceived', () => {
                     Livewire.dispatch('refresh-sidebar')
                 })
+                .listen('.attendanceConfirmed', () => {
+                    Livewire.dispatch('refresh-guest-status-widget')
+                })
         })()
     </script>
 @endif

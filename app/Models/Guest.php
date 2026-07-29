@@ -92,11 +92,19 @@ class Guest extends Model
     }
 
     /**
+     * Apply a query scope to filter guests by their status.
+     */
+    public function scopeStatus(Builder $query, GuestStatus $status): void
+    {
+        $query->where('status', $status->value);
+    }
+
+    /**
      * Scope a query to only include guests with a confirmed status.
      */
     public function scopeConfirmed(Builder $query): void
     {
-        $query->where('status', GuestStatus::Confirmed);
+        $query->status(GuestStatus::Confirmed);
     }
 
     /**

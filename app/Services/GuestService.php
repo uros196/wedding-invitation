@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\DTOs\GuestGroupedCountsData;
 use App\DTOs\GuestStatsData;
+use App\Models\Group;
 use App\Models\Guest;
 
 class GuestService
@@ -13,9 +14,15 @@ class GuestService
     /**
      * Retrieve guest status counts data.
      */
-    public function getStatusCounts(): GuestStatsData
+    public function getStatusCounts(?Group $group = null): GuestStatsData
     {
-        return GuestStatsData::make();
+        $guests = Guest::query()
+            ->when($group, fn ($query) => $query->whereBelongsTo($group))
+            ->selectRaw('status, COUNT(*) AS aggregate')
+            ->groupBy('status')
+            ->get();
+
+        return GuestStatsData::make($guests);
     }
 
     /**

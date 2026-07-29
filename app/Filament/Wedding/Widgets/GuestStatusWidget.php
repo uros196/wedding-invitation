@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Widgets;
 
+use App\Models\Group;
 use App\Services\GuestService;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Livewire\Attributes\On;
 
 class GuestStatusWidget extends StatsOverviewWidget
 {
+    public ?Group $group = null;
+    protected ?string $pollingInterval = null;
+
     protected static ?int $sort = 3;
 
     /**
@@ -18,7 +23,7 @@ class GuestStatusWidget extends StatsOverviewWidget
      */
     protected function getStats(): array
     {
-        $data = app(GuestService::class)->getStatusCounts();
+        $data = app(GuestService::class)->getStatusCounts($this->group);
 
         return [
             Stat::make(__('widgets.guest_status.confirmed.label'), $data->confirmedGuestsCount)
@@ -36,5 +41,11 @@ class GuestStatusWidget extends StatsOverviewWidget
                 ->descriptionIcon(Heroicon::Clock)
                 ->color('warning'),
         ];
+    }
+
+    #[On('refresh-guest-status-widget')]
+    public function refreshStats(): void
+    {
+        $this->dispatch('$refresh');
     }
 }

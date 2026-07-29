@@ -6,17 +6,13 @@ namespace App\Services;
 
 use App\DTOs\ConfirmAttendanceData;
 use App\Enums\GuestStatus;
+use App\Events\AttendanceConfirmed;
 use App\Events\MessageReceived;
 use App\Models\Group;
-use App\Models\Message;
 use App\Models\User;
-use App\Models\Wedding;
 use App\Models\WeddingTimeline;
-use App\Notifications\AttendanceConfirmed;
-use App\Notifications\NewMessageReceived;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Notification;
 
 class GroupService
 {
@@ -124,7 +120,7 @@ class GroupService
             $guest->update(['status' => $newStatus]);
         });
 
-        $this->notifyAdminsAboutConfirmation($group, $confirmedIds);
+        AttendanceConfirmed::dispatch($group, $confirmedIds);
 
         if (filled($data->message)) {
             $message = $group->messages()->create([
@@ -133,32 +129,5 @@ class GroupService
 
             MessageReceived::dispatch($message, $group);
         }
-    }
-
-    /**
-     * Notify administrators about attendance confirmation.
-     */
-    protected function notifyAdminsAboutConfirmation(Group $group, array $confirmedGuestIds): void
-    {
-        $admins = $this->getWeddingUsers($group->wedding);
-
-        Notification::send(
-            $admins,
-            new AttendanceConfirmed($group, count($confirmedGuestIds), $group->guests->count())
-        );
-    }
-
-    /**
-     * Get users assigned to teams for the group's wedding.
-     *
-     * @return Collection<int, User>
-     */
-    protected function getWeddingUsers(?Wedding $wedding): Collection
-    {
-        if (! $wedding) {
-            return collect();
-        }
-
-        return $wedding->users()->get();
     }
 }

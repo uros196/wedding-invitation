@@ -4,6 +4,7 @@ namespace App\DTOs;
 
 use App\Enums\GuestStatus;
 use App\Models\Guest;
+use Illuminate\Support\Collection;
 
 final readonly class GuestStatsData
 {
@@ -15,13 +16,15 @@ final readonly class GuestStatsData
 
     /**
      * Make data object using default queries/counts.
+     *
+     * @param Collection<Guest> $guests
      */
-    public static function make(): self
+    public static function make(Collection $guests): self
     {
         return new self(
-            confirmedGuestsCount: Guest::whereStatus(GuestStatus::Confirmed)->count(),
-            declinedGuestsCount: Guest::whereStatus(GuestStatus::Declined)->count(),
-            pendingGuestsCount: Guest::whereStatus(GuestStatus::Pending)->count(),
+            confirmedGuestsCount: $guests->firstWhere('status', GuestStatus::Confirmed)?->aggregate ?? 0,
+            declinedGuestsCount: $guests->firstWhere('status', GuestStatus::Declined)?->aggregate ?? 0,
+            pendingGuestsCount: $guests->firstWhere('status', GuestStatus::Pending)?->aggregate ?? 0,
         );
     }
 }

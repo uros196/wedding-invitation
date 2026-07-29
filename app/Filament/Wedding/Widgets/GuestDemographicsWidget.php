@@ -13,6 +13,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class GuestDemographicsWidget extends StatsOverviewWidget
 {
+    protected ?string $pollingInterval = null;
+
     protected static ?int $sort = 2;
 
     /**

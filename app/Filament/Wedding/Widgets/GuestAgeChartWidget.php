@@ -10,6 +10,8 @@ use Filament\Widgets\ChartWidget;
 
 class GuestAgeChartWidget extends ChartWidget
 {
+    protected ?string $pollingInterval = null;
+
     protected static ?int $sort = 4;
 
     /**
@@ -29,10 +31,12 @@ class GuestAgeChartWidget extends ChartWidget
 
         $labels = [];
         $counts = [];
+        $colors = [];
 
         foreach (Age::cases() as $age) {
             $labels[] = $age->getLabel();
             $counts[] = $ageData[$age->value] ?? 0;
+            $colors[] = $age->chartColor();
         }
 
         // Handle null (not declared)
@@ -40,6 +44,7 @@ class GuestAgeChartWidget extends ChartWidget
         if ($notDeclaredCount > 0) {
             $labels[] = __('widgets.guest_age_chart.unknown');
             $counts[] = $notDeclaredCount;
+            $colors[] = 'rgba(156, 163, 175, 0.35)';
         }
 
         return [
@@ -47,12 +52,7 @@ class GuestAgeChartWidget extends ChartWidget
                 [
                     'label' => __('widgets.guest_age_chart.dataset_label'),
                     'data' => $counts,
-                    'backgroundColor' => [
-                        '#36A2EB',
-                        '#FFCE56',
-                        '#FF6384',
-                        '#9966FF',
-                    ],
+                    'backgroundColor' => $colors,
                 ],
             ],
             'labels' => $labels,
@@ -61,6 +61,6 @@ class GuestAgeChartWidget extends ChartWidget
 
     protected function getType(): string
     {
-        return 'pie';
+        return 'polarArea';
     }
 }

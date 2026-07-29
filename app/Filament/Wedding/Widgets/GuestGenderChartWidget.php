@@ -10,6 +10,8 @@ use Filament\Widgets\ChartWidget;
 
 class GuestGenderChartWidget extends ChartWidget
 {
+    protected ?string $pollingInterval = null;
+
     protected static ?int $sort = 5;
 
     /**
@@ -29,10 +31,12 @@ class GuestGenderChartWidget extends ChartWidget
 
         $labels = [];
         $counts = [];
+        $colors = [];
 
         foreach (Gender::cases() as $gender) {
             $labels[] = $gender->getLabel();
             $counts[] = $genderData[$gender->value] ?? 0;
+            $colors[] = $gender->chartColor();
         }
 
         // Handle null (not declared)
@@ -40,6 +44,7 @@ class GuestGenderChartWidget extends ChartWidget
         if ($notDeclaredCount > 0) {
             $labels[] = __('widgets.guest_gender_chart.unknown');
             $counts[] = $notDeclaredCount;
+            $colors[] = 'rgba(156, 163, 175, 0.6)';
         }
 
         return [
@@ -47,11 +52,7 @@ class GuestGenderChartWidget extends ChartWidget
                 [
                     'label' => __('widgets.guest_gender_chart.dataset_label'),
                     'data' => $counts,
-                    'backgroundColor' => [
-                        '#36A2EB',
-                        '#FF6384',
-                        '#9966FF',
-                    ],
+                    'backgroundColor' => $colors,
                 ],
             ],
             'labels' => $labels,
@@ -63,6 +64,6 @@ class GuestGenderChartWidget extends ChartWidget
      */
     protected function getType(): string
     {
-        return 'pie';
+        return 'doughnut';
     }
 }

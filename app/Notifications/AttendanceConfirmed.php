@@ -10,12 +10,14 @@ use App\Models\User;
 use App\Traits\Broadcastable;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class AttendanceConfirmed extends Notification
+class AttendanceConfirmed extends Notification implements ShouldQueue
 {
-    use Broadcastable;
+    use Broadcastable, Queueable;
 
     public function __construct(
         public Group $group,

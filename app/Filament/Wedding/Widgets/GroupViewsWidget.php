@@ -14,6 +14,8 @@ use Filament\Widgets\TableWidget;
  */
 class GroupViewsWidget extends TableWidget
 {
+    protected ?string $pollingInterval = null;
+
     /**
      * Get the widget heading.
      */

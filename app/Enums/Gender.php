@@ -22,4 +22,15 @@ enum Gender: string implements HasLabel
             self::Female => __('Female'),
         };
     }
+
+    /**
+     * Retrieves the chart color associated with the gender category.
+     */
+    public function chartColor(): string
+    {
+        return match ($this) {
+            self::Male => 'rgba(54, 162, 235, 0.6)',
+            self::Female => 'rgba(255, 99, 132, 0.6)',
+        };
+    }
 }
