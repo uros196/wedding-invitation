@@ -14,6 +14,7 @@ use Livewire\Attributes\On;
 class GuestStatusWidget extends StatsOverviewWidget
 {
     public ?Group $group = null;
+
     protected ?string $pollingInterval = null;
 
     protected static ?int $sort = 3;
@@ -26,18 +27,18 @@ class GuestStatusWidget extends StatsOverviewWidget
         $data = app(GuestService::class)->getStatusCounts($this->group);
 
         return [
-            Stat::make(__('widgets.guest_status.confirmed.label'), $data->confirmedGuestsCount)
-                ->description(__('widgets.guest_status.confirmed.description'))
+            Stat::make(__('Confirmed'), $data->confirmedGuestsCount)
+                ->description(__('wedding.widgets.guest_status.confirmed.description'))
                 ->descriptionIcon(Heroicon::CheckCircle)
                 ->color('success'),
 
-            Stat::make(__('widgets.guest_status.declined.label'), $data->declinedGuestsCount)
-                ->description(__('widgets.guest_status.declined.description'))
+            Stat::make(__('Declined'), $data->declinedGuestsCount)
+                ->description(__('wedding.widgets.guest_status.declined.description'))
                 ->descriptionIcon(Heroicon::XCircle)
                 ->color('danger'),
 
-            Stat::make(__('widgets.guest_status.pending.label'), $data->pendingGuestsCount)
-                ->description(__('widgets.guest_status.pending.description'))
+            Stat::make(__('Pending'), $data->pendingGuestsCount)
+                ->description(__('wedding.widgets.guest_status.pending.description'))
                 ->descriptionIcon(Heroicon::Clock)
                 ->color('warning'),
         ];

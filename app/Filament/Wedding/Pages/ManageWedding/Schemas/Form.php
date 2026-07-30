@@ -35,7 +35,7 @@ class Form
             ->components([
                 Grid::make(3)
                     ->schema([
-                        Section::make(__('messages.basic_info'))
+                        Section::make(__('Basic Information'))
                             ->columnSpan(2)
                             ->schema([
                                 Grid::make(1)
@@ -51,7 +51,7 @@ class Form
                             ]),
 
                         Section::make(__('Main Image'))
-                            ->description(__('This image is displayed at the top of the invitation.'))
+                            ->description(__('wedding.manage_wedding.main_image_description'))
                             ->columnSpan(1)
                             ->schema([
                                 HeroImageFileUpload::make(),
@@ -82,7 +82,7 @@ class Form
                     ]),
 
                 Section::make(__('Meta Data'))
-                    ->description(__('Used to generate the link preview when the invitation is shared.'))
+                    ->description(__('wedding.manage_wedding.meta.description'))
                     ->columns(3)
                     ->schema([
                         Grid::make(1)

@@ -13,7 +13,7 @@ class NotesTextArea
     {
         return Textarea::make('notes')
             ->label(__('Notes'))
-            ->placeholder(__('e.g. Allergies, special wishes...'))
+            ->placeholder(__('wedding.guests.form.notes_placeholder'))
             ->rows(3)
             ->string()
             ->nullable()

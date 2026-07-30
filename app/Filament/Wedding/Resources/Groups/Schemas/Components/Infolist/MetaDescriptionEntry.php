@@ -14,7 +14,7 @@ class MetaDescriptionEntry
     public static function make(): TextEntry
     {
         return TextEntry::make('meta_description')
-            ->label(__('messages.meta.description'))
+            ->label(__('Meta Description'))
             ->placeholder(__('Not set'))
             ->columnSpanFull();
     }

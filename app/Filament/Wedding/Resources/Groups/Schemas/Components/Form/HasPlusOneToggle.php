@@ -15,12 +15,12 @@ class HasPlusOneToggle
     public static function make(): Toggle
     {
         return Toggle::make('has_plus_one')
-            ->label(__('messages.group.has_plus_one'))
+            ->label(__('wedding.groups.plus_one.label'))
             ->helperText(function (?Group $record): string {
 
                 return ! $record?->hasOnlyOneGuest()
-                    ? __('messages.group.has_plus_one_disabled_helper')
-                    : __('messages.group.has_plus_one_description');
+                    ? __('wedding.groups.plus_one.disabled_helper')
+                    : __('wedding.groups.plus_one.description');
             })
             ->disabled(fn (?Group $record): bool => ! $record?->hasOnlyOneGuest());
     }

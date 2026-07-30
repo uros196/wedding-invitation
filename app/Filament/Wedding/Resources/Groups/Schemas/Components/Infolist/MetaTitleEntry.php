@@ -14,7 +14,7 @@ class MetaTitleEntry
     public static function make(): TextEntry
     {
         return TextEntry::make('meta_title')
-            ->label(__('messages.meta.title'))
+            ->label(__('Meta Title'))
             ->placeholder(__('Not set'));
     }
 }

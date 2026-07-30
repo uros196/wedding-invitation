@@ -31,7 +31,7 @@ class GuestForm
     {
         return $schema
             ->components([
-                Section::make(__('messages.guest_info'))
+                Section::make(__('Guest Information'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -55,9 +55,9 @@ class GuestForm
                     ])
                     ->columnSpan(1),
 
-                Section::make(__('messages.companions'))
+                Section::make(__('Companions'))
                     ->key('companions_section')
-                    ->description(__('messages.companions_description'))
+                    ->description(__('wedding.guests.companions.description'))
                     ->headerActions([
                         AddCompanionAction::make(),
                     ])

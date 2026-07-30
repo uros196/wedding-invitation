@@ -15,10 +15,10 @@ class HiddenTimelineItemsEntry
     public static function make(): RepeatableEntry
     {
         return RepeatableEntry::make('hiddenTimelineItems')
-            ->label(__('messages.hidden_timeline_items'))
+            ->label(__('wedding.groups.timeline.hidden_items'))
             ->schema([
                 TextEntry::make('list_name')
-                    ->label(__('messages.timeline_item')),
+                    ->label(__('Timeline Item')),
                 HiddenTimelineAddressEntry::make(),
             ])
             ->columns(2)

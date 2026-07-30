@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Invitation Configuration
@@ -11,6 +12,7 @@ return [
     | on the invitation page.
     |
     */
+
     'invitation' => [
         'countdown' => [
             'wedding_format' => 'd.m.Y',
@@ -22,6 +24,11 @@ return [
             // Wedding day will be used in the calculation.
             // Value expressed in days
             'form_open_for' => 1,
+
+            // Tell the use how long a memory wall form can be opened
+            // starting from the wedding day.
+            // Value expressed in days
+            'form_open_for_max' => 10,
         ],
     ],
 
@@ -34,6 +41,7 @@ return [
     | the application, such as the countdown widget labels and formats.
     |
     */
+
     'widgets' => [
 
         'countdown' => [
@@ -59,6 +67,7 @@ return [
     | on the front-end when no custom values are defined.
     |
     */
+
     'meta' => [
         'title' => 'wedding.title',
         'description' => 'wedding.greeting',

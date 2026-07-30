@@ -19,7 +19,7 @@ class GuestGenderChartWidget extends ChartWidget
      */
     public function getHeading(): string
     {
-        return __('widgets.guest_gender_chart.heading');
+        return __('wedding.widgets.guest_gender_chart.heading');
     }
 
     /**
@@ -42,7 +42,7 @@ class GuestGenderChartWidget extends ChartWidget
         // Handle null (not declared)
         $notDeclaredCount = $genderData[''] ?? $genderData[null] ?? 0;
         if ($notDeclaredCount > 0) {
-            $labels[] = __('widgets.guest_gender_chart.unknown');
+            $labels[] = __('Unknown');
             $counts[] = $notDeclaredCount;
             $colors[] = 'rgba(156, 163, 175, 0.6)';
         }
@@ -50,7 +50,7 @@ class GuestGenderChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('widgets.guest_gender_chart.dataset_label'),
+                    'label' => __('Guests'),
                     'data' => $counts,
                     'backgroundColor' => $colors,
                 ],

@@ -16,7 +16,7 @@ class NameInput
     {
         return TextInput::make('name')
             ->label(__('Group Name'))
-            ->placeholder(__('e.g. Petrović Family'))
+            ->placeholder(__('wedding.groups.form.name_placeholder'))
             ->required()
             ->string()
             ->live()

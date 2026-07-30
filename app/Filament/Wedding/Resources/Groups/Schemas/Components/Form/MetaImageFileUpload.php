@@ -16,7 +16,7 @@ class MetaImageFileUpload
 
         return SpatieMediaLibraryFileUpload::make('MetaImage')
             ->label(__('Meta Image'))
-            ->helperText(__('Optional. If left empty, the wedding meta data will be used.'))
+            ->helperText(__('wedding.groups.meta.fallback_description'))
             ->collection('MetaImage')
             ->image()
             ->conversion('preview')

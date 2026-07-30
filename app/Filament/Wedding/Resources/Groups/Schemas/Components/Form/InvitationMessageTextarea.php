@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Resources\Groups\Schemas\Components\Form;
 
-use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Utilities\Get;
+use Schmeits\FilamentCharacterCounter\Forms\Components\Textarea;
 
 class InvitationMessageTextarea
 {
@@ -14,10 +15,14 @@ class InvitationMessageTextarea
     public static function make(): Textarea
     {
         return Textarea::make('invitation_message')
-            ->label(__('messages.personalized_message'))
-            ->placeholder(__('messages.personalized_message_placeholder'))
+            ->label(__('Personalized Message'))
+            ->placeholder(__('wedding.groups.invitation.personalized_message_placeholder'))
             ->rows(3)
             ->requiredWith('invitation_title')
+            ->live()
+            ->maxLength(150)
+            ->showCharacterCounter(fn (Get $get) => filled($get('invitation_message')))
+            ->showInsideControl()
             ->columnSpanFull();
     }
 }

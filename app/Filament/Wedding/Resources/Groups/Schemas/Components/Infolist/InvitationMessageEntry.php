@@ -14,7 +14,7 @@ class InvitationMessageEntry
     public static function make(): TextEntry
     {
         return TextEntry::make('invitation_message')
-            ->label(__('messages.invitation_message'))
+            ->label(__('Invitation Message'))
             ->placeholder(__('Not set'))
             ->columnSpanFull();
     }

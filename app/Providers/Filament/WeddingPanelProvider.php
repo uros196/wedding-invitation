@@ -36,6 +36,7 @@ class WeddingPanelProvider extends PanelProvider
             ->path(FilamentPanel::Wedding->path())
             ->authGuard(FilamentPanel::Wedding->guard())
             ->login()
+            ->spa()
             ->colors([
                 'primary' => Color::Amber,
             ])

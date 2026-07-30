@@ -32,18 +32,18 @@ class GuestDemographicsWidget extends StatsOverviewWidget
         $females    = $data->guestsByGender[Gender::Female->value] ?? 0;
 
         return [
-            Stat::make(__('widgets.guest_demographics.total_guests.label'), $data->totalGuestsCount)
-                ->description(__('widgets.guest_demographics.total_guests.description'))
+            Stat::make(__('Total Guests'), $data->totalGuestsCount)
+                ->description(__('wedding.widgets.guest_demographics.total_guests.description'))
                 ->descriptionIcon(Heroicon::Users)
                 ->color('info'),
 
-            Stat::make(__('widgets.guest_demographics.age_structure.label'), "{$adults} / {$children} / {$babies}")
-                ->description(__('widgets.guest_demographics.age_structure.description'))
+            Stat::make(__('Age Structure'), "{$adults} / {$children} / {$babies}")
+                ->description(__('wedding.widgets.guest_demographics.age_structure.description'))
                 ->descriptionIcon(Heroicon::UserGroup)
                 ->color('success'),
 
-            Stat::make(__('widgets.guest_demographics.gender_structure.label'), "{$males} / {$females}")
-                ->description(__('widgets.guest_demographics.gender_structure.description'))
+            Stat::make(__('Gender Structure'), "{$males} / {$females}")
+                ->description(__('wedding.widgets.guest_demographics.gender_structure.description'))
                 ->descriptionIcon(Heroicon::Variable)
                 ->color('warning'),
         ];

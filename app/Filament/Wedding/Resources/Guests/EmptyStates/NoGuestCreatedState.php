@@ -16,8 +16,8 @@ class NoGuestCreatedState
     public static function make(): EmptyState
     {
         return EmptyState::make('No content')
-            ->heading(__('No guest information'))
-            ->description(__('messages.create_guest_description'))
+            ->heading(__('wedding.guests.empty'))
+            ->description(__('wedding.guests.create_description'))
             ->contained(false)
             ->icon(Heroicon::UserCircle)
             ->visible(fn (?Guest $record) => is_null($record));

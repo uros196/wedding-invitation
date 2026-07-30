@@ -18,7 +18,7 @@ class TimelineVisibilityEntry
             ->label(__('Visibility'))
             ->state(fn (Group $record): string => $record->hiddenTimelineItems()->exists()
                 ? __('Custom')
-                : __('messages.all_timeline_items_visible'))
+                : __('wedding.groups.timeline.all_items_visible'))
             ->badge()
             ->color(fn (Group $record): string => $record->hiddenTimelineItems()->exists()
                 ? 'warning'

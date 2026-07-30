@@ -23,6 +23,6 @@ final class ConfirmAttendanceController extends Controller
         $group->load('guests');
         $this->groupService->confirmAttendance($group, $request->toDto());
 
-        return back()->with('success', __('messages.attendence_confirmation_success'));
+        return back()->with('success', __('wedding.notifications.attendance_confirmation_success'));
     }
 }

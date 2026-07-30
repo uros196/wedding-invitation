@@ -23,7 +23,7 @@ class RemoveCompanionAction
             ->color('danger')
             ->requiresConfirmation()
             ->modalHeading(__('Remove companion'))
-            ->modalDescription(__('Are you sure you want to remove this companion from the list?'))
+            ->modalDescription(__('wedding.guests.companions.remove_confirmation'))
             ->modalSubmitActionLabel(__('Remove'))
             ->action(function (Guest $record) {
                 $parent = $record->parent;

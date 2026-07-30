@@ -19,8 +19,8 @@ class NoCompanionAddedState
         $isVisible = fn (?Guest $record) => $record?->exists && ! $record->hasCompanions();
 
         return EmptyState::make('No content')
-            ->heading(__('No additional companions'))
-            ->description(__('messages.add_companion_description'))
+            ->heading(__('wedding.guests.companions.empty'))
+            ->description(__('wedding.guests.companions.add_description'))
             ->contained(false)
             ->icon(Heroicon::UserCircle)
             ->footer([

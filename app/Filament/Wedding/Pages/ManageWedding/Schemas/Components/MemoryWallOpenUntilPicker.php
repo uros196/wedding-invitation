@@ -6,6 +6,7 @@ namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\Utilities\Get;
+use Illuminate\Support\Carbon;
 
 class MemoryWallOpenUntilPicker
 {
@@ -16,6 +17,24 @@ class MemoryWallOpenUntilPicker
     {
         return DateTimePicker::make('memory_wall_open_until')
             ->label(__('Memory Wall Open Until'))
-            ->disabled(fn (Get $get): bool => ! $get('has_memory_wall'));
+            ->disabled(fn (Get $get): bool => ! $get('has_memory_wall'))
+            ->minDate(fn (Get $get) => filled($get('wedding_date'))
+                ? Carbon::parse($get('wedding_date'))->endOfDay()
+                : null
+            )
+            ->maxDate(fn (Get $get) => filled($get('wedding_date'))
+                ? static::getFormOpenForMax($get('wedding_date'))
+                : null
+            );
+    }
+
+    /**
+     * Calculate the maximum date for the memory wall form to remain open based on the wedding date.
+     */
+    protected static function getFormOpenForMax(string $weddingDate): Carbon
+    {
+        return Carbon::parse($weddingDate)
+            ->addDays(config('wedding.invitation.memory_wall.form_open_for_max'))
+            ->endOfDay();
     }
 }

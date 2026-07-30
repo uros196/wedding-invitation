@@ -15,7 +15,6 @@ use App\Filament\Wedding\Resources\Groups\Schemas\Components\Form\NameInput;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Form\UuidInput;
 use App\Filament\Wedding\Resources\Groups\Schemas\Components\Form\WeddingTimelineList;
 use App\Models\Group;
-use App\Models\WeddingTimeline;
 use App\Services\WeddingService;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
@@ -41,8 +40,8 @@ class GroupForm
 
                 Grid::make(1)
                     ->schema([
-                        Section::make(__('messages.basic_info'))
-                            ->description(__('messages.group.basic_info_description'))
+                        Section::make(__('Basic Information'))
+                            ->description(__('wedding.groups.form.basic_info_description'))
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
@@ -55,7 +54,7 @@ class GroupForm
                             ]),
 
                         Section::make(__('Meta Data'))
-                            ->description(__('messages.group.meta_description'))
+                            ->description(__('wedding.groups.meta.description'))
                             ->collapsible()
                             ->collapsed(fn (?Group $record): bool => ! $record?->hasAnyMeta())
                             ->schema([
@@ -67,7 +66,7 @@ class GroupForm
 
                 Grid::make(1)
                     ->schema([
-                        Section::make(__('messages.invitation_status'))
+                        Section::make(__('Invitation Status'))
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
@@ -83,11 +82,10 @@ class GroupForm
                             ]),
 
                         Section::make(__('Timeline'))
-                            ->description(__('Manage which timeline items are visible for this group.'))
+                            ->description(__('wedding.groups.timeline.description'))
                             ->schema([
                                 NoTimelineDefinedState::make()
-                                    ->visible(fn (?Group $record) =>
-                                        blank(resolve(WeddingService::class)->timelineList($record?->wedding))
+                                    ->visible(fn (?Group $record) => blank(resolve(WeddingService::class)->timelineList($record?->wedding))
                                     ),
 
                                 WeddingTimelineList::make(),

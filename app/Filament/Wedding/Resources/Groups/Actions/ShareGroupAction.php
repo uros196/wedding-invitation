@@ -16,7 +16,7 @@ class ShareGroupAction
     public static function make(): Action
     {
         return Action::make('share')
-            ->label(__('messages.share'))
+            ->label(__('Share'))
             ->icon(Heroicon::Share)
             ->color('gray')
             ->alpineClickHandler(fn (Group $record) => "

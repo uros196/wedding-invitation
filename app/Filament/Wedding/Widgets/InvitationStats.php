@@ -32,13 +32,13 @@ class InvitationStats extends StatsOverviewWidget
         $data = app(WeddingService::class)->getInvitationStats(auth()->user());
 
         $stats = [
-            Stat::make(__('widgets.invitation_stats.sent_invitations.label'), $data->sentInvitationsCount)
-                ->description(__('widgets.invitation_stats.sent_invitations.description'))
+            Stat::make(__('Sent Invitations'), $data->sentInvitationsCount)
+                ->description(__('wedding.widgets.invitation_stats.sent_invitations.description'))
                 ->descriptionIcon(Heroicon::PaperAirplane)
                 ->color('info'),
 
-            Stat::make(__('widgets.invitation_stats.total_views.label'), $data->totalViews)
-                ->description(__('widgets.invitation_stats.total_views.description'))
+            Stat::make(__('Total Views'), $data->totalViews)
+                ->description(__('wedding.widgets.invitation_stats.total_views.description'))
                 ->descriptionIcon(Heroicon::Eye)
                 ->color('warning'),
         ];

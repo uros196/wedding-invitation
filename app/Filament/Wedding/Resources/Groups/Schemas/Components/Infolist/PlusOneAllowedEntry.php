@@ -14,7 +14,7 @@ class PlusOneAllowedEntry
     public static function make(): IconEntry
     {
         return IconEntry::make('has_plus_one')
-            ->label(__('messages.group.plus_one_allowed'))
+            ->label(__('wedding.groups.plus_one.allowed'))
             ->boolean();
     }
 }

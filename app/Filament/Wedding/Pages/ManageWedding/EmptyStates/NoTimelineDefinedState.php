@@ -18,7 +18,7 @@ class NoTimelineDefinedState
     public static function make(bool $withAction = true): EmptyState
     {
         $state = EmptyState::make('no_timeline')
-            ->heading(__('Timeline is not defined yet.'))
+            ->heading(__('wedding.manage_wedding.timeline.not_defined'))
             ->icon(Heroicon::OutlinedClock)
             ->contained(false)
             ->visible(fn (Get $get) => empty($get('timelines') ?? []));

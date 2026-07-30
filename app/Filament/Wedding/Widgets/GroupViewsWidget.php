@@ -21,7 +21,7 @@ class GroupViewsWidget extends TableWidget
      */
     public function getHeading(): string
     {
-        return __('widgets.group_views.heading');
+        return __('wedding.widgets.group_views.heading');
     }
 
     /**
@@ -40,10 +40,10 @@ class GroupViewsWidget extends TableWidget
             )
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('widgets.group_views.columns.name')),
+                    ->label(__('Name')),
 
                 TextColumn::make('views_count')
-                    ->label(__('widgets.group_views.columns.views_count'))
+                    ->label(__('Views Count'))
                     ->numeric()
                     ->alignEnd(),
             ])

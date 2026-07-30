@@ -24,7 +24,7 @@ class AddCompanionAction
         return Action::make('addCompanion')
             ->label(__('Add companion'))
             ->modalHeading(__('Add companion'))
-            ->modalDescription(__('Select an existing guest or create a new one.'))
+            ->modalDescription(__('wedding.guests.companions.select_or_create'))
             ->modalSubmitActionLabel(__('Add'))
             ->icon(Heroicon::Plus)
             ->schema([
@@ -38,7 +38,7 @@ class AddCompanionAction
                     ->required()
                     ->exists('guests', 'id')
                     ->validationMessages([
-                        'required' => __('You must select a guest or create a new one.'),
+                        'required' => __('wedding.guests.companions.guest_required'),
                     ])
                     ->createOptionForm(ModalGrid::make()),
             ])

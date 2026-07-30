@@ -43,8 +43,8 @@ class GroupInfolist
                     ->schema([
                         Grid::make(1)
                             ->schema([
-                                Section::make(__('messages.basic_info'))
-                                    ->description(__('messages.group.basic_info_description'))
+                                Section::make(__('Basic Information'))
+                                    ->description(__('wedding.groups.form.basic_info_description'))
                                     ->columns(2)
                                     ->schema([
                                         NameEntry::make(),
@@ -53,8 +53,8 @@ class GroupInfolist
                                         InvitationMessageEntry::make(),
                                     ]),
 
-                                Section::make(__('messages.meta.data'))
-                                    ->description(__('messages.group.meta_description'))
+                                Section::make(__('Meta Data'))
+                                    ->description(__('wedding.groups.meta.description'))
                                     ->columns(2)
                                     ->collapsible()
                                     ->collapsed(fn (Group $record): bool => ! $record->hasAnyMeta())
@@ -66,7 +66,7 @@ class GroupInfolist
                             ]),
                         Grid::make(1)
                             ->schema([
-                                Section::make(__('messages.invitation_status'))
+                                Section::make(__('Invitation Status'))
                                     ->columns(2)
                                     ->schema([
                                         InvitationSentEntry::make(),
@@ -80,7 +80,7 @@ class GroupInfolist
                                     ]),
 
                                 Section::make(__('Timeline'))
-                                    ->description(__('messages.timeline_description'))
+                                    ->description(__('wedding.groups.timeline.description'))
                                     ->schema([
                                         TimelineVisibilityEntry::make(),
                                         HiddenTimelineItemsEntry::make(),

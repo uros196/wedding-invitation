@@ -15,7 +15,7 @@ class InvitationUrlEntry
     public static function make(): TextEntry
     {
         return TextEntry::make('url')
-            ->label(__('messages.invitation_url'))
+            ->label(__('Invitation URL'))
             ->state(fn (Group $record): string => route('group.show', $record))
             ->copyable()
             ->url(fn (Group $record): string => route('group.show', $record))

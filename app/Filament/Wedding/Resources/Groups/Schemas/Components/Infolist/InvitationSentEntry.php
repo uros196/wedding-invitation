@@ -14,7 +14,7 @@ class InvitationSentEntry
     public static function make(): IconEntry
     {
         return IconEntry::make('is_sent')
-            ->label(__('messages.invitation_sent'))
+            ->label(__('Invitation Sent'))
             ->boolean();
     }
 }

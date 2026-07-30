@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Resources\Groups\Schemas\Components\Form;
 
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Schmeits\FilamentCharacterCounter\Forms\Components\TextInput;
 
 class InvitationTitleInput
 {
@@ -14,8 +15,11 @@ class InvitationTitleInput
     public static function make(): TextInput
     {
         return TextInput::make('invitation_title')
-            ->label(__('messages.personalized_title'))
+            ->label(__('Personalized Title'))
             ->requiredWith('invitation_message')
-            ->columnSpanFull();
+            ->columnSpanFull()
+            ->live()
+            ->showCharacterCounter(fn (Get $get) => filled($get('invitation_title')))
+            ->maxLength(50);
     }
 }

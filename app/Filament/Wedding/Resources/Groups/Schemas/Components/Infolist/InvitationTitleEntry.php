@@ -14,7 +14,7 @@ class InvitationTitleEntry
     public static function make(): TextEntry
     {
         return TextEntry::make('invitation_title')
-            ->label(__('messages.invitation_title'))
+            ->label(__('Invitation Title'))
             ->placeholder(__('Not set'))
             ->columnSpanFull();
     }

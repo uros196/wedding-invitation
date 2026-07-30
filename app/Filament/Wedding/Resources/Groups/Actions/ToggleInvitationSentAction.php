@@ -16,8 +16,8 @@ class ToggleInvitationSentAction
     {
         return Action::make('toggleInvitationSent')
             ->label(fn (Group $record): string => $record->is_sent
-                ? __('messages.invitation_sent')
-                : __('messages.invitation_not_sent'))
+                ? __('Invitation Sent')
+                : __('Invitation Not Sent'))
             ->color(fn (Group $record): string => $record->is_sent ? 'success' : 'gray')
             ->action(function (Group $record): void {
                 $record->update([
