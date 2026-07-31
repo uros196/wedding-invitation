@@ -85,8 +85,11 @@ class GroupForm
                             ->description(__('wedding.groups.timeline.description'))
                             ->schema([
                                 NoTimelineDefinedState::make()
-                                    ->visible(fn (?Group $record) => blank(resolve(WeddingService::class)->timelineList($record?->wedding))
-                                    ),
+                                    ->visible(function () {
+                                        $wedding = auth()->user()->team->wedding;
+
+                                        return blank(resolve(WeddingService::class)->timelineList($wedding));
+                                    }),
 
                                 WeddingTimelineList::make(),
                             ]),

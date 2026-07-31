@@ -25,7 +25,7 @@ class WeddingTimelineList
                 $component->state(self::availableTimeline($record));
             })
             ->saveRelationshipsUsing(fn (?Group $record, $state) => $groupService->syncTimeline($record, $state))
-            ->visible(fn (?Group $record) => $record?->hasWedding())
+            ->visible(filled(self::timelineList(null)))
             ->columns(2)
             ->gridDirection('vertical');
     }
@@ -35,9 +35,10 @@ class WeddingTimelineList
      */
     protected static function timelineList(?Group $group): array
     {
+        $wedding = $group?->wedding ?? auth()->user()->team->wedding;
         $weddingService = resolve(WeddingService::class);
 
-        return $weddingService->timelineList($group?->wedding)
+        return $weddingService->timelineList($wedding)
             ->pluck('list_name', 'id')
             ->toArray();
     }

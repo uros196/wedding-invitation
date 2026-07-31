@@ -20,7 +20,7 @@ class InvitationMessageTextarea
             ->rows(3)
             ->requiredWith('invitation_title')
             ->live()
-            ->maxLength(150)
+            ->maxLength(500)
             ->showCharacterCounter(fn (Get $get) => filled($get('invitation_message')))
             ->showInsideControl()
             ->columnSpanFull();

@@ -64,6 +64,14 @@ class Form
                     ]),
 
                 Section::make(__('Schedule'))
+                    ->id('wedding-timeline')
+                    ->extraAlpineAttributes([
+                        'x-init' => <<<'JS'
+                            if (window.location.hash === '#wedding-timeline') {
+                                $nextTick(() => $el.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+                            }
+                            JS,
+                    ])
                     ->schema([
                         NoTimelineDefinedState::make(false),
                         TimelineRepeater::make(),
