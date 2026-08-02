@@ -11,9 +11,11 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AttendanceConfirmed implements ShouldBroadcast
+final class AttendanceConfirmed implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    protected readonly string $broadcastChannel;
 
     /**
      * Create a new event instance.
@@ -21,7 +23,9 @@ class AttendanceConfirmed implements ShouldBroadcast
     public function __construct(
         public readonly Group $group,
         public readonly array $confirmedIds,
-    ) {}
+    ) {
+        $this->broadcastChannel = $group->team->broadcastChannelName();
+    }
 
     /**
      * Get the channels the event should broadcast on.
@@ -30,9 +34,7 @@ class AttendanceConfirmed implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [
-            new PrivateChannel($this->group->team->broadcastChannelName()),
-        ];
+        return [new PrivateChannel($this->broadcastChannel)];
     }
 
     /**

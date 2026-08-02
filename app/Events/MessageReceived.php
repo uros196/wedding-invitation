@@ -16,13 +16,17 @@ final class MessageReceived implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    protected readonly string $broadcastChannel;
+
     /**
      * Create a new event instance.
      */
     public function __construct(
         public readonly Message $message,
         public readonly Group $group,
-    ) {}
+    ) {
+        $this->broadcastChannel = $group->team->broadcastChannelName();
+    }
 
     /**
      * Get the channels the event should broadcast on.
@@ -34,7 +38,7 @@ final class MessageReceived implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [new PrivateChannel($this->group->team->broadcastChannelName())];
+        return [new PrivateChannel($this->broadcastChannel)];
     }
 
     /**
