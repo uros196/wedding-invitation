@@ -7,6 +7,7 @@ namespace App\Providers\Filament;
 use App\Enums\FilamentPanel;
 use App\Filament\Wedding\Plugins\EchoRegisterPlugin;
 use AzGasim\FilamentUnsavedChangesModal\FilamentUnsavedChangesModalPlugin;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -15,6 +16,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -25,6 +27,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
+use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
 class WeddingPanelProvider extends PanelProvider
 {
@@ -54,8 +58,20 @@ class WeddingPanelProvider extends PanelProvider
                 FilamentInfoWidget::class,
             ])
             ->plugins([
-                FilamentUnsavedChangesModalPlugin::make(),
                 EchoRegisterPlugin::make(),
+                FilamentUnsavedChangesModalPlugin::make(),
+                FilamentEditProfilePlugin::make()
+                    ->shouldRegisterNavigation(false)
+                    ->shouldShowEmailForm(false)
+                    ->shouldShowLocaleForm(true, [
+                        'sr_Latn' => 'Srpski',
+                        'en' => 'English',
+                    ])
+                    ->shouldShowAvatarForm(
+                        directory: 'avatars',
+                        //only accept jpeg and png files with a maximum size of 2MB
+                        rules: 'mimes:jpeg,png|max:2048',
+                    ),
             ])
             ->renderHook(
                 PanelsRenderHook::USER_MENU_BEFORE,
@@ -75,6 +91,12 @@ class WeddingPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                'profile' => Action::make('profile_settings')
+                    ->label(fn ():string => __('filament-edit-profile::default.title'))
+                    ->url(fn (): string => EditProfilePage::getUrl())
+                    ->icon(Heroicon::Cog6Tooth)
             ]);
     }
 }
