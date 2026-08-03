@@ -8,6 +8,7 @@ use App\Auth\FilamentAuth\ManagementDriver;
 use App\Contracts\FilamentAuth;
 use App\Models\User;
 use Closure;
+use Filament\Panel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,6 +65,17 @@ enum FilamentPanel: string
     public static function guards(): array
     {
         return collect(self::cases())->map(fn (self $panel) => $panel->guard())->toArray();
+    }
+
+    /**
+     * Configure the panel with the appropriate settings.
+     */
+    public function configurePanel(Panel $panel): Panel
+    {
+        return $panel
+            ->id($this->id())
+            ->path($this->path())
+            ->authGuard($this->guard());
     }
 
     /**

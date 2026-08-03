@@ -9,11 +9,14 @@ use App\Models\Wedding;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MemoryWallService
 {
+    public function __construct(
+        private readonly QrCodeService $qrCodeService,
+    ) {}
+
     /**
      * Check if the memory wall is enabled for the given wedding.
      */
@@ -64,7 +67,9 @@ class MemoryWallService
      */
     public function generateQrCode(Wedding $wedding, int $size = 200): string
     {
-        return $this->getQrCode($wedding, $size)->toHtml();
+        $qrCode = $this->getQrCode($wedding, $size);
+
+        return $qrCode instanceof HtmlString ? $qrCode->toHtml() : $qrCode;
     }
 
     /**
@@ -72,9 +77,12 @@ class MemoryWallService
      */
     public function getQrCode(Wedding $wedding, int $size = 200, ?QrCodeFormat $format = null): HtmlString|string
     {
-        return QrCode::format(($format ?? QrCodeFormat::default())->value)
-            ->size($size)
-            ->generate($wedding->memory_wall_url);
+        $format ??= QrCodeFormat::default();
+        $result = $this->qrCodeService->generate($wedding->memory_wall_url, $format, $size);
+
+        return $format === QrCodeFormat::Svg
+            ? new HtmlString($result->getString())
+            : $result->getString();
     }
 
     /**
@@ -85,7 +93,7 @@ class MemoryWallService
         $qrCode = $this->getQrCode($wedding, $size, $option);
 
         return response()->streamDownload(
-            fn () => print($qrCode),
+            fn () => print ($qrCode),
             "qr-code-{$wedding->uuid}.{$option->extension()}",
             ['Content-Type' => $option->contentType()]
         );

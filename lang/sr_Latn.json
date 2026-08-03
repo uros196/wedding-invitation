@@ -110,5 +110,9 @@
     "Number of unread messages": "Broj nepročitanih poruka",
     "Total Guests": "Ukupan broj gostiju",
     "Age Structure": "Struktura po godinama",
-    "Gender Structure": "Struktura po polu"
+    "Gender Structure": "Struktura po polu",
+    "Profile Settings": "Podešavanja profila",
+    "Language": "Jezik",
+    "Srpski": "Srpski",
+    "English": "Engleski"
 }

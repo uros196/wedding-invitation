@@ -27,11 +27,8 @@ class ManagementPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
-            ->id(FilamentPanel::Management->id())
-            ->path(FilamentPanel::Management->path())
+        return FilamentPanel::Management->configurePanel($panel)
             ->login(ManagementLogin::class)
-            ->authGuard(FilamentPanel::Management->guard())
             ->colors([
                 'primary' => Color::Amber,
             ])

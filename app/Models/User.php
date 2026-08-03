@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\FilamentPanel;
 use App\Enums\UserType;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -14,14 +15,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['name', 'email', 'password', 'user_type', 'team_id', 'avatar_url', 'locale'])]
+#[Fillable(['name', 'email', 'password', 'user_type', 'team_id', 'locale'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia
 {
     use HasFactory, Notifiable;
+    use InteractsWithMedia;
 
     /**
      * Get the attributes that should be cast.
@@ -56,8 +60,21 @@ class User extends Authenticatable implements FilamentUser
      */
     public function getFilamentAvatarUrl(): ?string
     {
-        $avatarColumn = config('filament-edit-profile.avatar_column', 'avatar_url');
-        return $this->$avatarColumn ? Storage::url($this->$avatarColumn) : null;
+        return $this->getFirstMediaUrl('Avatar', 'preview');
+    }
+
+    /**
+     * Register the user's media collections and conversions.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('Avatar')
+            ->singleFile()
+            ->registerMediaConversions(function (): void {
+                $this->addMediaConversion('preview')
+                    ->fit(Fit::Crop, 500, 500)
+                    ->format('webp');
+            });
     }
 
     /**

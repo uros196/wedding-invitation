@@ -41,9 +41,8 @@ class AppServiceProvider extends ServiceProvider
         // Define Filament language switcher.
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch->locales(['sr_Latn', 'en'])
-                ->userPreferredLocale(config('app.locale'))
-                ->trigger(style: TriggerStyle::Avatar)
-                ->visible(blank(auth()->user()->locale));
+                ->userPreferredLocale(auth()->user()?->locale ?? config('app.locale'))
+                ->trigger(style: TriggerStyle::Avatar);
         });
 
         // Expand SVG factory with a new path
