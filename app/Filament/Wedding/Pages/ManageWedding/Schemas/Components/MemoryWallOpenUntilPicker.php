@@ -6,6 +6,7 @@ namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Carbon;
 
 class MemoryWallOpenUntilPicker
@@ -17,6 +18,11 @@ class MemoryWallOpenUntilPicker
     {
         return DateTimePicker::make('memory_wall_open_until')
             ->label(__('Memory Wall Open Until'))
+            ->placeholder(__('wedding.manage_wedding.memory_wall.open_until_placeholder'))
+            ->hintIcon(
+                Heroicon::InformationCircle,
+                __('wedding.manage_wedding.memory_wall.open_until_help'),
+            )
             ->disabled(fn (Get $get): bool => ! $get('has_memory_wall'))
             ->minDate(fn (Get $get) => filled($get('wedding_date'))
                 ? Carbon::parse($get('wedding_date'))->endOfDay()

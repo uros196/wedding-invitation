@@ -6,12 +6,15 @@ namespace App\Livewire;
 
 use App\Filament\Exports\GuestExporter;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\ExportAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
 class GlobalExport extends Component implements HasActions, HasForms
@@ -25,12 +28,28 @@ class GlobalExport extends Component implements HasActions, HasForms
     public function exportGuestsAction(): Action
     {
         return ExportAction::make('exportGuests')
-            ->label('Izvezi potvrđene goste')
+            ->label(__('Export Confirmed Guests'))
             ->exporter(GuestExporter::class)
-            ->modifyQueryUsing(fn ($query) => $query->confirmed())
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->confirmed())
             ->icon(Heroicon::ArrowDownTray)
-            ->color('primary')
-            ->link();
+            ->color('primary');
+    }
+
+    /**
+     * Render the export menu.
+     */
+    public function exportAction(): ActionGroup
+    {
+        return ActionGroup::make([
+            $this->exportGuestsAction(),
+        ])
+            ->livewire($this)
+            ->label(__('Export'))
+            ->icon(Heroicon::ArrowDownTray)
+            ->color('secondary')
+            ->button()
+            ->dropdownPlacement('bottom-end')
+            ->dropdownWidth(Width::ExtraSmall);
     }
 
     /**
@@ -40,7 +59,7 @@ class GlobalExport extends Component implements HasActions, HasForms
     {
         return <<<'BLADE'
             <div>
-                {{ $this->exportGuestsAction }}
+                {{ $this->exportAction() }}
 
                 <x-filament-actions::modals />
             </div>

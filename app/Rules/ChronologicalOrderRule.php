@@ -20,7 +20,7 @@ class ChronologicalOrderRule implements ValidationRule
         }
 
         $times = array_column($value, 'time');
-        $times = array_filter($times);
+        $times = array_values(array_filter($times));
 
         for ($i = 1; $i < count($times); $i++) {
             if ($times[$i] <= $times[$i - 1]) {

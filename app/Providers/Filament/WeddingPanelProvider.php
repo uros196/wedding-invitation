@@ -6,25 +6,22 @@ namespace App\Providers\Filament;
 
 use App\Enums\FilamentPanel;
 use App\Filament\Plugins\BreezyCoreConfiguration;
+use App\Filament\Wedding\Pages\Dashboard;
 use App\Filament\Wedding\Plugins\EchoRegisterPlugin;
+use App\Filament\Wedding\Plugins\ExportPlugin;
 use AzGasim\FilamentUnsavedChangesModal\FilamentUnsavedChangesModalPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class WeddingPanelProvider extends PanelProvider
@@ -49,19 +46,12 @@ class WeddingPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Wedding/Widgets'), for: 'App\Filament\Wedding\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
             ->plugins([
                 EchoRegisterPlugin::make(),
+                ExportPlugin::make(),
                 FilamentUnsavedChangesModalPlugin::make(),
                 BreezyCoreConfiguration::make(),
             ])
-            ->renderHook(
-                PanelsRenderHook::USER_MENU_BEFORE,
-                fn (): string => Blade::render('@livewire(\'global-export\')'),
-            )
             ->sidebarCollapsibleOnDesktop()
             ->middleware([
                 EncryptCookies::class,

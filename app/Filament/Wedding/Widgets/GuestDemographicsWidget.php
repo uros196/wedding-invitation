@@ -15,7 +15,15 @@ class GuestDemographicsWidget extends StatsOverviewWidget
 {
     protected ?string $pollingInterval = null;
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 4;
+
+    /**
+     * Get the guest demographics heading.
+     */
+    protected function getHeading(): ?string
+    {
+        return __('wedding.widgets.guest_demographics.heading');
+    }
 
     /**
      * Retrieves statistics about guests, including total count, age structure, and gender structure.
@@ -24,12 +32,12 @@ class GuestDemographicsWidget extends StatsOverviewWidget
     {
         $data = app(GuestService::class)->getGroupedCounts();
 
-        $adults     = $data->guestsByAge[Age::Adult->value] ?? 0;
-        $children   = $data->guestsByAge[Age::Child->value] ?? 0;
-        $babies     = $data->guestsByAge[Age::Baby->value] ?? 0;
+        $adults = $data->guestsByAge[Age::Adult->value] ?? 0;
+        $children = $data->guestsByAge[Age::Child->value] ?? 0;
+        $babies = $data->guestsByAge[Age::Baby->value] ?? 0;
 
-        $males      = $data->guestsByGender[Gender::Male->value] ?? 0;
-        $females    = $data->guestsByGender[Gender::Female->value] ?? 0;
+        $males = $data->guestsByGender[Gender::Male->value] ?? 0;
+        $females = $data->guestsByGender[Gender::Female->value] ?? 0;
 
         return [
             Stat::make(__('Total Guests'), $data->totalGuestsCount)

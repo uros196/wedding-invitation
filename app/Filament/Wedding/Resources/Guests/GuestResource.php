@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Wedding\Resources\Guests;
 
 use App\Concerns\RelationScopedResource;
+use App\Enums\NavigationGroup;
 use App\Filament\Wedding\Resources\Guests\Pages\CreateGuest;
 use App\Filament\Wedding\Resources\Guests\Pages\EditGuest;
 use App\Filament\Wedding\Resources\Guests\Pages\ListGuests;
+use App\Filament\Wedding\Resources\Guests\Pages\ViewGuest;
 use App\Filament\Wedding\Resources\Guests\Schemas\GuestForm;
+use App\Filament\Wedding\Resources\Guests\Schemas\GuestInfolist;
 use App\Filament\Wedding\Resources\Guests\Tables\GuestsTable;
 use App\Models\Guest;
 use BackedEnum;
@@ -33,6 +36,16 @@ class GuestResource extends Resource
     protected static ?string $model = Guest::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+
+    protected static ?int $navigationSort = 2;
+
+    /**
+     * Get the navigation group.
+     */
+    public static function getNavigationGroup(): \UnitEnum
+    {
+        return NavigationGroup::Guests;
+    }
 
     /**
      * Get the name of the relationship to scope the resource by.
@@ -75,6 +88,14 @@ class GuestResource extends Resource
     }
 
     /**
+     * Configure the infolist schema.
+     */
+    public static function infolist(Schema $schema): Schema
+    {
+        return GuestInfolist::configure($schema);
+    }
+
+    /**
      * Configure the table.
      */
     public static function table(Table $table): Table
@@ -102,6 +123,7 @@ class GuestResource extends Resource
         return [
             'index' => ListGuests::route('/'),
             'create' => CreateGuest::route('/create'),
+            'view' => ViewGuest::route('/{record}'),
             'edit' => EditGuest::route('/{record}/edit'),
         ];
     }

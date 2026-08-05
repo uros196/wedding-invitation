@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Pages\ManageWedding;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Wedding\Pages\ManageWedding\Schemas\Form;
 use App\Models\User;
 use App\Models\Wedding;
@@ -22,9 +23,9 @@ class ManageWedding extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
-    protected string $view = 'filament.wedding.pages.manage-wedding';
+    protected static ?int $navigationSort = 1;
 
-    protected static ?string $title = 'Detalji venčanja';
+    protected string $view = 'filament.wedding.pages.manage-wedding';
 
     public ?array $data = [];
 
@@ -36,6 +37,14 @@ class ManageWedding extends Page implements HasForms
     public static function getNavigationLabel(): string
     {
         return __('Wedding Details');
+    }
+
+    /**
+     * Get the navigation group.
+     */
+    public static function getNavigationGroup(): \UnitEnum
+    {
+        return NavigationGroup::Wedding;
     }
 
     /**

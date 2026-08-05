@@ -6,6 +6,7 @@ namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Carbon;
 
 class RSVPDeadlinePicker
@@ -17,6 +18,11 @@ class RSVPDeadlinePicker
     {
         return DateTimePicker::make('rsvp_deadline')
             ->label(__('RSVP Deadline'))
+            ->placeholder(__('wedding.manage_wedding.basic_information.rsvp_deadline_placeholder'))
+            ->hintIcon(
+                Heroicon::InformationCircle,
+                __('wedding.manage_wedding.basic_information.rsvp_deadline_help'),
+            )
             ->maxDate(fn (Get $get) => filled($get('wedding_date'))
                 ? Carbon::parse($get('wedding_date'))->endOfDay()
                 : null)

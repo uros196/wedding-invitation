@@ -15,6 +15,7 @@ class WelcomeTextRichEditor
     {
         return RichEditor::make('welcome_text')
             ->label(__('Main Text'))
+            ->placeholder(__('wedding.manage_wedding.invitation_text.welcome_text_placeholder'))
             ->extraInputAttributes(['style' => 'min-height: 300px;'])
             ->required();
     }

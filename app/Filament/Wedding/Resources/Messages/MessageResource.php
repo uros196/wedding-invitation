@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Wedding\Resources\Messages;
 
 use App\Concerns\RelationScopedResource;
+use App\Enums\NavigationGroup;
 use App\Filament\Wedding\Resources\Messages\Pages\ManageMessages;
 use App\Filament\Wedding\Resources\Messages\Pages\ViewMessage;
 use App\Filament\Wedding\Resources\Messages\Schemas\MessageInfolist;
@@ -28,6 +29,16 @@ class MessageResource extends Resource
     protected static ?string $model = Message::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleBottomCenterText;
+
+    protected static ?int $navigationSort = 2;
+
+    /**
+     * Get the navigation group.
+     */
+    public static function getNavigationGroup(): \UnitEnum
+    {
+        return NavigationGroup::Wedding;
+    }
 
     /**
      * Get the name of the relationship to scope the resource by.

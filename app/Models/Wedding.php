@@ -101,6 +101,15 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
+     * Define an attribute to retrieve the wedding title,
+     * formatted as a combination of the bride's name and the groom's name.
+     */
+    protected function weddingTitle(): Attribute
+    {
+        return Attribute::get(fn () => "{$this->bride_name} & {$this->groom_name}");
+    }
+
+    /**
      * Get the wedding countdown.
      */
     protected function weddingCountdown(): Attribute

@@ -12,7 +12,7 @@ class GuestGenderChartWidget extends ChartWidget
 {
     protected ?string $pollingInterval = null;
 
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 7;
 
     /**
      * Get the widget heading.

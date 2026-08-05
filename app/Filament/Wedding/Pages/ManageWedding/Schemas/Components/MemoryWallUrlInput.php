@@ -7,6 +7,7 @@ namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 use App\Models\Wedding;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Support\Icons\Heroicon;
 use Webbingbrasil\FilamentCopyActions\Actions\CopyAction;
 
 class MemoryWallUrlInput
@@ -18,6 +19,10 @@ class MemoryWallUrlInput
     {
         return TextInput::make('memory_wall_url')
             ->label(__('Memory Wall URL'))
+            ->hintIcon(
+                Heroicon::InformationCircle,
+                __('wedding.manage_wedding.memory_wall.url_help'),
+            )
             ->readonly()
             ->visible(fn (Get $get, ?Wedding $wedding): bool => (bool) $get('has_memory_wall') && $wedding?->exists)
             ->afterStateHydrated(function (TextInput $component, ?Wedding $record) {

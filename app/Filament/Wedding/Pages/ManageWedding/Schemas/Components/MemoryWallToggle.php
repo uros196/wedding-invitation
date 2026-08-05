@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 
 use Filament\Forms\Components\Toggle;
+use Filament\Support\Icons\Heroicon;
 
 class MemoryWallToggle
 {
@@ -15,6 +16,10 @@ class MemoryWallToggle
     {
         return Toggle::make('has_memory_wall')
             ->label(__('Enable Memory Wall'))
+            ->hintIcon(
+                Heroicon::InformationCircle,
+                __('wedding.manage_wedding.memory_wall.enable_help'),
+            )
             ->live()
             ->default(true);
     }

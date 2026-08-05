@@ -56,7 +56,11 @@ class WeddingTimeline extends Model
      */
     public function hiddenByGroups(): BelongsToMany
     {
-        return $this->belongsToMany(Group::class, 'group_hidden_timeline_items');
+        return $this->belongsToMany(Group::class, 'group_hidden_timeline_items')
+            ->where('group_hidden_timeline_items.wedding_id', $this->wedding_id)
+            ->where('groups.wedding_id', $this->wedding_id)
+            ->withPivot('wedding_id')
+            ->withTimestamps();
     }
 
     /**

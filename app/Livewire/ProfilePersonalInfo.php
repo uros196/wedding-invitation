@@ -29,8 +29,7 @@ class ProfilePersonalInfo extends PersonalInfo
                     'sr_Latn' => __('Srpski'),
                     'en' => __('English'),
                 ])
-                ->default(config('app.locale'))
-                ->required(),
+                ->default(config('app.locale')),
         ];
     }
 

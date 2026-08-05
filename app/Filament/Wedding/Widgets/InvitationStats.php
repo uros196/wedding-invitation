@@ -20,7 +20,15 @@ class InvitationStats extends StatsOverviewWidget
     /**
      * The sort order of the widget on the dashboard.
      */
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 2;
+
+    /**
+     * Get the invitation statistics heading.
+     */
+    protected function getHeading(): ?string
+    {
+        return __('wedding.widgets.invitation_stats.heading');
+    }
 
     /**
      * Get the stats to be displayed on the dashboard.

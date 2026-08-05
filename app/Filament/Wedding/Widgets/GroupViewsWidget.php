@@ -27,7 +27,9 @@ class GroupViewsWidget extends TableWidget
     /**
      * The sort order of the widget on the dashboard.
      */
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 5;
+
+    protected int|string|array $columnSpan = 'full';
 
     /**
      * Configure the table for the widget.

@@ -81,6 +81,37 @@ class GroupService
     }
 
     /**
+     * Save the groups that can see a timeline item.
+     *
+     * Groups not included in the submitted list are stored as hidden for the
+     * timeline item. The submitted group IDs are restricted to groups that
+     * belong to the timeline item's wedding before the pivot is synchronized.
+     */
+    public function saveVisibility(?WeddingTimeline $timeline, mixed $visibleGroupIds): void
+    {
+        if (! $timeline) {
+            return;
+        }
+
+        $allGroupIds = Group::query()
+            ->where('wedding_id', $timeline->wedding_id)
+            ->pluck('id')
+            ->map(static fn (mixed $groupId): int => (int) $groupId)
+            ->all();
+        $visibleGroupIds = collect(is_array($visibleGroupIds) ? $visibleGroupIds : [])
+            ->map(static fn (mixed $groupId): int => (int) $groupId)
+            ->intersect($allGroupIds)
+            ->values()
+            ->all();
+        $hiddenGroupIds = array_values(array_diff($allGroupIds, $visibleGroupIds));
+
+        $timeline->hiddenByGroups()->syncWithPivotValues($hiddenGroupIds, [
+            'wedding_id' => $timeline->wedding_id,
+        ]);
+        $timeline->unsetRelation('hiddenByGroups');
+    }
+
+    /**
      * Confirm attendance for a group and send a message.
      */
     public function confirmAttendance(Group $group, ConfirmAttendanceData $data): void

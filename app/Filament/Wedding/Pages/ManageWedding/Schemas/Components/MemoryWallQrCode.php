@@ -30,13 +30,19 @@ class MemoryWallQrCode
             ->label(__('QR Code'))
             ->visible(fn (Get $get, ?Wedding $wedding): bool => (bool) $get('has_memory_wall') && $wedding?->exists)
             ->state(function (?Wedding $record) use ($service): HtmlString {
-                $qrCode = $record?->exists ? $service->generateQrCode($record, 100) : '';
+                $qrCode = $record?->exists ? $service->generateQrCode($record, 150) : '';
+
                 return new HtmlString($qrCode);
             })
+            ->alignCenter()
+            ->extraEntryWrapperAttributes([
+                'class' => 'rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50',
+            ])
             ->hintAction(
                 Action::make('download')
                     ->label(__('Download'))
                     ->icon(Heroicon::ArrowDownTray)
+                    ->modalSubmitActionLabel(__('Download'))
                     ->schema([
                         Grid::make()
                             ->schema([
@@ -51,11 +57,19 @@ class MemoryWallQrCode
                                     ->options(QrCodeSize::class)
                                     ->default(QrCodeSize::default())
                                     ->required(),
-                            ])
+                            ]),
                     ])
-                    ->action(fn (Wedding $record, array $data): Response =>
-                        $service->downloadQrCode($record, $data['format'], $data['size']->value)
-                    )
+                    ->action(fn (Wedding $record, array $data): Response => $service
+                        ->downloadQrCode($record, $data['format'], $data['size']->value)
+                    ),
+            )
+            ->hintAction(
+                Action::make('help')
+                    ->label(__('wedding.manage_wedding.help_action'))
+                    ->icon(Heroicon::InformationCircle)
+                    ->iconButton()
+                    ->color('gray')
+                    ->tooltip(__('wedding.manage_wedding.memory_wall.qr_code_help')),
             );
     }
 }

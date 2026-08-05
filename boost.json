@@ -16,9 +16,9 @@
         "wayfinder-development",
         "pest-testing",
         "inertia-react-development",
-        "tailwindcss-development",
         "echo-react-development",
         "echo-development",
+        "tailwindcss-development",
         "translation-development"
     ]
 }

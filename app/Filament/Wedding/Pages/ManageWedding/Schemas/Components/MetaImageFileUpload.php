@@ -18,7 +18,7 @@ class MetaImageFileUpload
 
         return SpatieMediaLibraryFileUpload::make('MetaImage')
             ->label(__('Meta Image'))
-            ->helperText(__('wedding.manage_wedding.meta.image_fallback'))
+            ->helperText(__('wedding.manage_wedding.meta.image_help'))
             ->collection('MetaImage')
             ->image()
             ->conversion('preview')

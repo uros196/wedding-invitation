@@ -20,6 +20,14 @@ class GuestStatusWidget extends StatsOverviewWidget
     protected static ?int $sort = 3;
 
     /**
+     * Get the guest response status heading.
+     */
+    protected function getHeading(): ?string
+    {
+        return __('wedding.widgets.guest_status.heading');
+    }
+
+    /**
      * Retrieves statistical data related to guest confirmations, declines, and pending responses.
      */
     protected function getStats(): array

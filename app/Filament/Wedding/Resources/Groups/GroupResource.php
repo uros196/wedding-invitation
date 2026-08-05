@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Wedding\Resources\Groups;
 
 use App\Concerns\RelationScopedResource;
+use App\Enums\NavigationGroup;
 use App\Filament\Wedding\Resources\Groups\Pages\CreateGroup;
 use App\Filament\Wedding\Resources\Groups\Pages\EditGroup;
 use App\Filament\Wedding\Resources\Groups\Pages\ListGroups;
 use App\Filament\Wedding\Resources\Groups\Pages\ViewGroup;
+use App\Filament\Wedding\Resources\Groups\RelationManagers\GuestsRelationManager;
 use App\Filament\Wedding\Resources\Groups\Schemas\GroupForm;
 use App\Filament\Wedding\Resources\Groups\Schemas\GroupInfolist;
 use App\Filament\Wedding\Resources\Groups\Tables\GroupsTable;
@@ -30,6 +32,16 @@ class GroupResource extends Resource
     protected static ?string $model = Group::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?int $navigationSort = 1;
+
+    /**
+     * Get the navigation group.
+     */
+    public static function getNavigationGroup(): \UnitEnum
+    {
+        return NavigationGroup::Guests;
+    }
 
     /**
      * Get the name of the relationship to scope the resource by.
@@ -93,7 +105,7 @@ class GroupResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Wedding\Resources\Groups\RelationManagers\GuestsRelationManager::class,
+            GuestsRelationManager::class,
         ];
     }
 

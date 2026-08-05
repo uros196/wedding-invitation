@@ -16,6 +16,7 @@ class BrideNameInput
     {
         return TextInput::make('bride_name')
             ->label(__('Bride\'s Name'))
+            ->placeholder(__('wedding.manage_wedding.basic_information.bride_name_placeholder'))
             ->live()
             ->showCharacterCounter(fn (Get $get) => filled($get('bride_name')))
             ->maxLength(50)

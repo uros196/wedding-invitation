@@ -5,50 +5,27 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\QrCodeFormat;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\RoundBlockSizeMode;
-use Endroid\QrCode\Writer\PngWriter;
+use App\Support\QrCodeBuilder\QrCodeBuilder;
+use App\Support\QrCodeBuilder\QrCodeFactory;
 use Endroid\QrCode\Writer\Result\ResultInterface;
-use Endroid\QrCode\Writer\SvgWriter;
-use Endroid\QrCode\Writer\WriterInterface;
 
-class QrCodeService
+/**
+ * Provides the application-facing API for generating invitation QR codes.
+ */
+final readonly class QrCodeService
 {
-    private const int MARGIN = 16;
+    public function __construct(
+        private QrCodeBuilder $qrCodeBuilder,
+        private QrCodeFactory $factory,
+    ) {}
 
-    private const int FOREGROUND_RED = 74;
-
-    private const int FOREGROUND_GREEN = 52;
-
-    private const int FOREGROUND_BLUE = 46;
-
-    public function generate(string $data, QrCodeFormat $format, int $size): ResultInterface
+    /**
+     * Generate a QR code result for the given payload.
+     */
+    public function generateForWedding(string $data, QrCodeFormat $format, int $size): ResultInterface
     {
-        return (new Builder(
-            writer: $this->writerFor($format),
-            data: $data,
-            encoding: new Encoding('UTF-8'),
-            errorCorrectionLevel: ErrorCorrectionLevel::High,
-            size: $size,
-            margin: self::MARGIN,
-            roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            foregroundColor: new Color(
-                self::FOREGROUND_RED,
-                self::FOREGROUND_GREEN,
-                self::FOREGROUND_BLUE,
-            ),
-            backgroundColor: new Color(255, 255, 255),
-        ))->build();
-    }
+        $style = $this->factory->makeForWedding();
 
-    private function writerFor(QrCodeFormat $format): WriterInterface
-    {
-        return match ($format) {
-            QrCodeFormat::Svg => new SvgWriter,
-            QrCodeFormat::Png => new PngWriter,
-        };
+        return $this->qrCodeBuilder->build($data, $style, $format, $size);
     }
 }

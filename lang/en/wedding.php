@@ -5,10 +5,59 @@ return [
     'greeting' => 'You are invited to our wedding. Join us in celebrating love!',
 
     'manage_wedding' => [
+        'help_action' => 'More information',
+        'basic_information' => [
+            'description' => 'Enter the names and dates that will appear on the invitation.',
+            'help' => 'Use the names exactly as you want guests to see them. The RSVP deadline must be before the wedding date.',
+            'bride_name_placeholder' => 'e.g. Ana',
+            'groom_name_placeholder' => 'e.g. Marko',
+            'wedding_date_placeholder' => 'Choose the wedding date and time',
+            'rsvp_deadline_placeholder' => 'Choose when guest responses close',
+            'rsvp_deadline_help' => 'Guests can confirm or decline their attendance until this date and time.',
+        ],
         'main_image_description' => 'This image is displayed at the top of the invitation.',
+        'main_image_help' => 'Choose the main photo guests will see first. You can crop it after uploading.',
+        'invitation_text' => [
+            'description' => 'Write the welcome message guests will read on the invitation.',
+            'help' => 'This is the main message on your invitation. Use the editor to add emphasis or lists if needed.',
+            'welcome_text_placeholder' => 'e.g. We are happy to invite you to celebrate our special day...',
+        ],
+        'schedule' => [
+            'description' => 'Add the events in the order they will happen.',
+            'help' => 'Add one item for each part of the celebration. Guests will see only the items marked as visible.',
+            'event_name_placeholder' => 'e.g. Ceremony',
+            'time_placeholder' => 'e.g. 16:00',
+            'address_placeholder' => 'e.g. Church of Saint Sava',
+            'map_link_placeholder' => 'Paste a Google Maps link',
+            'icon_help' => 'Choose an icon that helps guests recognize this event.',
+            'visibility_help' => 'Turn this off if you want to hide this event from guests without deleting it.',
+            'visibility_all' => 'Visible to all groups',
+            'visibility_custom' => 'Custom group visibility',
+            'visibility_manage' => 'Choose which groups can see this event.',
+            'visibility_save_first' => 'Save the timeline item before choosing groups.',
+            'visibility_modal_heading' => 'Choose groups for :event',
+            'visibility_modal_description' => 'New timeline items are visible to every group by default. Uncheck groups that should not see this event.',
+            'visibility_save' => 'Save visibility',
+            'visible_groups' => 'Groups that can see this event',
+            'visibility_select_all' => 'Select all',
+            'visibility_deselect_all' => 'Deselect all',
+        ],
+        'memory_wall' => [
+            'description' => 'Let guests share photos and messages from your celebration.',
+            'help' => 'When enabled, guests can open the memory wall using its link or QR code. Set how long submissions should remain open.',
+            'enable_help' => 'Turn this on to create a page where guests can share photos and memories.',
+            'open_until_placeholder' => 'Choose when photo and message sharing closes',
+            'open_until_help' => 'The date must be after the wedding and within the allowed period.',
+            'url_help' => 'This link is created automatically. Copy it and share it with your guests.',
+            'qr_code_help' => 'Print or show this QR code so guests can quickly open the memory wall.',
+        ],
         'meta' => [
             'description' => 'Used to generate the link preview when the invitation is shared.',
             'image_fallback' => 'Optional. If left empty, the main image above will be used.',
+            'help' => 'These settings affect the title, text and image shown when the invitation link is shared in a chat or social network.',
+            'title_help' => 'This is the title shown in the link preview. Leave it empty to use the default wedding title.',
+            'description_help' => 'This is the text shown below the title in the link preview. Leave it empty to use the default greeting.',
+            'image_help' => 'Optional. Leave it empty to use the main invitation image.',
         ],
         'timeline' => [
             'not_defined' => 'Timeline is not defined yet.',
@@ -57,6 +106,19 @@ return [
     ],
 
     'widgets' => [
+        'wedding_status' => [
+            'heading' => 'Public access',
+            'rsvp' => [
+                'open' => 'Guests can confirm or decline attendance.',
+                'closed' => 'Guest responses are no longer accepted.',
+                'not_set' => 'Set the RSVP deadline in Wedding Details.',
+            ],
+            'memory_wall' => [
+                'open' => 'Guests can share photos and messages.',
+                'closed' => 'Photo and message sharing is currently closed.',
+                'not_set' => 'Enable the Memory Wall in Wedding Details.',
+            ],
+        ],
         'group_views' => [
             'heading' => 'Views by Groups',
         ],
@@ -64,6 +126,7 @@ return [
             'heading' => 'Distribution by Age',
         ],
         'guest_demographics' => [
+            'heading' => 'Guest demographics',
             'total_guests' => [
                 'description' => 'Total number of all guests in the database',
             ],
@@ -75,6 +138,7 @@ return [
             ],
         ],
         'guest_status' => [
+            'heading' => 'RSVP responses',
             'confirmed' => [
                 'description' => 'Guests who are coming',
             ],
@@ -86,6 +150,7 @@ return [
             ],
         ],
         'invitation_stats' => [
+            'heading' => 'Invitation overview',
             'sent_invitations' => [
                 'description' => 'Total number of groups to which the invitation was sent',
             ],

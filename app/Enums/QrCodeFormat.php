@@ -49,4 +49,12 @@ enum QrCodeFormat: string implements HasLabel
             self::Png => 'png',
         };
     }
+
+    /**
+     * Determines if the given mime type matches the content type of the current instance.
+     */
+    public function isMimeType(string $mimeType): bool
+    {
+        return $mimeType === $this->contentType();
+    }
 }
