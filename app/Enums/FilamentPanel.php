@@ -8,7 +8,9 @@ use App\Auth\FilamentAuth\ManagementDriver;
 use App\Contracts\FilamentAuth;
 use App\Models\User;
 use Closure;
+use Database\Seeders\WeddingPanelSeeder;
 use Filament\Panel;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -65,6 +67,18 @@ enum FilamentPanel: string
     public static function guards(): array
     {
         return collect(self::cases())->map(fn (self $panel) => $panel->guard())->toArray();
+    }
+
+    /**
+     * Retrieve the development seeder for each seedable panel.
+     *
+     * @return array<string, class-string<Seeder>>
+     */
+    public static function devSeedFor(): array
+    {
+        return [
+            self::Wedding->value => WeddingPanelSeeder::class,
+        ];
     }
 
     /**
