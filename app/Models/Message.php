@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\MessageFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
     /**
+     * @use HasFactory<MessageFactory>
+     */
+    use HasFactory;
+
+    /**
      * The attributes that are mass-assignable.
      *
-     * @returns array
+     * @var list<string>
      */
     protected $fillable = [
         'group_id',
@@ -21,6 +28,8 @@ class Message extends Model
 
     /**
      * Get related group.
+     *
+     * @return BelongsTo<Group, $this>
      */
     public function group(): BelongsTo
     {

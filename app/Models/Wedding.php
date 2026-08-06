@@ -115,8 +115,10 @@ class Wedding extends Model implements HasMedia
     protected function weddingCountdown(): Attribute
     {
         return Attribute::make(
-            get: fn () => filled($this) ? new Countdown($this->wedding_date)
-                ->setFormat(config('wedding.widgets.countdown.wedding_format')) : null,
+            get: fn () => filled($this->wedding_date)
+                ? new Countdown($this->wedding_date)
+                    ->setFormat(config('wedding.widgets.countdown.wedding_format'))
+                : null,
         );
     }
 
@@ -126,8 +128,10 @@ class Wedding extends Model implements HasMedia
     protected function rsvpCountdown(): Attribute
     {
         return Attribute::make(
-            get: fn () => filled($this) ? new Countdown($this->rsvp_deadline)
-                ->setFormat(config('wedding.widgets.countdown.rsvp_format')) : null,
+            get: fn () => filled($this->rsvp_deadline)
+                ? new Countdown($this->rsvp_deadline)
+                    ->setFormat(config('wedding.widgets.countdown.rsvp_format'))
+                : null,
         );
     }
 
@@ -136,7 +140,7 @@ class Wedding extends Model implements HasMedia
      */
     protected function isRsvpOpen(): Attribute
     {
-        return Attribute::get(fn () => $this->rsvp_deadline->isFuture());
+        return Attribute::get(fn () => $this->rsvp_deadline?->isFuture());
     }
 
     /**

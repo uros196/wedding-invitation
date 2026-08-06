@@ -36,8 +36,8 @@ class WeddingStatusWidget extends StatsOverviewWidget
     {
         $wedding = $this->getWedding();
 
-        $rsvpIsOpen = $wedding?->is_rsvp_open ?? false;
-        $memoryWallIsOpen = $wedding?->is_memory_wall_form_open ?? false;
+        $rsvpIsOpen = $wedding?->is_rsvp_open;
+        $memoryWallIsOpen = $wedding?->is_memory_wall_form_open;
 
         return [
             Stat::make(__('RSVP'), $this->statusLabel($rsvpIsOpen))

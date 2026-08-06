@@ -29,10 +29,17 @@ readonly class MemoryWallService
      */
     public function isFormOpen(Wedding $wedding): bool
     {
+        $weddingDate = $wedding->wedding_date;
+
+        if (blank($weddingDate)) {
+            return false;
+        }
+
         $openUntil = $wedding->memory_wall_open_until
-            ?? $wedding->wedding_date->addDays(config('wedding.memory_wall.form_open_for'));
+            ?? $weddingDate->addDays(config('wedding.invitation.memory_wall.form_open_for'));
 
         return $wedding->has_memory_wall
+            && ($weddingDate->isToday() || $weddingDate->isPast())
             && $openUntil->isFuture();
     }
 

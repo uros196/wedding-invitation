@@ -23,7 +23,7 @@ export default function MemoryWallPage({ wedding, metaData, media, }: MemoryWall
             )}
 
             {/* Show this component on the wedding day and so long as the Memory Wall form is open */}
-            {wedding.is_wedding_date && wedding.is_memory_wall_form_open && (
+            {wedding.is_memory_wall_form_open && (
                 <MemoryUpload wedding={wedding} />
             )}
 

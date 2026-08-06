@@ -36,7 +36,7 @@ class GroupForm
             ->components([
                 Hidden::make('wedding_id')
                     ->default(fn (): ?int => auth()->user()?->team?->wedding?->id)
-                    ->dehydrated(),
+                    ->dehydrated(false),
 
                 Grid::make(1)
                     ->schema([

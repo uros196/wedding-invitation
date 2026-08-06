@@ -1,5 +1,10 @@
 <?php
 
+use App\Enums\FilamentPanel;
+use App\Filament\Auth\ManagementLogin;
+use App\Models\User;
+use Filament\Auth\Pages\Login;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,7 +21,63 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->in('Feature');
+    ->in('Feature', 'Browser');
+
+pest()->beforeEach(function (): void {
+    // Every Wedding test uses the Wedding panel and an authenticated team member.
+    Filament::setCurrentPanel('wedding');
+    Filament::bootCurrentPanel();
+
+    $this->user = User::factory()->weddingTeamMember()->create();
+    $this->actingAs($this->user, 'wedding');
+})->in('Feature/Filament/Wedding');
+
+/**
+ * @return array<string, array{
+ *     panel: FilamentPanel,
+ *     login_page: class-string,
+ *     authorized_user: Closure(): User,
+ *     unauthorized_users: array<string, Closure(): User>
+ * }>
+ */
+function filamentPanelLoginConfigurations(): array
+{
+    return [
+        'management' => [
+            'panel' => FilamentPanel::Management,
+            'login_page' => ManagementLogin::class,
+            'authorized_user' => fn (): User => User::factory()->managementAdmin()->create(),
+            'unauthorized_users' => [
+                'wedding team member' => fn (): User => User::factory()->weddingTeamMember()->create(),
+            ],
+        ],
+        'wedding' => [
+            'panel' => FilamentPanel::Wedding,
+            'login_page' => Login::class,
+            'authorized_user' => fn (): User => User::factory()->weddingTeamMember()->create(),
+            'unauthorized_users' => [
+                'management admin' => fn (): User => User::factory()->managementAdmin()->create(),
+                'wedding team member without a team' => fn (): User => User::factory()
+                    ->weddingTeamMember()
+                    ->create(['team_id' => null]),
+            ],
+        ],
+    ];
+}
+
+dataset('filament panels', array_keys(filamentPanelLoginConfigurations()));
+
+function bootFilamentPanel(FilamentPanel $panel): void
+{
+    Filament::setCurrentPanel($panel->value);
+    Filament::bootCurrentPanel();
+    auth()->guard($panel->guard())->logout();
+}
+
+function createFilamentTestUser(Closure $userFactory): User
+{
+    return $userFactory();
+}
 
 /*
 |--------------------------------------------------------------------------

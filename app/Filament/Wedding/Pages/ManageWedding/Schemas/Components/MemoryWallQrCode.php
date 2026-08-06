@@ -36,7 +36,7 @@ class MemoryWallQrCode
             })
             ->alignCenter()
             ->extraEntryWrapperAttributes([
-                'class' => 'rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50',
+                'class' => 'rounded-xl border border-gray-200 p-4 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50',
             ])
             ->hintAction(
                 Action::make('download')
