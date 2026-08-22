@@ -47,6 +47,25 @@ test('confirms selected guests, declines the rest, and stores a sanitized messag
     Event::assertDispatched(MessageReceived::class);
 });
 
+test('does not dispatch attendance confirmation for an unchanged RSVP replay', function (): void {
+    $wedding = Wedding::factory()->rsvpOpen()->create();
+    $group = Group::factory()->for($wedding)->create();
+    $guest = Guest::factory()->for($group)->pending()->create();
+    Event::fake([AttendanceConfirmed::class]);
+
+    $payload = [
+        'confirmed_guest_ids' => [$guest->id],
+    ];
+
+    $this->post(route('group.confirm', ['group' => $group->uuid]), $payload)
+        ->assertRedirect();
+    $this->post(route('group.confirm', ['group' => $group->uuid]), $payload)
+        ->assertRedirect();
+
+    // Replaying the same RSVP must not notify administrators a second time.
+    Event::assertDispatchedTimes(AttendanceConfirmed::class, 1);
+});
+
 test('creates an attendance confirmation notification for wedding administrators', function (): void {
     $wedding = Wedding::factory()->rsvpOpen()->create();
     $admin = User::factory()->for($wedding->team)->create();

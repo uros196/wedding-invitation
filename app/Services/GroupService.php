@@ -116,9 +116,10 @@ class GroupService
      */
     public function confirmAttendance(Group $group, ConfirmAttendanceData $data): void
     {
-        $group->loadMissing('guests');
+        $group->loadMissing('guests', 'team');
 
         $confirmedIds = $data->confirmedGuestIds;
+        $attendanceChanged = false;
 
         if ($group->has_plus_one && filled($data->plusOne)) {
             $parentGuest = $group->guests->first();
@@ -134,6 +135,7 @@ class GroupService
                 ]);
 
                 $group->update(['has_plus_one' => false]);
+                $attendanceChanged = true;
 
                 // Add the new guest to the confirmed list so it doesn't get declined in the next step
                 $confirmedIds[] = $plusOneGuest->id;
@@ -143,15 +145,20 @@ class GroupService
             }
         }
 
-        $group->guests->each(function ($guest) use ($confirmedIds) {
+        $group->guests->each(function ($guest) use ($confirmedIds, &$attendanceChanged) {
             $newStatus = in_array($guest->id, $confirmedIds)
                 ? GuestStatus::Confirmed
                 : GuestStatus::Declined;
 
-            $guest->update(['status' => $newStatus]);
+            if ($guest->status !== $newStatus) {
+                $attendanceChanged = true;
+                $guest->update(['status' => $newStatus]);
+            }
         });
 
-        AttendanceConfirmed::dispatch($group, $confirmedIds);
+        if ($attendanceChanged) {
+            AttendanceConfirmed::dispatch($group, $confirmedIds);
+        }
 
         if (filled($data->message)) {
             $message = $group->messages()->create([
