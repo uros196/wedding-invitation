@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\Status;
 use App\Models\Team;
 use App\Models\Wedding;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,6 +24,7 @@ class WeddingFactory extends Factory
         return [
             'uuid' => $this->faker->uuid(),
             'team_id' => Team::factory(),
+            'status' => Status::Published,
             'bride_name' => $this->faker->firstName('female'),
             'groom_name' => $this->faker->firstName('male'),
             'wedding_date' => $this->faker->dateTimeBetween('+1 month', '+1 year'),

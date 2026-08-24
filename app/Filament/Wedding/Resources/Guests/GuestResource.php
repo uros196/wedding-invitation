@@ -40,6 +40,14 @@ class GuestResource extends Resource
     protected static ?int $navigationSort = 2;
 
     /**
+     * Determine whether guest management is available.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('access', self::$model);
+    }
+
+    /**
      * Get the navigation group.
      */
     public static function getNavigationGroup(): \UnitEnum

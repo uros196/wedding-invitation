@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Status;
 use App\Models\Wedding;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -19,6 +20,16 @@ test('renders the enabled memory wall and its public state', function (): void {
             ->where('metaData.title', $wedding->meta_title)
             ->has('media', 0)
         );
+});
+
+test('does not expose the memory wall while its wedding is a draft', function (): void {
+    $wedding = Wedding::factory()->memoryWallEnabled()->create([
+        'status' => Status::Draft,
+    ]);
+
+    // A valid wedding UUID must not bypass the publication boundary.
+    $this->get(route('memory-wall.show', ['wedding' => $wedding->uuid]))
+        ->assertNotFound();
 });
 
 test('provides the wedding metadata used by memory wall meta tags', function (): void {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\GuestStatus;
+use App\Enums\Status;
 use App\Events\AttendanceConfirmed;
 use App\Events\MessageReceived;
 use App\Models\Group;
@@ -45,6 +46,19 @@ test('confirms selected guests, declines the rest, and stores a sanitized messag
     Event::assertDispatched(AttendanceConfirmed::class, fn (AttendanceConfirmed $event): bool => $event->group->is($group) && $event->confirmedIds === [$confirmedGuest->id]
     );
     Event::assertDispatched(MessageReceived::class);
+});
+
+test('does not accept an RSVP for a draft wedding', function (): void {
+    $wedding = Wedding::factory()->rsvpOpen()->create(['status' => Status::Draft]);
+    $group = Group::factory()->for($wedding)->create();
+    $guest = Guest::factory()->for($group)->pending()->create();
+
+    $this->post(route('group.confirm', ['group' => $group->uuid]), [
+        'confirmed_guest_ids' => [$guest->id],
+    ])->assertForbidden();
+
+    // A draft RSVP must not mutate guest attendance state.
+    expect($guest->refresh()->status)->toBe(GuestStatus::Pending);
 });
 
 test('does not dispatch attendance confirmation for an unchanged RSVP replay', function (): void {

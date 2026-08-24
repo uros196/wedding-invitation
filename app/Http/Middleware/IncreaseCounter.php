@@ -6,6 +6,8 @@ namespace App\Http\Middleware;
 
 use App\Contracts\HasCounts;
 use App\Enums\FilamentPanel;
+use App\Models\Group;
+use App\Models\Wedding;
 use Closure;
 use Filament\Exceptions\NoDefaultPanelSetException;
 use Filament\Facades\Filament;
@@ -92,8 +94,8 @@ class IncreaseCounter
         }
 
         return preg_match(
-                '/bot|crawler|spider|slurp|headless|phantom|selenium|playwright|puppeteer|curl|wget|python-requests|httpclient|okhttp|go-http-client|scrapy|symfony|facebookexternalhit|facebookcatalog|bingpreview|google-inspectiontool|mediapartners-google|semrush|ahrefs|mj12bot|dotbot|bytespider|petalbot|applebot|baiduspider|yandexbot|perplexity|gptbot|chatgpt-user/i',
-                $userAgent,
-            ) === 1;
+            '/bot|crawler|spider|slurp|headless|phantom|selenium|playwright|puppeteer|curl|wget|python-requests|httpclient|okhttp|go-http-client|scrapy|symfony|facebookexternalhit|facebookcatalog|bingpreview|google-inspectiontool|mediapartners-google|semrush|ahrefs|mj12bot|dotbot|bytespider|petalbot|applebot|baiduspider|yandexbot|perplexity|gptbot|chatgpt-user/i',
+            $userAgent,
+        ) === 1;
     }
 }

@@ -15,4 +15,12 @@ class WeddingPolicy
     {
         return $user->team->has_memory_wall;
     }
+
+    /**
+     * Determine if the user has access based on their published wedding status.
+     */
+    public function access(User $user): bool
+    {
+        return $user->hasPublishedWedding();
+    }
 }

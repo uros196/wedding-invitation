@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Enums\Status;
+use App\Filament\Wedding\Pages\Dashboard;
 use App\Filament\Wedding\Pages\ManageWedding\ManageWedding;
+use App\Filament\Wedding\Pages\SetupWedding\SetupWedding;
 use App\Models\Group;
 use App\Models\Team;
 use App\Models\User;
@@ -12,7 +15,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\assertModelExists;
@@ -43,26 +45,53 @@ test('displays all populated wedding detail sections', function (): void {
         ->assertSchemaStateSet([
             'bride_name' => 'Ana',
             'groom_name' => 'Marko',
-            'wedding_date' => '2027-07-10',
-            'rsvp_deadline' => '2027-06-30 18:00:00',
-            'welcome_text' => '<p>Welcome to our wedding.</p>',
-            'has_memory_wall' => true,
-            'memory_wall_open_until' => '2027-07-20 23:59:59',
-            'meta_title' => 'Ana and Marko',
-            'meta_description' => 'Join us for our special day.',
         ])
         // The populated schedule is rendered and the memory-wall-only fields are available.
-        ->assertSee($timeline->title)
-        ->assertSchemaComponentExists('timelines')
+        ->set('activeTab', 'appearance')
+        ->assertSchemaStateSet(['welcome_text' => '<p>Welcome to our wedding.</p>'])
         ->assertFormFieldExists('Hero')
         ->assertFormFieldExists('welcome_text')
+        ->set('activeTab', 'schedule')
+        ->assertSchemaComponentExists('timelines')
+        ->assertSee($timeline->title)
+        ->set('activeTab', 'memory')
+        ->assertSchemaStateSet([
+            'has_memory_wall' => true,
+            'memory_wall_open_until' => '2027-07-20 23:59:59',
+        ])
         ->assertFormFieldVisible('has_memory_wall')
         ->assertFormFieldVisible('memory_wall_open_until')
         ->assertFormFieldVisible('memory_wall_url')
         ->assertSchemaComponentVisible('memory_wall_qr_code')
+        ->set('activeTab', 'meta')
+        ->assertSchemaStateSet([
+            'meta_title' => 'Ana and Marko',
+            'meta_description' => 'Join us for our special day.',
+        ])
         ->assertFormFieldVisible('meta_title')
         ->assertFormFieldVisible('meta_description')
         ->assertFormFieldVisible('MetaImage');
+});
+
+test('returns to the tab containing the first validation error', function (): void {
+    Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'meta')
+        ->fillForm([
+            'bride_name' => null,
+            'groom_name' => 'Marko',
+            'wedding_date' => '2027-07-10',
+            'rsvp_deadline' => '2027-06-30 18:00:00',
+            'welcome_text' => '<p>Welcome to our wedding.</p>',
+        ])
+        ->call('save')
+        ->assertHasFormErrors(['bride_name' => 'required'])
+        ->assertSet('activeTab', 'basic');
+});
+
+test('does not expose wedding details while the wedding is a draft', function (): void {
+    $this->user->team->wedding->update(['status' => Status::Draft]);
+
+    $this->get(ManageWedding::getUrl())->assertForbidden();
 });
 
 test('limits timeline visibility changes to groups in the timeline wedding', function (): void {
@@ -79,6 +108,7 @@ test('limits timeline visibility changes to groups in the timeline wedding', fun
     ]);
 
     Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'schedule')
         ->callFormComponentAction(
             'timelines',
             'manage_visibility',
@@ -89,6 +119,7 @@ test('limits timeline visibility changes to groups in the timeline wedding', fun
 
     // A foreign group ID is rejected by the action schema before persistence.
     Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'schedule')
         ->callFormComponentAction(
             'timelines',
             'manage_visibility',
@@ -117,6 +148,7 @@ test('shows the empty schedule state when no timeline exists', function (): void
     $wedding->timelines()->delete();
 
     Livewire::test(ManageWedding::class)
+        ->set('activeTab', 3)
         // An empty schedule explains how to start defining the wedding day.
         ->assertSee(__('wedding.manage_wedding.timeline.not_defined'));
 
@@ -126,6 +158,7 @@ test('shows the empty schedule state when no timeline exists', function (): void
     ]);
 
     Livewire::test(ManageWedding::class)
+        ->set('activeTab', 3)
         // The empty state disappears as soon as the relationship has an item.
         ->assertDontSee(__('wedding.manage_wedding.timeline.not_defined'))
         ->assertSee($timeline->title);
@@ -136,17 +169,16 @@ test('hides memory wall controls when the team does not have access', function (
 
     Livewire::test(ManageWedding::class)
         // The policy-controlled section must not expose any memory wall control.
-        ->assertFormFieldHidden('has_memory_wall')
-        ->assertFormFieldHidden('memory_wall_open_until')
-        ->assertFormFieldHidden('memory_wall_url')
-        ->assertSchemaComponentHidden('memory_wall_qr_code')
+        ->assertDontSee(__('Memory Wall'))
         // Meta data remains available when the optional section is removed.
+        ->set('activeTab', 5)
         ->assertFormFieldVisible('meta_title')
         ->assertFormFieldVisible('meta_description');
 });
 
 test('disables dependent memory wall fields when the wall is turned off', function (): void {
     Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'memory')
         ->fillForm(['has_memory_wall' => false])
         // The date cannot be changed while memory-wall submissions are disabled.
         ->assertFormFieldDisabled('memory_wall_open_until')
@@ -155,46 +187,40 @@ test('disables dependent memory wall fields when the wall is turned off', functi
         ->assertSchemaComponentHidden('memory_wall_qr_code');
 });
 
-test('starts with an empty wedding model when the team has no wedding', function (): void {
+test('does not expose wedding details when the team has no wedding', function (): void {
     $team = Team::factory()->create();
-    $user = User::factory()->weddingTeamMember()->create(['team_id' => $team->getKey()]);
+    $user = User::factory()->create(['team_id' => $team->getKey()]);
     $this->actingAs($user, 'wedding');
 
-    Livewire::test(ManageWedding::class)
-        // The page supports first-time setup without exposing a generated URL or QR code.
-        ->assertFormFieldHidden('memory_wall_url')
-        ->assertSchemaComponentHidden('memory_wall_qr_code')
-        ->assertSchemaStateSet([
-            'bride_name' => null,
-            'groom_name' => null,
-        ]);
+    $this->get(ManageWedding::getUrl())->assertForbidden();
 });
 
-test('creates the first wedding with a hero image', function (): void {
+test('creates the first wedding through the setup wizard', function (): void {
     Storage::fake('public');
-    $team = Team::factory()->create();
-    $user = User::factory()->weddingTeamMember()->create(['team_id' => $team->getKey()]);
-    $this->actingAs($user, 'wedding');
+    $team = $this->user->team;
+    $team->wedding()->delete();
+    $this->user->unsetRelation('team');
 
-    Livewire::test(ManageWedding::class)
+    $component = Livewire::test(SetupWedding::class)
         ->fillForm([
             'Hero' => [UploadedFile::fake()->image('first-hero.jpg', 800, 1000)],
             'bride_name' => 'Ana',
             'groom_name' => 'Marko',
             'wedding_date' => '2027-07-10',
             'rsvp_deadline' => '2027-06-30 18:00',
-            'welcome_text' => 'Welcome to our wedding.',
+            'welcome_text' => '<p>Welcome to our wedding.</p>',
             'has_memory_wall' => false,
         ])
-        ->call('save')
-        ->assertHasNoFormErrors()
-        ->assertNotified();
+        ->call('publish');
+
+    $component->assertRedirect(Dashboard::getUrl());
 
     $wedding = $team->refresh()->wedding;
 
     // First-time setup creates the wedding under the authenticated team.
     expect($wedding)->not->toBeNull()
         ->and($wedding->bride_name)->toBe('Ana')
+        ->and($wedding->status)->toBe(Status::Published)
         ->and($wedding->getFirstMedia('Hero'))->not->toBeNull();
 });
 

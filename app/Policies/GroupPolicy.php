@@ -13,6 +13,14 @@ class GroupPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasWedding();
+        return $user->hasPublishedWedding();
+    }
+
+    /**
+     * Determine if the user has access based on their published wedding status.
+     */
+    public function access(User $user): bool
+    {
+        return $user->hasPublishedWedding();
     }
 }

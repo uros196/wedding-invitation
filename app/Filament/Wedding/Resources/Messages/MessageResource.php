@@ -11,6 +11,7 @@ use App\Filament\Wedding\Resources\Messages\Pages\ViewMessage;
 use App\Filament\Wedding\Resources\Messages\Schemas\MessageInfolist;
 use App\Filament\Wedding\Resources\Messages\Tables\MessagesTable;
 use App\Models\Message;
+use App\Models\User;
 use App\Services\MessageService;
 use BackedEnum;
 use Filament\Resources\Pages\PageRegistration;
@@ -31,6 +32,14 @@ class MessageResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleBottomCenterText;
 
     protected static ?int $navigationSort = 2;
+
+    /**
+     * Determine whether message management is available.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('access', self::$model);
+    }
 
     /**
      * Get the navigation group.

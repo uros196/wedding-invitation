@@ -27,7 +27,7 @@ final class MemoryWallController extends Controller
      */
     public function show(Wedding $wedding): Response
     {
-        abort_if(!$wedding->has_memory_wall, 404);
+        abort_if(! $wedding->has_memory_wall, 404);
 
         $metaData = $this->metaFactory->forWedding($wedding);
 

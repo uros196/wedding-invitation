@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Concerns\IsPublished;
+use App\Enums\Status;
 use App\Observers\WeddingObserver;
 use App\Policies\WeddingPolicy;
 use App\Services\MemoryWallService;
@@ -28,6 +30,7 @@ class Wedding extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
+    use IsPublished;
 
     /**
      * The attributes that are mass-assignable.
@@ -36,6 +39,7 @@ class Wedding extends Model implements HasMedia
      */
     protected $fillable = [
         'team_id',
+        'status',
         'bride_name',
         'groom_name',
         'wedding_date',
@@ -53,11 +57,42 @@ class Wedding extends Model implements HasMedia
     protected function casts(): array
     {
         return [
+            'status' => Status::class,
             'wedding_date' => 'date',
             'rsvp_deadline' => 'datetime',
             'has_memory_wall' => 'boolean',
             'memory_wall_open_until' => 'datetime',
         ];
+    }
+
+    /**
+     * Determine whether the wedding is published for public-facing features.
+     */
+    public function isPublished(): bool
+    {
+        return $this->status === Status::Published;
+    }
+
+    /**
+     * Determine whether the wedding is still being configured.
+     */
+    public function isDraft(): bool
+    {
+        return $this->status === Status::Draft;
+    }
+
+    /**
+     * Determine whether the wedding contains the minimum publishable content.
+     */
+    public function isReadyToPublish(): bool
+    {
+        return $this->isDraft()
+            && filled($this->bride_name)
+            && filled($this->groom_name)
+            && filled($this->wedding_date)
+            && filled($this->rsvp_deadline)
+            && filled($this->welcome_text)
+            && $this->getFirstMedia('Hero') !== null;
     }
 
     /**

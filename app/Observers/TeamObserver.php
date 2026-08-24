@@ -13,9 +13,12 @@ class TeamObserver
      */
     public function saving(Team $team): void
     {
-        // Replicate 'has_memory_wall' option to team's wedding.
-        if (filled($team->has_memory_wall) && filled($team->wedding)) {
-            $team->wedding->forceFill(['has_memory_wall' => $team->has_memory_wall])->save();
+        if (filled($team->has_memory_wall)) {
+            $wedding = $team->wedding()->withoutPublish()->first();
+
+            if ($wedding !== null) {
+                $wedding->forceFill(['has_memory_wall' => $team->has_memory_wall])->save();
+            }
         }
     }
 }

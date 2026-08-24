@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Status;
 use App\Models\Group;
 use App\Models\Guest;
 use App\Models\User;
@@ -50,6 +51,17 @@ test('renders the invitation with only the group-visible wedding data', function
 
     // The counter increases only for a real page view with a normal browser User-Agent.
     expect($group->refresh()->views_count)->toBe(1);
+});
+
+test('does not render an invitation while its wedding is a draft', function (): void {
+    $wedding = Wedding::factory()->create(['status' => Status::Draft]);
+    $group = Group::factory()->for($wedding)->create();
+
+    // Draft invitations must not become public through a previously created group link.
+    $this->get(route('group.show', ['group' => $group->uuid]))
+        ->assertNotFound();
+
+    expect($group->refresh()->views_count)->toBe(0);
 });
 
 test('provides the group metadata used by invitation meta tags', function (): void {

@@ -36,6 +36,14 @@ class GroupResource extends Resource
     protected static ?int $navigationSort = 1;
 
     /**
+     * Determine whether group management is available.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('access', self::$model);
+    }
+
+    /**
      * Get the navigation group.
      */
     public static function getNavigationGroup(): \UnitEnum

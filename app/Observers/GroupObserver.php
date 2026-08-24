@@ -19,7 +19,8 @@ class GroupObserver
         }
 
         if (blank($group->wedding_id)) {
-            $group->fill(['wedding_id' => auth()->user()->team->wedding->id]);
+            $wedding = auth()->user()->team->wedding()->withoutPublish()->firstOrFail();
+            $group->fill(['wedding_id' => $wedding->id]);
         }
     }
 }

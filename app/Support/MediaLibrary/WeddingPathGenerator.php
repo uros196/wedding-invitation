@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\MediaLibrary;
 
+use App\Models\Wedding;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
@@ -16,6 +17,8 @@ class WeddingPathGenerator extends ModelPathGenerator
      */
     protected function getModelPath(Media $media): string
     {
-        return parent::getModelPath($media)."/{$media->model->uuid}";
+        $wedding = Wedding::withoutPublish()->findOrFail($media->model_id);
+
+        return parent::getModelPath($media)."/{$wedding->uuid}";
     }
 }

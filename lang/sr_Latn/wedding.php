@@ -4,6 +4,37 @@ return [
     'title' => 'Pozivnica za venčanje',
     'greeting' => 'Pozvani ste na naše venčanje. Pridružite nam se u proslavi ljubavi!',
 
+    'setup' => [
+        'title' => 'Podešavanje venčanja',
+        'intro' => [
+            'heading' => 'Hajde da podesimo vašu pozivnicu',
+            'description' => 'Prvo ćemo uneti najvažnije podatke. Sve možete izmeniti i kasnije.',
+            'duration' => 'Podešavanje obično traje oko 3 minuta.',
+        ],
+        'steps' => [
+            'basics' => [
+                'title' => 'Osnovni podaci',
+                'description' => 'Imena i datum venčanja',
+                'heading' => 'Počnimo od osnova',
+                'help' => 'Ovi podaci su potrebni da napravimo osnovu vaše pozivnice.',
+            ],
+            'appearance' => [
+                'title' => 'Izgled pozivnice',
+                'description' => 'Slika i poruka dobrodošlice',
+                'heading' => 'Dodajte lični pečat pozivnici',
+                'help' => 'Izaberite sliku i poruku koju će gosti prvo videti.',
+            ],
+            'guest_info' => [
+                'title' => 'Odgovori gostiju',
+                'description' => 'Rok za potvrdu dolaska',
+                'heading' => 'Podesite rok za odgovor',
+                'help' => 'Izaberite do kada gosti treba da potvrde ili odbiju dolazak.',
+            ],
+        ],
+        'publish_action' => 'Završi i objavi pozivnicu',
+        'dashboard_action' => 'Nazad na početnu stranu',
+    ],
+
     'manage_wedding' => [
         'help_action' => 'Dodatne informacije',
         'basic_information' => [
@@ -68,6 +99,34 @@ return [
         'form' => [
             'basic_info_description' => 'Unesite naziv grupe i personalizovanu poruku.',
             'name_placeholder' => 'npr. Petrović Family',
+        ],
+        'quick_create' => [
+            'title' => 'Kreiranje grupnih pozivnica',
+            'intro' => [
+                'heading' => 'Napravite pozivnicu bez komplikovanja',
+                'description' => 'Prvo napravite grupu, a zatim dodajte goste jednog po jednog. Sve ostalo možete urediti kasnije.',
+            ],
+            'steps' => [
+                'label' => 'Koraci za kreiranje pozivnice',
+                'group' => '1. Napravite grupu',
+                'guests' => '2. Dodajte goste',
+            ],
+            'group' => [
+                'heading' => 'Prvo napravite grupu',
+                'description' => 'Jedna grupa dobija jedan link pozivnice. Unesite naziv po kom ćete lako prepoznati kome je pozivnica namenjena, na primer porodica ili grupa prijatelja.',
+                'create_action' => 'Napravi grupu i nastavi',
+            ],
+            'guest' => [
+                'heading' => 'Sada dodajte goste',
+                'description' => 'Unesite jednog gosta po jednom. Posle čuvanja polja će biti spremna za sledećeg gosta.',
+                'form_description' => 'Dovoljno je da unesete ime, prezime i uzrast. Ostale podatke možete dopuniti kasnije.',
+                'current_group' => 'Trenutna grupa: :name',
+                'added_count' => 'Dodato gostiju: :count',
+                'empty' => 'Još niste dodali nijednog gosta.',
+                'add_action' => 'Dodaj gosta',
+                'finish_action' => 'Završi ovu grupu',
+                'another_action' => 'Napravi novu pozivnicu',
+            ],
         ],
         'meta' => [
             'description' => 'Personalizujte pregled linka za ovu grupu. Ako se ostavi prazno, koristiće se meta podaci venčanja.',
@@ -158,6 +217,16 @@ return [
                 'description' => 'Koliko puta su sve pozivnice ukupno otvorene',
             ],
         ],
+        'invitation_creator' => [
+            'heading' => 'Kreiranje pozivnica',
+            'description' => 'Kliknite ovde da napravite grupu i dodate goste jednog po jednog.',
+        ],
+        'wedding_setup' => [
+            'heading' => 'Podešavanje venčanja',
+            'stat' => 'Pozivnica za venčanje',
+            'status' => 'Još nije objavljena',
+            'description' => 'Nastavite podešavanje da otključate goste, grupe i ostatak početne strane.',
+        ],
         'guest_gender_chart' => [
             'heading' => 'Distribucija po polu',
         ],
@@ -165,5 +234,8 @@ return [
 
     'notifications' => [
         'attendance_confirmation_success' => 'Dolazak je uspešno potvrđen.',
+        'group_created' => 'Grupa je napravljena. Sada dodajte goste jednog po jednog.',
+        'guest_added' => 'Gost je dodat.',
+        'wedding_published' => 'Vaša pozivnica za venčanje je objavljena.',
     ],
 ];

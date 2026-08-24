@@ -11,6 +11,7 @@ use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -82,6 +83,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia
      */
     public function hasWedding(): bool
     {
-        return $this->team->wedding()->exists();
+        return $this->team()
+            ->whereHas('wedding', fn (Builder $query): Builder => $query->withoutPublish())
+            ->exists();
+    }
+
+    /**
+     * Determine whether the current team has a published wedding.
+     */
+    public function hasPublishedWedding(): bool
+    {
+        return $this->team()->whereHas('wedding')->exists();
     }
 }

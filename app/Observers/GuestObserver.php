@@ -19,10 +19,10 @@ class GuestObserver
             return;
         }
 
-        // Fill team_id from group_id if available
         if (filled($guest->group_id)) {
-            $group = Group::with('wedding:id,team_id')->find($guest->group_id);
-            $guest->fill(['team_id' => $group->wedding->team_id]);
+            $group = Group::query()->findOrFail($guest->group_id);
+            $wedding = $group->wedding()->withoutPublish()->firstOrFail();
+            $guest->fill(['team_id' => $wedding->team_id]);
 
             return;
         }

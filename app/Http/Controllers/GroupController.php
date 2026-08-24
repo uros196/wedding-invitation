@@ -29,7 +29,10 @@ final class GroupController extends Controller
     {
         $group->load('guests', 'wedding')
             ->loadCount('guests')
-            ->wedding->loadCount('timelines');
+            ->wedding?->loadCount('timelines');
+
+        // Do not load the page if wedding is not available
+        abort_if(blank($group->wedding), 404);
 
         // Get available timelines for the group and attach them to the wedding
         $group->wedding->setRelation('timelines', $this->groupService->getAvailableTimeline($group));

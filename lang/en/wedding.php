@@ -4,6 +4,37 @@ return [
     'title' => 'Wedding invitation',
     'greeting' => 'You are invited to our wedding. Join us in celebrating love!',
 
+    'setup' => [
+        'title' => 'Set up your wedding',
+        'intro' => [
+            'heading' => 'Let’s set up your wedding invitation',
+            'description' => 'We will go through the most important details first. You can return and change anything later.',
+            'duration' => 'This usually takes about 3 minutes.',
+        ],
+        'steps' => [
+            'basics' => [
+                'title' => 'Basic details',
+                'description' => 'Names and wedding date',
+                'heading' => 'Start with the basics',
+                'help' => 'These details are needed to create the foundation of your invitation.',
+            ],
+            'appearance' => [
+                'title' => 'Invitation look',
+                'description' => 'Photo and welcome message',
+                'heading' => 'Give your invitation a personal touch',
+                'help' => 'Choose the photo and message your guests will see first.',
+            ],
+            'guest_info' => [
+                'title' => 'Guest responses',
+                'description' => 'RSVP deadline',
+                'heading' => 'Set the response deadline',
+                'help' => 'Choose when guests should confirm or decline their attendance.',
+            ],
+        ],
+        'publish_action' => 'Finish and publish invitation',
+        'dashboard_action' => 'Back to dashboard',
+    ],
+
     'manage_wedding' => [
         'help_action' => 'More information',
         'basic_information' => [
@@ -68,6 +99,34 @@ return [
         'form' => [
             'basic_info_description' => 'Enter group name and personalized message.',
             'name_placeholder' => 'e.g. Petrović Family',
+        ],
+        'quick_create' => [
+            'title' => 'Create group invitations',
+            'intro' => [
+                'heading' => 'Create an invitation without the complicated steps',
+                'description' => 'Create a group first, then add guests one at a time. You can edit everything else later.',
+            ],
+            'steps' => [
+                'label' => 'Invitation creation steps',
+                'group' => '1. Create a group',
+                'guests' => '2. Add guests',
+            ],
+            'group' => [
+                'heading' => 'First, create a group',
+                'description' => 'One group gets one invitation link. Use a name that helps you recognize who the invitation is for, such as a family or a group of friends.',
+                'create_action' => 'Create group and continue',
+            ],
+            'guest' => [
+                'heading' => 'Now add guests',
+                'description' => 'Enter one guest at a time. After saving, the fields will be ready for the next guest.',
+                'form_description' => 'All you need is the first name, last name, and age group. You can add other details later.',
+                'current_group' => 'Current group: :name',
+                'added_count' => 'Guests added: :count',
+                'empty' => 'You have not added any guests yet.',
+                'add_action' => 'Add guest',
+                'finish_action' => 'Finish this group',
+                'another_action' => 'Create another invitation',
+            ],
         ],
         'meta' => [
             'description' => 'Personalize the link preview for this group. If left empty, the wedding meta data will be used.',
@@ -158,6 +217,16 @@ return [
                 'description' => 'How many times all invitations have been opened in total',
             ],
         ],
+        'invitation_creator' => [
+            'heading' => 'Create invitations',
+            'description' => 'Click here to create a group and add guests one at a time.',
+        ],
+        'wedding_setup' => [
+            'heading' => 'Set up your wedding',
+            'stat' => 'Wedding invitation',
+            'status' => 'Not published yet',
+            'description' => 'Continue the setup to unlock guests, groups and the rest of the dashboard.',
+        ],
         'guest_gender_chart' => [
             'heading' => 'Distribution by Gender',
         ],
@@ -165,5 +234,8 @@ return [
 
     'notifications' => [
         'attendance_confirmation_success' => 'Attendance confirmed successfully.',
+        'group_created' => 'Group created. Now add guests one at a time.',
+        'guest_added' => 'Guest added.',
+        'wedding_published' => 'Your wedding invitation is published.',
     ],
 ];

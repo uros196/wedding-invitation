@@ -16,6 +16,8 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ManageWedding extends Page implements HasForms
 {
@@ -27,9 +29,22 @@ class ManageWedding extends Page implements HasForms
 
     protected string $view = 'filament.wedding.pages.manage-wedding';
 
-    public ?array $data = [];
+    /**
+     * @var array<string, mixed>
+     */
+    public array $data = [];
 
     public ?Wedding $record = null;
+
+    public string $activeTab = 'basic';
+
+    /**
+     * Determine whether the detailed form is available.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('access', Wedding::class);
+    }
 
     /**
      * Get the navigation label.
@@ -97,9 +112,17 @@ class ManageWedding extends Page implements HasForms
     public function save(): void
     {
         $user = auth()->user();
-        $data = $this->form->getState();
 
         abort_unless($user instanceof User, 403);
+
+        try {
+            $data = $this->form->getState();
+        } catch (ValidationException $exception) {
+            $this->activeTab = $this->tabForValidationErrors($exception->errors());
+            $this->dispatch('focus-wedding-tab', tab: $this->activeTab);
+
+            throw $exception;
+        }
 
         $this->record = app(WeddingService::class)->saveWeddingData($this->record, $user, $data);
 
@@ -109,5 +132,27 @@ class ManageWedding extends Page implements HasForms
             ->title(__('Saved Successfully'))
             ->success()
             ->send();
+    }
+
+    /**
+     * Find the first tab represented by the validation errors.
+     *
+     * @param  array<string, array<int, string>>  $errors
+     */
+    private function tabForValidationErrors(array $errors): string
+    {
+        foreach (array_keys($errors) as $error) {
+            $path = Str::after($error, 'data.');
+
+            return match (true) {
+                Str::startsWith($path, ['Hero', 'welcome_text']) => 'appearance',
+                Str::startsWith($path, 'timelines') => 'schedule',
+                Str::startsWith($path, ['has_memory_wall', 'memory_wall_open_until']) => 'memory',
+                Str::startsWith($path, ['meta_title', 'meta_description', 'MetaImage']) => 'meta',
+                default => 'basic',
+            };
+        }
+
+        return 'basic';
     }
 }

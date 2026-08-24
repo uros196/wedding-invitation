@@ -9,8 +9,11 @@ use App\Filament\Wedding\Widgets\GuestAgeChartWidget;
 use App\Filament\Wedding\Widgets\GuestDemographicsWidget;
 use App\Filament\Wedding\Widgets\GuestGenderChartWidget;
 use App\Filament\Wedding\Widgets\GuestStatusWidget;
+use App\Filament\Wedding\Widgets\InvitationCreatorWidget;
 use App\Filament\Wedding\Widgets\InvitationStats;
+use App\Filament\Wedding\Widgets\WeddingSetupWidget;
 use App\Filament\Wedding\Widgets\WeddingStatusWidget;
+use App\Models\User;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -30,7 +33,14 @@ class Dashboard extends BaseDashboard
      */
     public function getWidgets(): array
     {
+        $user = auth()->user();
+
+        if (! $user instanceof User || ! $user->hasPublishedWedding()) {
+            return [WeddingSetupWidget::class];
+        }
+
         return [
+            InvitationCreatorWidget::class,
             WeddingStatusWidget::class,
             InvitationStats::class,
             GuestStatusWidget::class,
