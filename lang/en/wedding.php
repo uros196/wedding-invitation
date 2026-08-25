@@ -23,6 +23,10 @@ return [
                 'description' => 'Photo and welcome message',
                 'heading' => 'Give your invitation a personal touch',
                 'help' => 'Choose the photo and message your guests will see first.',
+                'image_callout' => [
+                    'heading' => 'An important step for your main image',
+                    'description' => 'The image must use one of the available aspect ratios: 9:16 or 4:5. After uploading it, open the image editor, choose the format that works best for you, and crop the image so the important part stays in frame.',
+                ],
             ],
             'guest_info' => [
                 'title' => 'Guest responses',

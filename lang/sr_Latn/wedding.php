@@ -23,6 +23,10 @@ return [
                 'description' => 'Slika i poruka dobrodošlice',
                 'heading' => 'Dodajte lični pečat pozivnici',
                 'help' => 'Izaberite sliku i poruku koju će gosti prvo videti.',
+                'image_callout' => [
+                    'heading' => 'Važan korak za glavnu sliku',
+                    'description' => 'Slika mora da bude u jednom od ponuđenih odnosa stranica (aspect ratio): 9:16 ili 4:5. Nakon otpremanja otvorite uređivanje slike, izaberite format koji vam najviše odgovara i kropujte je tako da važan deo ostane u kadru.',
+                ],
             ],
             'guest_info' => [
                 'title' => 'Odgovori gostiju',

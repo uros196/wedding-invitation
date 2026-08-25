@@ -12,6 +12,7 @@ use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\WeddingDatePicke
 use App\Filament\Wedding\Pages\ManageWedding\Schemas\Components\WelcomeTextRichEditor;
 use App\Filament\Wedding\Pages\SetupWedding\SetupWedding;
 use Filament\Actions\Action;
+use Filament\Schemas\Components\Callout;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
@@ -51,6 +52,7 @@ class Form
                                 ->description(__('wedding.setup.steps.appearance.help'))
                                 ->schema([
                                     HeroImageFileUpload::make(),
+                                    self::infoCallout(),
                                     WelcomeTextRichEditor::make(),
                                 ]),
                         ])
@@ -76,5 +78,16 @@ class Form
                         ->submit('publish')),
             ])
             ->statePath('data');
+    }
+
+    /**
+     * Make the callout for the appearance step.
+     */
+    protected static function infoCallout(): Callout
+    {
+        return Callout::make(__('wedding.setup.steps.appearance.image_callout.heading'))
+            ->description(__('wedding.setup.steps.appearance.image_callout.description'))
+            ->info()
+            ->columnSpanFull();
     }
 }

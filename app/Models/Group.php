@@ -73,16 +73,20 @@ class Group extends Model implements HasCounts, HasMedia
 
     /**
      * Get the related team through the wedding.
+     *
+     * The foreign keys point towards the parent models, so the explicit keys
+     * reverse the default has-one-through direction for this relationship:
+     * groups.wedding_id -> weddings.id -> weddings.team_id -> teams.id.
      */
     public function team(): HasOneThrough
     {
         return $this->hasOneThrough(
             Team::class,
             Wedding::class,
-            'team_id',
+            'id',
             'id',
             'wedding_id',
-            'id'
+            'team_id',
         );
     }
 
