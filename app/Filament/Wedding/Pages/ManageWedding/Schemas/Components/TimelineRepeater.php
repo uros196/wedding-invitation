@@ -16,6 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 
 class TimelineRepeater
@@ -31,30 +32,50 @@ class TimelineRepeater
             ->addActionLabel(__('Add Timeline'))
             ->rules([new ChronologicalOrderRule])
             ->extraItemActions([
+                fn (): Action => self::visibilityStatus(),
                 fn (): Action => self::visibilityAction(),
             ])
             ->schema([
-                Grid::make(3)
+                Grid::make([
+                    'default' => 1,
+                    'md' => 4,
+                ])
                     ->schema([
-                        TextInput::make('title')
-                            ->label(__('Event Name'))
-                            ->placeholder(__('wedding.manage_wedding.schedule.event_name_placeholder'))
-                            ->maxLength(100)
-                            ->required(),
-
                         TimePicker::make('time')
                             ->label(__('Time'))
                             ->placeholder(__('wedding.manage_wedding.schedule.time_placeholder'))
                             ->seconds(false)
+                            ->columnSpan([
+                                'default' => 1,
+                                'md' => 1,
+                            ])
+                            ->required(),
+
+                        TextInput::make('title')
+                            ->label(__('Event Name'))
+                            ->placeholder(__('wedding.manage_wedding.schedule.event_name_placeholder'))
+                            ->maxLength(100)
+                            ->columnSpan([
+                                'default' => 1,
+                                'md' => 2,
+                            ])
                             ->required(),
 
                         IconSelect::make('icon')
                             ->hintIcon(
                                 Heroicon::InformationCircle,
                                 __('wedding.manage_wedding.schedule.icon_help'),
-                            ),
+                            )
+                            ->columnSpan([
+                                'default' => 1,
+                                'md' => 1,
+                            ]),
                     ]),
-                Grid::make(2)
+
+                Grid::make([
+                    'default' => 1,
+                    'md' => 2,
+                ])
                     ->schema([
                         TextInput::make('address')
                             ->label(__('Address'))
@@ -74,23 +95,38 @@ class TimelineRepeater
                                     ->visible(fn (?string $state): bool => filled($state)),
                             ),
                     ]),
-                Grid::make(2)
-                    ->schema([
-                        Toggle::make('is_visible')
-                            ->label(__('Visible'))
-                            ->hintIcon(
-                                Heroicon::InformationCircle,
-                                __('wedding.manage_wedding.schedule.visibility_help'),
-                            )
-                            ->default(true),
-                    ]),
+                Toggle::make('is_visible')
+                    ->label(__('wedding.manage_wedding.schedule.visibility_toggle'))
+                    ->hintIcon(
+                        Heroicon::InformationCircle,
+                        __('wedding.manage_wedding.schedule.visibility_help'),
+                    )
+                    ->default(true),
             ])
             ->columns(1)
+            ->collapsed()
             ->reorderable()
             ->orderColumn('sort_order')
             ->defaultItems(0)
             ->live()
-            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null);
+            ->itemLabel(fn (Schema $item): ?string => self::timelineItemLabel($item));
+    }
+
+    /**
+     * Build a compact item label from the persisted timeline record.
+     *
+     * The repeater state is intentionally not used here, so labels remain stable
+     * while the user edits an item and updates only after a successful save.
+     */
+    private static function timelineItemLabel(Schema $item): ?string
+    {
+        $timeline = $item->getRecord();
+
+        if (! $timeline instanceof WeddingTimeline || ! $timeline->exists) {
+            return null;
+        }
+
+        return $timeline->repeater_label;
     }
 
     /**
@@ -137,6 +173,23 @@ class TimelineRepeater
             ])
             ->action(function (Action $action, array $data) use ($groupService): void {
                 $groupService->saveVisibility(self::timelineForAction($action), $data['visible_group_ids'] ?? []);
+            });
+    }
+
+    /**
+     * Create an action for managing the visibility status of a wedding schedule.
+     */
+    private static function visibilityStatus(): Action
+    {
+        return Action::make('visibility_status')
+            ->label(__('wedding.manage_wedding.schedule.visibility_inactive_label'))
+            ->badge()
+            ->color('warning')
+            ->hiddenLabel()
+            ->visible(function (Action $action): bool {
+                $record = self::timelineForAction($action);
+
+                return $record?->exists === true && ! $record->is_visible;
             });
     }
 

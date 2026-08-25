@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\Status;
+use App\Filament\Schemas\Components\OpenGraphPreview;
 use App\Filament\Wedding\Pages\Dashboard;
 use App\Filament\Wedding\Pages\ManageWedding\ManageWedding;
 use App\Filament\Wedding\Pages\SetupWedding\SetupWedding;
@@ -10,11 +11,14 @@ use App\Models\Group;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\WeddingTimeline;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\View;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\assertModelExists;
@@ -54,6 +58,7 @@ test('displays all populated wedding detail sections', function (): void {
         ->set('activeTab', 'schedule')
         ->assertSchemaComponentExists('timelines')
         ->assertSee($timeline->title)
+        ->assertSee('16:00 - Ceremony')
         ->set('activeTab', 'memory')
         ->assertSchemaStateSet([
             'has_memory_wall' => true,
@@ -71,6 +76,157 @@ test('displays all populated wedding detail sections', function (): void {
         ->assertFormFieldVisible('meta_title')
         ->assertFormFieldVisible('meta_description')
         ->assertFormFieldVisible('MetaImage');
+});
+
+test('uses focused callouts for standalone wedding detail tabs', function (): void {
+    Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'basic')
+        ->assertSee(__('Basic Information'))
+        ->assertSee(__('wedding.manage_wedding.basic_information.callout.description'))
+        ->set('activeTab', 'memory')
+        ->assertSee(__('Memory Wall'))
+        ->assertSee(__('wedding.manage_wedding.memory_wall.callout.description'));
+});
+
+test('configures the wedding schedule for compact mobile editing', function (): void {
+    $component = Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'schedule');
+    $repeater = $component->instance()->form->getComponent(
+        fn (mixed $schemaComponent): bool => $schemaComponent instanceof Repeater
+            && $schemaComponent->getName() === 'timelines',
+    );
+
+    expect($repeater)->toBeInstanceOf(Repeater::class);
+
+    expect($repeater->isReorderableWithDragAndDrop())->toBeTrue()
+        ->and($repeater->isCollapsed())->toBeTrue();
+});
+
+test('uses saved timeline data for collapsed labels and inactive badges', function (): void {
+    Storage::fake('public');
+    $wedding = $this->user->team->wedding;
+    $wedding->addMedia(UploadedFile::fake()->image('hero.jpg'))
+        ->toMediaCollection('Hero', 'public');
+
+    $timeline = WeddingTimeline::factory()->for($wedding)->create([
+        'title' => 'Reception',
+        'time' => '18:00',
+        'is_visible' => false,
+    ]);
+
+    $component = Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'schedule')
+        ->assertSee('18:00 - Reception')
+        ->assertSee(__('wedding.manage_wedding.schedule.visibility_inactive_label'))
+        ->assertSee('fi-badge');
+
+    $repeater = $component->instance()->form->getComponent(
+        fn (mixed $schemaComponent): bool => $schemaComponent instanceof Repeater
+            && $schemaComponent->getName() === 'timelines',
+    );
+
+    expect($repeater)->toBeInstanceOf(Repeater::class);
+
+    $statusAction = collect($repeater->getExtraItemActions())
+        ->first(fn (Action $action): bool => $action->getName() === 'visibility_status');
+
+    expect($statusAction)->toBeInstanceOf(Action::class)
+        ->and($statusAction->isBadge())->toBeTrue()
+        ->and($statusAction->getLabel())->toBe(__('wedding.manage_wedding.schedule.visibility_inactive_label'));
+
+    $component
+        ->set("data.timelines.record-{$timeline->getKey()}.title", 'Updated Reception')
+        ->set("data.timelines.record-{$timeline->getKey()}.time", '19:00')
+        ->set("data.timelines.record-{$timeline->getKey()}.is_visible", true)
+        // Unsaved repeater changes must not change the collapsed label or badge.
+        ->assertSee('18:00 - Reception')
+        ->assertDontSee('19:00 - Updated Reception')
+        ->assertSee(__('wedding.manage_wedding.schedule.visibility_inactive_label'))
+        ->fillForm([
+            'meta_title' => 'Ana and Marko',
+            'meta_description' => 'Join us on our special day.',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertNotified()
+        // The saved record is reflected after a successful save.
+        ->assertSee('19:00 - Updated Reception')
+        ->assertDontSee(__('wedding.manage_wedding.schedule.visibility_inactive_label'));
+});
+
+test('keeps the metadata preview on saved values until the form is saved', function (): void {
+    Storage::fake('public');
+    $wedding = $this->user->team->wedding;
+    $wedding->update([
+        'meta_title' => 'Sačuvani naslov',
+        'meta_description' => 'Sačuvani opis pozivnice.',
+    ]);
+    $wedding->addMedia(UploadedFile::fake()->image('hero.jpg'))
+        ->toMediaCollection('Hero', 'public');
+
+    $component = Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'meta')
+        ->assertSee('Sačuvani naslov')
+        ->assertSee('Sačuvani opis pozivnice.')
+        ->assertSee(__('wedding.manage_wedding.meta.preview.callout.heading'))
+        ->assertSee(__('wedding.manage_wedding.meta.preview.callout.description'))
+        ->assertSee(__('wedding.manage_wedding.meta.preview.platforms.whatsapp.label'))
+        ->assertSee(__('wedding.manage_wedding.meta.preview.platforms.viber.label'))
+        ->assertSee(__('wedding.manage_wedding.meta.preview.platforms.messenger.label'))
+        ->assertSee(__('wedding.manage_wedding.meta.preview.platforms.telegram.label'))
+        ->fillForm(['meta_title' => 'Novi naslov']);
+
+    // The preview stays on persisted content while the live form state is dirty.
+    $component
+        ->assertSeeHtmlInOrder([
+            'data-open-graph-platform="whatsapp"',
+            'Sačuvani naslov',
+        ])
+        ->assertSee(__('wedding.manage_wedding.meta.preview.unsaved'))
+        ->assertSee(__('wedding.manage_wedding.meta.preview.unsaved_tooltip'))
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertNotified()
+        // A successful save makes the newly persisted title available to the preview.
+        ->assertSeeHtmlInOrder([
+            'data-open-graph-platform="whatsapp"',
+            'Novi naslov',
+        ]);
+});
+
+test('can opt into updating the metadata preview from form state', function (): void {
+    $wedding = $this->user->team->wedding;
+    $wedding->update(['meta_title' => 'Sačuvani naslov']);
+
+    $component = Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'meta')
+        ->fillForm(['meta_title' => 'Novi naslov']);
+
+    $defaultPreview = $component->instance()->form->getComponent(
+        fn (mixed $schemaComponent): bool => $schemaComponent instanceof View
+            && $schemaComponent->getView() === 'filament.schemas.components.open-graph-preview',
+    );
+
+    expect($defaultPreview)->not->toBeNull();
+
+    $livePreview = OpenGraphPreview::make(updateOnStateChange: true)
+        ->container($defaultPreview->getContainer());
+
+    expect($livePreview->getViewData()['metaData']->title)->toBe('Novi naslov');
+});
+
+test('opens the requested wedding details tab from the query string', function (): void {
+    Livewire::withQueryParams(['tab' => 'schedule'])
+        ->test(ManageWedding::class)
+        // Filament resolves the schedule tab from the URL query parameter.
+        ->assertSee('activeTab: 3');
+});
+
+test('falls back to the basic wedding details tab for an unknown query tab', function (): void {
+    Livewire::withQueryParams(['tab' => 'unknown'])
+        ->test(ManageWedding::class)
+        // Unknown query values must not select a tab that does not exist.
+        ->assertSee('activeTab: 1');
 });
 
 test('returns to the tab containing the first validation error', function (): void {
@@ -148,7 +304,7 @@ test('shows the empty schedule state when no timeline exists', function (): void
     $wedding->timelines()->delete();
 
     Livewire::test(ManageWedding::class)
-        ->set('activeTab', 3)
+        ->set('activeTab', 'schedule')
         // An empty schedule explains how to start defining the wedding day.
         ->assertSee(__('wedding.manage_wedding.timeline.not_defined'));
 
@@ -158,7 +314,7 @@ test('shows the empty schedule state when no timeline exists', function (): void
     ]);
 
     Livewire::test(ManageWedding::class)
-        ->set('activeTab', 3)
+        ->set('activeTab', 'schedule')
         // The empty state disappears as soon as the relationship has an item.
         ->assertDontSee(__('wedding.manage_wedding.timeline.not_defined'))
         ->assertSee($timeline->title);
@@ -171,7 +327,7 @@ test('hides memory wall controls when the team does not have access', function (
         // The policy-controlled section must not expose any memory wall control.
         ->assertDontSee(__('Memory Wall'))
         // Meta data remains available when the optional section is removed.
-        ->set('activeTab', 5)
+        ->set('activeTab', 'meta')
         ->assertFormFieldVisible('meta_title')
         ->assertFormFieldVisible('meta_description');
 });

@@ -42,8 +42,9 @@ return [
     'manage_wedding' => [
         'help_action' => 'More information',
         'basic_information' => [
-            'description' => 'Enter the names and dates that will appear on the invitation.',
-            'help' => 'Use the names exactly as you want guests to see them. The RSVP deadline must be before the wedding date.',
+            'callout' => [
+                'description' => 'Enter the names and dates that will appear on the invitation. Use the names exactly as you want guests to see them, and make sure the RSVP deadline is before the wedding date.',
+            ],
             'bride_name_placeholder' => 'e.g. Ana',
             'groom_name_placeholder' => 'e.g. Marko',
             'wedding_date_placeholder' => 'Choose the wedding date and time',
@@ -66,6 +67,8 @@ return [
             'map_link_placeholder' => 'Paste a Google Maps link',
             'icon_help' => 'Choose an icon that helps guests recognize this event.',
             'visibility_help' => 'Turn this off if you want to hide this event from guests without deleting it.',
+            'visibility_toggle' => 'Visible to guests',
+            'visibility_inactive_label' => 'Inactive',
             'visibility_all' => 'Visible to all groups',
             'visibility_custom' => 'Custom group visibility',
             'visibility_manage' => 'Choose which groups can see this event.',
@@ -78,8 +81,9 @@ return [
             'visibility_deselect_all' => 'Deselect all',
         ],
         'memory_wall' => [
-            'description' => 'Let guests share photos and messages from your celebration.',
-            'help' => 'When enabled, guests can open the memory wall using its link or QR code. Set how long submissions should remain open.',
+            'callout' => [
+                'description' => 'Let guests share photos and messages from your celebration. When enabled, they can use the link or QR code, and you can set how long submissions remain open.',
+            ],
             'enable_help' => 'Turn this on to create a page where guests can share photos and memories.',
             'open_until_placeholder' => 'Choose when photo and message sharing closes',
             'open_until_help' => 'The date must be after the wedding and within the allowed period.',
@@ -93,6 +97,34 @@ return [
             'title_help' => 'This is the title shown in the link preview. Leave it empty to use the default wedding title.',
             'description_help' => 'This is the text shown below the title in the link preview. Leave it empty to use the default greeting.',
             'image_help' => 'Optional. Leave it empty to use the main invitation image.',
+            'preview' => [
+                'heading' => 'Link preview',
+                'description' => 'A representative preview of how the invitation may appear when shared in a chat application.',
+                'tabs_label' => 'Link preview applications',
+                'empty' => 'No link preview applications are selected.',
+                'callout' => [
+                    'heading' => 'Preview note',
+                    'description' => 'This is only a preview. Each chat or social app may implement link previews differently, including the image crop and aspect ratio, so the shared invitation can look different there.',
+                ],
+                'platforms' => [
+                    'whatsapp' => [
+                        'label' => 'WhatsApp',
+                    ],
+                    'viber' => [
+                        'label' => 'Viber',
+                    ],
+                    'messenger' => [
+                        'label' => 'Messenger',
+                    ],
+                    'telegram' => [
+                        'label' => 'Telegram',
+                    ],
+                ],
+                'unsaved' => 'Save your changes to update this preview and the shared link.',
+                'unsaved_tooltip' => 'There are unsaved changes',
+                'image_alt' => 'Invitation preview image',
+                'image_placeholder' => 'Invitation image',
+            ],
         ],
         'timeline' => [
             'not_defined' => 'Timeline is not defined yet.',

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Filament\Wedding\Pages\ManageWedding\ManageWedding;
 use App\Filament\Wedding\Resources\Groups\Pages\EditGroup;
 use App\Models\Group;
 use App\Models\Guest;
@@ -169,6 +170,8 @@ test('shows the empty schedule state when no timeline is defined', function (): 
     Livewire::test(EditGroup::class, ['record' => $group->getKey()])
         // The form explains that the wedding has no schedule yet.
         ->assertSee(__('wedding.manage_wedding.timeline.not_defined'))
+        // The action opens the wedding details page on its schedule tab.
+        ->assertSee(ManageWedding::getUrl(['tab' => 'schedule']).'#wedding-timeline')
         // There are no timeline choices to submit when the schedule is empty.
         ->assertFormFieldHidden('visible_timeline_items');
 });

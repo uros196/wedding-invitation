@@ -42,8 +42,9 @@ return [
     'manage_wedding' => [
         'help_action' => 'Dodatne informacije',
         'basic_information' => [
-            'description' => 'Unesite imena i datume koji će se prikazivati na pozivnici.',
-            'help' => 'Unesite imena tačno onako kako želite da ih gosti vide. Rok za prijavu mora biti pre datuma venčanja.',
+            'callout' => [
+                'description' => 'Unesite imena i datume koji će se prikazivati na pozivnici. Unesite imena tačno onako kako želite da ih gosti vide i podesite rok za prijavu pre datuma venčanja.',
+            ],
             'bride_name_placeholder' => 'npr. Ana',
             'groom_name_placeholder' => 'npr. Marko',
             'wedding_date_placeholder' => 'Izaberite datum i vreme venčanja',
@@ -66,6 +67,8 @@ return [
             'map_link_placeholder' => 'Nalepite link ka Google mapi',
             'icon_help' => 'Izaberite ikonicu koja će gostima pomoći da prepoznaju ovaj događaj.',
             'visibility_help' => 'Isključite ovo ako želite da sakrijete događaj od gostiju, a da ga ne obrišete.',
+            'visibility_toggle' => 'Vidljivo gostima',
+            'visibility_inactive_label' => 'Neaktivno',
             'visibility_all' => 'Vidljivo svim grupama',
             'visibility_custom' => 'Prilagođena vidljivost grupa',
             'visibility_manage' => 'Izaberite grupe koje mogu da vide ovaj događaj.',
@@ -78,8 +81,9 @@ return [
             'visibility_deselect_all' => 'Poništi sve',
         ],
         'memory_wall' => [
-            'description' => 'Omogućite gostima da podele fotografije i poruke sa proslave.',
-            'help' => 'Kada je uključen, gosti mogu da otvore zid uspomena preko linka ili QR koda. Podesite do kada mogu da šalju sadržaj.',
+            'callout' => [
+                'description' => 'Omogućite gostima da podele fotografije i poruke sa proslave. Kada je uključen, mogu da koriste link ili QR kod, a vi možete da podesite do kada je slanje otvoreno.',
+            ],
             'enable_help' => 'Uključite ovo da biste napravili stranicu na kojoj gosti mogu da podele fotografije i uspomene.',
             'open_until_placeholder' => 'Izaberite do kada je moguće slanje fotografija i poruka',
             'open_until_help' => 'Datum mora biti posle venčanja i u okviru dozvoljenog perioda.',
@@ -93,6 +97,34 @@ return [
             'title_help' => 'Ovo je naslov koji se prikazuje u pregledu linka. Ostavite prazno da se koristi podrazumevani naslov venčanja.',
             'description_help' => 'Ovo je tekst ispod naslova u pregledu linka. Ostavite prazno da se koristi podrazumevani pozdrav.',
             'image_help' => 'Opciono. Ostavite prazno da se koristi glavna slika pozivnice.',
+            'preview' => [
+                'heading' => 'Pregled linka',
+                'description' => 'Primer kako pozivnica može izgledati kada se podeli u čet aplikaciji.',
+                'tabs_label' => 'Aplikacije za pregled linka',
+                'empty' => 'Nijedna aplikacija za pregled linka nije izabrana.',
+                'callout' => [
+                    'heading' => 'Napomena o pregledu',
+                    'description' => 'Ovo je samo pregled. Svaka čet aplikacija ili društvena mreža može drugačije da prikaže link, uključujući isecanje i odnos stranica slike, pa se podeljena pozivnica može razlikovati od ovog primera.',
+                ],
+                'platforms' => [
+                    'whatsapp' => [
+                        'label' => 'WhatsApp',
+                    ],
+                    'viber' => [
+                        'label' => 'Viber',
+                    ],
+                    'messenger' => [
+                        'label' => 'Messenger',
+                    ],
+                    'telegram' => [
+                        'label' => 'Telegram',
+                    ],
+                ],
+                'unsaved' => 'Sačuvajte izmene da biste ažurirali ovaj pregled i prikaz deljenog linka.',
+                'unsaved_tooltip' => 'Postoje nesnimljene izmene',
+                'image_alt' => 'Slika iz pregleda pozivnice',
+                'image_placeholder' => 'Slika pozivnice',
+            ],
         ],
         'timeline' => [
             'not_defined' => 'Vremenska linija još uvek nije definisana.',

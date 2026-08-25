@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Filament\Wedding\Pages\ManageWedding\ManageWedding;
 use App\Filament\Wedding\Resources\Groups\Pages\CreateGroup;
 use App\Filament\Wedding\Resources\Groups\Pages\EditGroup;
 use App\Filament\Wedding\Resources\Groups\Pages\ViewGroup;
@@ -52,6 +53,11 @@ test('creates a group for the authenticated wedding', function (): void {
         ->and($group->has_plus_one)->toBeFalse()
         ->and($group->views_count)->toBe(0)
         ->and($group->uuid)->not->toBeEmpty();
+});
+
+test('links to the wedding schedule tab from the create form', function (): void {
+    Livewire::test(CreateGroup::class)
+        ->assertSee(ManageWedding::getUrl(['tab' => 'schedule']).'#wedding-timeline');
 });
 
 test('does not allow creating a group without an associated wedding', function (): void {

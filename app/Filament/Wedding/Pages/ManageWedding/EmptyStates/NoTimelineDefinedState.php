@@ -27,7 +27,7 @@ class NoTimelineDefinedState
             $state->footer([
                 Action::make('add_timeline')
                     ->label(__('Add Timeline'))
-                    ->url(ManageWedding::getUrl().'#wedding-timeline')
+                    ->url(ManageWedding::getUrl(['tab' => 'schedule']).'#wedding-timeline')
                     ->button(),
             ]);
         }

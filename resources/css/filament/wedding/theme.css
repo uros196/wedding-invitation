@@ -2,6 +2,7 @@
 
 @source '../../../../app/Filament/Wedding/**/*';
 @source '../../../../app/Livewire/**/*';
+@source '../../../../resources/views/components/**/*';
 @source '../../../../resources/views/filament/wedding/**/*';
 @source '../../../../resources/views/vendor/filament-breezy/**/*';
 @source '../../../../vendor/jeffgreco13/filament-breezy/resources/views/**/*';

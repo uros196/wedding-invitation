@@ -78,4 +78,19 @@ class WeddingTimeline extends Model
     {
         return Attribute::get(fn () => "{$this->time->format('H:i')} - {$this->title}");
     }
+
+    /**
+     * Get the label used in repeater form.
+     */
+    protected function repeaterLabel(): Attribute
+    {
+        return Attribute::get(function () {
+            return collect([
+                $this->time?->format('H:i'),
+                $this->title,
+            ])
+                ->filter(fn ($value): bool => filled($value))
+                ->implode(' - ');
+        });
+    }
 }
