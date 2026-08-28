@@ -77,13 +77,14 @@ final readonly class CompleteMemoryWallUpload
     protected function addMedia(Wedding $wedding, MemoryWallUpload $upload, array $metadata): Media
     {
         $mediaDisk = (string) config('memory-wall.media_disk', 's3');
+        $conversationDisk = (string) config('memory-wall.conversions_disk', 's3');
 
         return $wedding
             ->addMediaFromDisk($upload->object_path, $mediaDisk)
             ->usingName(pathinfo($upload->original_name, PATHINFO_FILENAME))
             ->usingFileName(basename($upload->object_path))
             ->setFileSize($metadata['size'])
-            ->storingConversionsOnDisk((string) config('memory-wall.conversions_disk', 's3'))
+            ->storingConversionsOnDisk($conversationDisk)
             ->withProperties([
                 'mime_type' => $metadata['mime_type'] ?: $upload->mime_type,
             ])
