@@ -27,8 +27,11 @@ class MediaResource extends JsonResource
             'type' => $this->type,
             'extension' => $this->extension,
             'human_readable_size' => $this->human_readable_size,
-            'preview_url' => $this->preview_url,
-            'original_url' => $this->original_url,
+
+            // Video uploads may not have a generated conversion; fall back to
+            // the original URL so the gallery can still render them natively.
+            'preview_url' => $this->getAvailableUrl(['preview']),
+            'original_url' => $this->getUrl(),
             'size' => $this->size,
         ];
     }

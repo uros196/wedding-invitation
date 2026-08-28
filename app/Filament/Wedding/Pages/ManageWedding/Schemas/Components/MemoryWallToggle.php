@@ -7,6 +7,9 @@ namespace App\Filament\Wedding\Pages\ManageWedding\Schemas\Components;
 use Filament\Forms\Components\Toggle;
 use Filament\Support\Icons\Heroicon;
 
+/**
+ * Builds the setting that enables or disables the public memory wall.
+ */
 class MemoryWallToggle
 {
     /**

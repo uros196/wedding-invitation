@@ -10,6 +10,9 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Icons\Heroicon;
 use Webbingbrasil\FilamentCopyActions\Actions\CopyAction;
 
+/**
+ * Builds a read-only, copyable link to the public memory wall.
+ */
 class MemoryWallUrlInput
 {
     /**

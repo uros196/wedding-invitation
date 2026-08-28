@@ -1,6 +1,7 @@
 import { Heart, MessageCircleHeart } from 'lucide-react';
 import { fonts, palette } from '../invitation/theme';
 
+/** Explain that the public upload window has already closed. */
 export default function ShownAfter() {
     return (
         <div

@@ -40,10 +40,12 @@ class WeddingResource extends JsonResource
             'timelines_count' => $this->whenCounted('timelines'),
             'timelines' => WeddingTimelineResource::collection($this->whenLoaded('timelines')),
 
+            // The frontend uses these flags to choose between the upload panel,
+            // the gallery, and the post-event placeholder.
             // Memory Wall
             'has_memory_wall' => $this->has_memory_wall,
             'is_memory_wall_form_open' => $this->is_memory_wall_form_open,
-            'is_memory_wall_finished' => $isWeddingFinished && !$this->is_memory_wall_form_open,
+            'is_memory_wall_finished' => $isWeddingFinished && ! $this->is_memory_wall_form_open,
 
             // Media
             'hero_image' => HeroMediaResource::make($heroMedia),

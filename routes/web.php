@@ -17,10 +17,28 @@ Route::prefix('wedding')->group(function () {
         ->middleware(XSSProtection::class)
         ->middleware('throttle:10,1');
 
-    // Wedding's memory wall page
-    Route::get('/memory-wall/{wedding:uuid}', [MemoryWallController::class, 'show'])->name('memory-wall.show');
+    Route::controller(MemoryWallController::class)
+        ->prefix('/memory-wall/{wedding:uuid}')
+        ->name('memory-wall.')
+        ->group(function () {
 
-    // Wedding's memory wall upload API
-    Route::post('/memory-wall/{wedding:uuid}/upload', [MemoryWallController::class, 'upload'])->name('memory-wall.upload')
-        ->middleware('throttle:10,1');
+            // Wedding's memory wall page
+            Route::get('', 'show')->name('show');
+
+            // Wedding's memory wall upload API
+            Route::post('/upload/initialize', 'initializeUpload')->name('upload.initialize')
+                ->middleware('throttle:20,1');
+
+            // Upload sessions are resolved by UUID and then authorized against the wedding
+            // and private token in the upload actions; they are not nested bindings.
+            Route::post('/upload/{upload:uuid}/parts', 'getUploadPartUrls')->name('upload.parts')
+                ->withoutScopedBindings()
+                ->middleware('throttle:60,1');
+            Route::post('/upload/{upload:uuid}/complete', 'completeUpload')->name('upload.complete')
+                ->withoutScopedBindings()
+                ->middleware('throttle:20,1');
+            Route::delete('/upload/{upload:uuid}', 'cancelUpload')->name('upload.cancel')
+                ->withoutScopedBindings()
+                ->middleware('throttle:20,1');
+        });
 });

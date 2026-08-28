@@ -17,6 +17,9 @@ use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Builds the QR code preview and download action for the memory wall URL.
+ */
 class MemoryWallQrCode
 {
     /**

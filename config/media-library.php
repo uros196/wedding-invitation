@@ -8,6 +8,11 @@ use Spatie\MediaLibrary\Support\PathGenerator\DefaultPathGenerator;
 
 return [
     /*
+     * Keep the Media Library limit aligned with the Memory Wall multipart limit.
+     */
+    'max_file_size' => 1024 * 1024 * 1024,
+
+    /*
      * Keep Spatie's generator as the default for models without a custom mapping.
      */
     'path_generator' => DefaultPathGenerator::class,

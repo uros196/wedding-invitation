@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\MemoryWallUploadStatus;
 use App\Enums\QrCodeFormat;
+use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -44,25 +47,32 @@ readonly class MemoryWallService
     }
 
     /**
-     * Upload files to the wedding memory wall.
+     * Retrieve random media that is safe to show in the public preview.
      *
-     * @param  array<int, UploadedFile>  $files
+     * Legacy media without an upload-session row remains visible, while media
+     * created by the multipart flow is shown only after its session completes.
      */
-    public function uploadFiles(Wedding $wedding, array $files): void
+    public function getRandomFiles(Wedding $wedding, int $limit = 12): Collection
     {
-        foreach ($files as $file) {
-            $wedding->addMedia($file)
-                ->toMediaCollection('MemoryWall');
-        }
-    }
+        $uploadTable = (new MemoryWallUpload)->getTable();
+        $mediaTable = $wedding->media()->getModel()->getTable();
 
-    /**
-     * Retrieve a random collection of media files from the wedding's memory wall.
-     */
-    public function getRandomFiles(Wedding $wedding, int $limit = 10): Collection
-    {
         return $wedding->media()
             ->where('collection_name', 'MemoryWall')
+            ->where(function (Builder $query) use ($uploadTable, $mediaTable): void {
+                $query
+                    ->whereNotExists(function (QueryBuilder $query) use ($uploadTable, $mediaTable): void {
+                        $query->selectRaw('1')
+                            ->from($uploadTable)
+                            ->whereColumn("{$uploadTable}.media_id", "{$mediaTable}.id");
+                    })
+                    ->orWhereExists(function (QueryBuilder $query) use ($uploadTable, $mediaTable): void {
+                        $query->selectRaw('1')
+                            ->from($uploadTable)
+                            ->whereColumn("{$uploadTable}.media_id", "{$mediaTable}.id")
+                            ->where("{$uploadTable}.status", MemoryWallUploadStatus::Completed->value);
+                    });
+            })
             ->inRandomOrder()
             ->take($limit)
             ->get();

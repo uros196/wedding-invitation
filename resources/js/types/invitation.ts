@@ -137,5 +137,46 @@ export interface InvitationPageProps {
 export interface MemoryWallPageProps {
     wedding: Wedding;
     metaData: MetaData;
+    /** Random completed media used for the initial gallery preview. */
     media: Media[];
+    /** Server-side limits mirrored by the client-side drop-zone validation. */
+    uploadConfig: {
+        maxFiles: number;
+        maxFileSize: number;
+        acceptedTypes: string[];
+    };
+    /** Localized labels shared by the upload panel and gallery. */
+    translations: {
+        upload: {
+            title: string;
+            description: string;
+            dropzone: string;
+            browse: string;
+            dropzoneHint: string;
+            videoLabel: string;
+            selected: string;
+            uploadAction: string;
+            uploading: string;
+            queued: string;
+            completed: string;
+            failed: string;
+            retry: string;
+            cancel: string;
+            remove: string;
+            maxFiles: string;
+            maxFileSize: string;
+            fileTypeError: string;
+            fileSizeError: string;
+            maxFilesError: string;
+            empty: string;
+            networkError: string;
+            completedSummary: string;
+        };
+        gallery: {
+            title: string;
+            empty: string;
+            imageAlt: string;
+            videoLabel: string;
+        };
+    };
 }

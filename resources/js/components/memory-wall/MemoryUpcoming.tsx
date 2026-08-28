@@ -1,10 +1,12 @@
 import { Calendar, Camera } from 'lucide-react';
 import { fonts, palette } from '../invitation/theme';
 
+/** Wedding date displayed before the memory wall upload window opens. */
 interface MemoryUpcomingProps {
     weddingDate: string;
 }
 
+/** Explain when the memory wall becomes available to guests. */
 export default function MemoryUpcoming({ weddingDate }: MemoryUpcomingProps) {
     return (
         <div
@@ -60,19 +62,6 @@ export default function MemoryUpcoming({ weddingDate }: MemoryUpcomingProps) {
                     <span>Stranica će se aktivirati na dan venčanja!</span>
                 </div>
 
-                {/*<div className="flex justify-center pt-3">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-medium shadow-sm transition-all duration-200 hover:opacity-90"
-                        style={{
-                            backgroundColor: palette.deep,
-                            color: palette.background,
-                        }}
-                    >
-                        <ArrowLeft size={16} />
-                        <span>Nazad na pozivnicu</span>
-                    </Link>
-                </div>*/}
             </div>
         </div>
     );

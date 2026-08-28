@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Enums\MemoryWallUploadStatus;
 use App\Enums\Status;
+use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
+use Illuminate\Http\UploadedFile;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('renders the enabled memory wall and its public state', function (): void {
@@ -81,4 +84,30 @@ test('returns not found for an unknown wedding uuid', function (): void {
     $this->get(route('memory-wall.show', [
         'wedding' => '00000000-0000-4000-8000-000000000000',
     ]))->assertNotFound();
+});
+
+test('shows completed memory wall media and hides incomplete uploads', function (): void {
+    Storage::fake('public');
+    $wedding = Wedding::factory()->create();
+    $visibleMedia = $wedding->addMedia(UploadedFile::fake()->image('visible.jpg'))
+        ->toMediaCollection('MemoryWall');
+    $hiddenMedia = $wedding->addMedia(UploadedFile::fake()->image('pending.jpg'))
+        ->toMediaCollection('MemoryWall');
+
+    MemoryWallUpload::factory()->for($wedding)->create([
+        'media_id' => $visibleMedia->id,
+        'status' => MemoryWallUploadStatus::Completed,
+    ]);
+    MemoryWallUpload::factory()->for($wedding)->create([
+        'media_id' => $hiddenMedia->id,
+        'status' => MemoryWallUploadStatus::Uploading,
+    ]);
+
+    $this->get(route('memory-wall.show', $wedding))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('memory-wall')
+            ->has('media', 1)
+            ->where('media.0.id', $visibleMedia->id)
+        );
 });

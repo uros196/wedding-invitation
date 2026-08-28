@@ -112,6 +112,14 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
+     * Get upload sessions created for the wedding memory wall.
+     */
+    public function memoryWallUploads(): HasMany
+    {
+        return $this->hasMany(MemoryWallUpload::class);
+    }
+
+    /**
      * Get the related guests for the wedding.
      */
     public function guests(): HasManyThrough

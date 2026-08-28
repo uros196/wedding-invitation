@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\MemoryWallMultipartStorage;
+use App\Services\MemoryWall\S3MultipartUploadStorage;
 use App\Support\MetaFactory;
 use BezhanSalleh\LanguageSwitch\Enums\TriggerStyle;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
-use BladeUI\Icons\Factory;
+use BladeUI\Icons\Factory as IconFactory;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
@@ -22,7 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Keep the upload workflow independent of the concrete S3 SDK adapter.
+        $this->app->bind(MemoryWallMultipartStorage::class, S3MultipartUploadStorage::class);
     }
 
     /**
@@ -46,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Expand SVG factory with a new path
-        $this->callAfterResolving(Factory::class, function (Factory $factory) {
+        $this->callAfterResolving(IconFactory::class, function (IconFactory $factory) {
             $factory->add('default', [
                 'path' => resource_path('svg'),
                 'prefix' => '',
