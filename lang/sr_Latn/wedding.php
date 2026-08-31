@@ -300,6 +300,7 @@ return [
         ],
         'status' => [
             'uploading' => 'Šalje se',
+            'processing' => 'Obrađuje se',
             'completed' => 'Otpremljeno',
             'failed' => 'Neuspešno',
         ],
@@ -308,6 +309,7 @@ return [
             'file_type' => 'Ovaj tip fajla nije podržan.',
             'parts_incomplete' => 'Slanje nije završeno. Pokušajte ponovo.',
             'upload_size_mismatch' => 'Veličina poslatog fajla se ne podudara sa originalnim fajlom.',
+            'processing_failed' => 'Upload nije mogao da se obradi. Pokušajte ponovo.',
             'completed_upload_cannot_be_cancelled' => 'Poslat fajl ne može biti otkazan.',
         ],
     ],

@@ -249,7 +249,7 @@ class Wedding extends Model implements HasMedia
         $this->addMediaCollection('MemoryWall')
             ->registerMediaConversions(function (Media $media) {
                 $this->addMediaConversion('preview')
-                    ->fit(Fit::Contain, 500, 500)
+                    ->fit(Fit::Contain, 700, 700)
                     ->format('webp')
                     ->nonQueued();
             });

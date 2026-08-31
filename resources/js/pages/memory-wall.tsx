@@ -9,21 +9,36 @@ import type { MemoryWallPageProps } from '@/types';
 /**
  * Renders the memory wall page.
  */
-export default function MemoryWallPage({ wedding, metaData, media, uploadConfig, translations }: MemoryWallPageProps) {
+export default function MemoryWallPage({
+    wedding,
+    metaData,
+    media,
+    uploadConfig,
+    translations,
+}: MemoryWallPageProps) {
     // Keep server-provided media and newly completed uploads in one gallery list.
     const [visibleMedia, setVisibleMedia] = useState(media);
 
     /** Insert new uploads first while preventing duplicate media entries. */
-    const handleMediaUploaded = useCallback((newMedia: (typeof media)[number]): void => {
-        setVisibleMedia((currentMedia) => [newMedia, ...currentMedia.filter((item) => item.uuid !== newMedia.uuid)]);
-    }, []);
+    const handleMediaUploaded = useCallback(
+        (newMedia: (typeof media)[number]): void => {
+            setVisibleMedia((currentMedia) => [
+                newMedia,
+                ...currentMedia.filter((item) => item.uuid !== newMedia.uuid),
+            ]);
+        },
+        [],
+    );
 
     return (
         <>
             <Head title={metaData.title}>
                 <meta name="description" content={metaData.description} />
                 <meta property="og:title" content={metaData.title} />
-                <meta property="og:description" content={metaData.description} />
+                <meta
+                    property="og:description"
+                    content={metaData.description}
+                />
                 <meta property="og:type" content="website" />
                 <meta property="og:image" content={metaData.image} />
             </Head>

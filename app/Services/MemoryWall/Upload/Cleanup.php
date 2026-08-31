@@ -55,6 +55,17 @@ final readonly class Cleanup
      */
     public function markAsFailed(MemoryWallUpload $upload, string $message): void
     {
+        if (filled($upload->multipart_upload_id)) {
+            try {
+                $this->storage->abortMultipartUpload(
+                    $upload->object_path,
+                    (string) $upload->multipart_upload_id,
+                );
+            } catch (Throwable) {
+                // The provider may have completed or expired the multipart session.
+            }
+        }
+
         try {
             $this->storage->deleteObject($upload->object_path);
         } catch (Throwable) {
@@ -63,6 +74,7 @@ final readonly class Cleanup
 
         $upload->update([
             'status' => MemoryWallUploadStatus::Failed,
+            'multipart_upload_id' => null,
             'error_message' => $message,
         ]);
     }

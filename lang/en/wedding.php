@@ -300,6 +300,7 @@ return [
         ],
         'status' => [
             'uploading' => 'Uploading',
+            'processing' => 'Processing',
             'completed' => 'Uploaded',
             'failed' => 'Failed',
         ],
@@ -308,6 +309,7 @@ return [
             'file_type' => 'This file type is not supported.',
             'parts_incomplete' => 'The upload is incomplete. Please try again.',
             'upload_size_mismatch' => 'The uploaded file size does not match the original file.',
+            'processing_failed' => 'The upload could not be processed. Please try again.',
             'completed_upload_cannot_be_cancelled' => 'An uploaded file cannot be cancelled.',
         ],
     ],

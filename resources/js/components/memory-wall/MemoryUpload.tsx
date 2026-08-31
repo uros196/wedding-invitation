@@ -1,9 +1,11 @@
+import { useEchoPublic } from '@laravel/echo-react';
 import { Image as ImageIcon, Loader2, Upload, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useMemoryWallUpload } from '@/hooks/use-memory-wall-upload';
 import type {
     MemoryUploadItem,
     MemoryWallUploadConfig,
+    MemoryWallUploadProcessedEvent,
     MemoryWallUploadTranslations,
 } from '@/hooks/use-memory-wall-upload';
 import type { Media, Wedding } from '@/types';
@@ -23,6 +25,7 @@ interface MemoryUploadProps {
         selected: string;
         uploadAction: string;
         uploading: string;
+        processing: string;
         queued: string;
         completed: string;
         failed: string;
@@ -56,7 +59,15 @@ function formatFileSize(bytes: number): string {
  * Browsers can preview videos through an object URL, which keeps the feature
  * useful even when server-side video thumbnail generation is unavailable.
  */
-function Preview({ item, imageAlt, videoLabel }: { item: MemoryUploadItem; imageAlt: string; videoLabel: string }) {
+function Preview({
+    item,
+    imageAlt,
+    videoLabel,
+}: {
+    item: MemoryUploadItem;
+    imageAlt: string;
+    videoLabel: string;
+}) {
     if (item.file.type.startsWith('video/')) {
         return (
             <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-black/10">
@@ -74,13 +85,42 @@ function Preview({ item, imageAlt, videoLabel }: { item: MemoryUploadItem; image
         );
     }
 
-    return <img src={item.previewUrl} alt={imageAlt} className="h-24 w-24 shrink-0 rounded-lg object-cover" />;
+    return (
+        <img
+            src={item.previewUrl}
+            alt={imageAlt}
+            className="h-24 w-24 shrink-0 rounded-lg object-cover"
+        />
+    );
+}
+
+/** Listen for the queued completion result for one upload session. */
+function MemoryUploadStatusListener({
+    uploadUuid,
+    onProcessed,
+}: {
+    uploadUuid: string;
+    onProcessed: (event: MemoryWallUploadProcessedEvent) => void;
+}) {
+    useEchoPublic<MemoryWallUploadProcessedEvent>(
+        `memory-wall-upload.${uploadUuid}`,
+        '.memoryWallUploadProcessed',
+        onProcessed,
+        [onProcessed],
+    );
+
+    return null;
 }
 
 /**
  * Render the drop zone, queue controls, and per-file upload status.
  */
-export default function MemoryUpload({ wedding, config, translations, onMediaUploaded }: MemoryUploadProps) {
+export default function MemoryUpload({
+    wedding,
+    config,
+    translations,
+    onMediaUploaded,
+}: MemoryUploadProps) {
     const [isDragActive, setIsDragActive] = useState(false);
     const fileInput = useRef<HTMLInputElement>(null);
     const reportedMediaIds = useRef(new Set<number>());
@@ -89,6 +129,7 @@ export default function MemoryUpload({ wedding, config, translations, onMediaUpl
         fileSizeError: translations.fileSizeError,
         maxFilesError: translations.maxFilesError,
         networkError: translations.networkError,
+        processing: translations.processing,
     };
     const {
         items,
@@ -99,6 +140,7 @@ export default function MemoryUpload({ wedding, config, translations, onMediaUpl
         startUploads,
         retryUpload,
         removeItem,
+        handleProcessedEvent,
     } = useMemoryWallUpload({
         weddingUuid: wedding.uuid,
         config,
@@ -119,140 +161,220 @@ export default function MemoryUpload({ wedding, config, translations, onMediaUpl
     const statusLabels = {
         queued: translations.queued,
         uploading: translations.uploading,
+        processing: translations.processing,
         completed: translations.completed,
         error: translations.failed,
     };
+    const hasProcessingItems = items.some(
+        (item) => item.status === 'processing',
+    );
 
     return (
-        <section
-            className="flex w-full flex-col items-center justify-start px-4 pt-16 pb-12 sm:pt-24"
-            style={{ backgroundColor: palette.background, fontFamily: fonts.serif }}
-            aria-labelledby="memory-wall-upload-title"
-        >
-            <div
-                className="w-full max-w-3xl rounded-2xl p-6 text-center shadow-sm sm:p-8"
+        <>
+            <MemoryUploadStatusListener
+                uploadUuid='8dede7f4-202e-4df0-82b0-d1ae48546844'
+                onProcessed={handleProcessedEvent}
+            />
+
+            {items.map((item) =>
+                item.uploadUuid &&
+                (item.status === 'uploading' ||
+                    item.status === 'processing') ? (
+                    <MemoryUploadStatusListener
+                        key={item.id}
+                        uploadUuid={item.uploadUuid}
+                        onProcessed={handleProcessedEvent}
+                    />
+                ) : null,
+            )}
+            <section
+                className="flex w-full flex-col items-center justify-start px-4 pt-16 pb-12 sm:pt-24"
                 style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    border: '1px solid rgba(67, 58, 102, 0.15)',
+                    backgroundColor: palette.background,
+                    fontFamily: fonts.serif,
                 }}
+                aria-labelledby="memory-wall-upload-title"
             >
                 <div
-                    className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full"
-                    style={{ backgroundColor: 'rgba(67, 58, 102, 0.08)' }}
-                >
-                    <Upload size={24} style={{ color: palette.celestial }} />
-                </div>
-
-                <h3 id="memory-wall-upload-title" className="mb-3 text-3xl font-medium tracking-wide" style={{ color: palette.deep }}>
-                    {translations.title}
-                </h3>
-                <p className="mx-auto mb-6 max-w-xl text-base leading-relaxed" style={{ color: palette.dawn }}>
-                    {translations.description}
-                </p>
-
-                <form
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        // Uploads are started explicitly so guests can review
-                        // the selected queue before any network traffic begins.
-                        startUploads();
+                    className="w-full max-w-3xl rounded-2xl p-6 text-center shadow-sm sm:p-8"
+                    style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                        border: '1px solid rgba(67, 58, 102, 0.15)',
                     }}
-                    className="space-y-4"
                 >
                     <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => fileInput.current?.click()}
-                        onKeyDown={(event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                fileInput.current?.click();
-                            }
-                        }}
-                        onDragEnter={(event) => {
-                            event.preventDefault();
-                            setIsDragActive(true);
-                        }}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDragLeave={() => setIsDragActive(false)}
-                        onDrop={(event) => {
-                            event.preventDefault();
-                            setIsDragActive(false);
-                            addFiles(event.dataTransfer.files);
-                        }}
-                        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6 transition-all hover:opacity-80 ${isDragActive ? 'ring-2 ring-offset-2' : ''}`}
-                        style={{
-                            borderColor: isDragActive ? palette.celestial : 'rgba(67, 58, 102, 0.25)',
-                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                        }}
+                        className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full"
+                        style={{ backgroundColor: 'rgba(67, 58, 102, 0.08)' }}
                     >
-                        <input
-                            ref={fileInput}
-                            type="file"
-                            multiple
-                            accept={config.acceptedTypes.join(',')}
-                            className="hidden"
-                            onChange={(event) => {
-                                if (event.target.files) {
-                                    addFiles(event.target.files);
-                                    event.target.value = '';
+                        <Upload
+                            size={24}
+                            style={{ color: palette.celestial }}
+                        />
+                    </div>
+
+                    <h3
+                        id="memory-wall-upload-title"
+                        className="mb-3 text-3xl font-medium tracking-wide"
+                        style={{ color: palette.deep }}
+                    >
+                        {translations.title}
+                    </h3>
+                    <p
+                        className="mx-auto mb-6 max-w-xl text-base leading-relaxed"
+                        style={{ color: palette.dawn }}
+                    >
+                        {translations.description}
+                    </p>
+
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            // Uploads are started explicitly so guests can review
+                            // the selected queue before any network traffic begins.
+                            startUploads();
+                        }}
+                        className="space-y-4"
+                    >
+                        <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => fileInput.current?.click()}
+                            onKeyDown={(event) => {
+                                if (
+                                    event.key === 'Enter' ||
+                                    event.key === ' '
+                                ) {
+                                    event.preventDefault();
+                                    fileInput.current?.click();
                                 }
                             }}
-                        />
-                        <ImageIcon size={32} style={{ color: palette.deep }} />
-                        <span className="text-sm font-medium" style={{ color: palette.deep }}>
-                            {translations.dropzone}
-                        </span>
-                        <span className="text-xs" style={{ color: palette.dawn }}>
-                            {translations.browse} · {translations.dropzoneHint}
-                        </span>
-                    </div>
-
-                    <div className="flex flex-wrap justify-between gap-2 text-left text-xs" style={{ color: palette.dawn }}>
-                        <span>{translations.maxFiles}</span>
-                        <span>{translations.maxFileSize}</span>
-                    </div>
-
-                    {inputError && <p className="text-left text-xs text-red-600">{inputError}</p>}
-
-                    {items.length > 0 && (
-                        <div className="space-y-3 text-left" aria-live="polite">
-                            <p className="text-sm font-medium" style={{ color: palette.deep }}>
-                                {items.length} {translations.selected}
-                            </p>
-                            {items.map((item) => (
-                                <UploadItemRow
-                                    key={item.id}
-                                    item={item}
-                                    labels={translations}
-                                    statusLabels={statusLabels}
-                                    onRetry={retryUpload}
-                                    onRemove={removeItem}
-                                />
-                            ))}
-                        </div>
-                    )}
-
-                    {hasQueuedItems && (
-                        <button
-                            type="submit"
-                            disabled={isUploading}
-                            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium shadow-sm transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-                            style={{ backgroundColor: palette.deep, color: palette.background }}
+                            onDragEnter={(event) => {
+                                event.preventDefault();
+                                setIsDragActive(true);
+                            }}
+                            onDragOver={(event) => event.preventDefault()}
+                            onDragLeave={() => setIsDragActive(false)}
+                            onDrop={(event) => {
+                                event.preventDefault();
+                                setIsDragActive(false);
+                                addFiles(event.dataTransfer.files);
+                            }}
+                            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6 transition-all hover:opacity-80 ${isDragActive ? 'ring-2 ring-offset-2' : ''}`}
+                            style={{
+                                borderColor: isDragActive
+                                    ? palette.celestial
+                                    : 'rgba(67, 58, 102, 0.25)',
+                                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                            }}
                         >
-                            {isUploading && <Loader2 size={16} className="animate-spin" />}
-                            <span>{isUploading ? translations.uploading : translations.uploadAction}</span>
-                        </button>
-                    )}
-                </form>
+                            <input
+                                ref={fileInput}
+                                type="file"
+                                multiple
+                                accept={config.acceptedTypes.join(',')}
+                                className="hidden"
+                                onChange={(event) => {
+                                    if (event.target.files) {
+                                        addFiles(event.target.files);
+                                        event.target.value = '';
+                                    }
+                                }}
+                            />
+                            <ImageIcon
+                                size={32}
+                                style={{ color: palette.deep }}
+                            />
+                            <span
+                                className="text-sm font-medium"
+                                style={{ color: palette.deep }}
+                            >
+                                {translations.dropzone}
+                            </span>
+                            <span
+                                className="text-xs"
+                                style={{ color: palette.dawn }}
+                            >
+                                {translations.browse} ·{' '}
+                                {translations.dropzoneHint}
+                            </span>
+                        </div>
 
-                {items.some((item) => item.status === 'completed') && (
-                    <p className="mt-4 text-xs" style={{ color: palette.dawn }}>
-                        {translations.completedSummary}
-                    </p>
-                )}
-            </div>
-        </section>
+                        <div
+                            className="flex flex-wrap justify-between gap-2 text-left text-xs"
+                            style={{ color: palette.dawn }}
+                        >
+                            <span>{translations.maxFiles}</span>
+                            <span>{translations.maxFileSize}</span>
+                        </div>
+
+                        {inputError && (
+                            <p className="text-left text-xs text-red-600">
+                                {inputError}
+                            </p>
+                        )}
+
+                        {items.length > 0 && (
+                            <div
+                                className="space-y-3 text-left"
+                                aria-live="polite"
+                            >
+                                <p
+                                    className="text-sm font-medium"
+                                    style={{ color: palette.deep }}
+                                >
+                                    {items.length} {translations.selected}
+                                </p>
+                                {items.map((item) => (
+                                    <UploadItemRow
+                                        key={item.id}
+                                        item={item}
+                                        labels={translations}
+                                        statusLabels={statusLabels}
+                                        onRetry={retryUpload}
+                                        onRemove={removeItem}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {hasQueuedItems && (
+                            <button
+                                type="submit"
+                                disabled={isUploading}
+                                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium shadow-sm transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                style={{
+                                    backgroundColor: palette.deep,
+                                    color: palette.background,
+                                }}
+                            >
+                                {isUploading && (
+                                    <Loader2
+                                        size={16}
+                                        className="animate-spin"
+                                    />
+                                )}
+                                <span>
+                                    {isUploading
+                                        ? hasProcessingItems
+                                            ? translations.processing
+                                            : translations.uploading
+                                        : translations.uploadAction}
+                                </span>
+                            </button>
+                        )}
+                    </form>
+
+                    {items.some((item) => item.status === 'completed') && (
+                        <p
+                            className="mt-4 text-xs"
+                            style={{ color: palette.dawn }}
+                        >
+                            {translations.completedSummary}
+                        </p>
+                    )}
+                </div>
+            </section>
+        </>
     );
 }
 
@@ -270,17 +392,27 @@ function UploadItemRow({
     onRetry: (id: string) => void;
     onRemove: (id: string) => void;
 }) {
-    const removeLabel = item.status === 'uploading' ? labels.cancel : labels.remove;
+    const removeLabel =
+        item.status === 'uploading' ? labels.cancel : labels.remove;
 
     return (
         <div className="flex items-start gap-3 rounded-xl border border-black/10 bg-white/40 p-3">
-            <Preview item={item} imageAlt={labels.title} videoLabel={labels.videoLabel} />
+            <Preview
+                item={item}
+                imageAlt={labels.title}
+                videoLabel={labels.videoLabel}
+            />
             <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium" style={{ color: palette.deep }} title={item.file.name}>
+                <p
+                    className="truncate text-sm font-medium"
+                    style={{ color: palette.deep }}
+                    title={item.file.name}
+                >
                     {item.file.name}
                 </p>
                 <p className="mt-1 text-xs" style={{ color: palette.dawn }}>
-                    {formatFileSize(item.file.size)} · {statusLabels[item.status]}
+                    {formatFileSize(item.file.size)} ·{' '}
+                    {statusLabels[item.status]}
                 </p>
                 {item.status === 'uploading' && (
                     <div
@@ -292,11 +424,16 @@ function UploadItemRow({
                     >
                         <div
                             className="h-full transition-[width] duration-200"
-                            style={{ width: `${item.progress}%`, backgroundColor: palette.celestial }}
+                            style={{
+                                width: `${item.progress}%`,
+                                backgroundColor: palette.celestial,
+                            }}
                         />
                     </div>
                 )}
-                {item.status === 'error' && <p className="mt-1 text-xs text-red-600">{item.error}</p>}
+                {item.status === 'error' && (
+                    <p className="mt-1 text-xs text-red-600">{item.error}</p>
+                )}
             </div>
             <div className="flex shrink-0 items-center gap-2">
                 {item.status === 'error' && (

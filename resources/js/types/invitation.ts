@@ -60,17 +60,17 @@ export interface Wedding {
  * Represents a media object with details about its file properties and metadata.
  */
 export interface Media {
-    id: number,
-    uuid: string,
-    name: string,
-    file_name: string,
-    mime_type: string,
-    type: string,
-    extension: string,
-    human_readable_size: string,
-    preview_url: string,
-    original_url: string,
-    size: number,
+    id: number;
+    uuid: string;
+    name: string;
+    file_name: string;
+    mime_type: string;
+    type: string;
+    extension: string;
+    human_readable_size: string;
+    preview_url: string;
+    original_url: string;
+    size: number;
 }
 
 /**
@@ -78,18 +78,18 @@ export interface Media {
  * with additional srcset data.
  */
 export interface HeroMedia {
-    id: number,
-    uuid: string,
-    name: string,
-    file_name: string,
-    mime_type: string,
-    type: string,
-    extension: string,
-    human_readable_size: string,
-    preview_url: string,
-    original_url: string,
-    size: number,
-    srcset: string,
+    id: number;
+    uuid: string;
+    name: string;
+    file_name: string;
+    mime_type: string;
+    type: string;
+    extension: string;
+    human_readable_size: string;
+    preview_url: string;
+    original_url: string;
+    size: number;
+    srcset: string;
 }
 
 /**
@@ -157,6 +157,7 @@ export interface MemoryWallPageProps {
             selected: string;
             uploadAction: string;
             uploading: string;
+            processing: string;
             queued: string;
             completed: string;
             failed: string;

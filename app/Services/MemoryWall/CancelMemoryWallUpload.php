@@ -30,7 +30,7 @@ final readonly class CancelMemoryWallUpload
     {
         $this->authorizer->authorize($wedding, $upload, $uploadToken);
 
-        if ($upload->status->isCompleted()) {
+        if ($upload->status->isCompleted() || $upload->status->isProcessing()) {
             throw ValidationException::withMessages([
                 'upload' => __('wedding.memory_wall.validation.completed_upload_cannot_be_cancelled'),
             ]);

@@ -39,8 +39,27 @@ final readonly class CompleteMemoryWallUpload
     {
         $this->authorizer->authorize($wedding, $upload, $uploadToken);
 
+        return $this->finalize($wedding, $upload);
+    }
+
+    /**
+     * Finalize an upload after its caller has already verified ownership.
+     */
+    public function finalize(Wedding $wedding, MemoryWallUpload $upload): Media
+    {
         if ($upload->status->isCompleted()) {
-            return $upload->media()->firstOrFail();
+            /** @var Media $media */
+            $media = $upload->media()->firstOrFail();
+
+            return $media;
+        }
+
+        $existingMedia = $this->findExistingMedia($wedding, $upload);
+
+        if ($existingMedia !== null) {
+            $this->markAsCompleted($upload, $existingMedia);
+
+            return $existingMedia;
         }
 
         $this->completeMultipartUpload($upload);
@@ -59,14 +78,43 @@ final readonly class CompleteMemoryWallUpload
 
         $media = $this->addMedia($wedding, $upload, $metadata);
 
+        $this->markAsCompleted($upload, $media);
+
+        return $media;
+    }
+
+    /**
+     * Find a Media row that was created before a worker interruption.
+     */
+    private function findExistingMedia(Wedding $wedding, MemoryWallUpload $upload): ?Media
+    {
+        if ($upload->media_id !== null) {
+            /** @var Media|null $media */
+            $media = $upload->media()->first();
+
+            return $media;
+        }
+
+        /** @var Media|null $media */
+        $media = $wedding->media()
+            ->where('collection_name', 'MemoryWall')
+            ->where('file_name', basename($upload->object_path))
+            ->first();
+
+        return $media;
+    }
+
+    /**
+     * Persist the control-plane link only after a Media row exists.
+     */
+    private function markAsCompleted(MemoryWallUpload $upload, Media $media): void
+    {
         $upload->update([
             'media_id' => $media->getKey(),
             'status' => MemoryWallUploadStatus::Completed,
-            'completed_at' => now(),
+            'completed_at' => $upload->completed_at ?? now(),
             'error_message' => null,
         ]);
-
-        return $media;
     }
 
     /**
@@ -99,6 +147,10 @@ final readonly class CompleteMemoryWallUpload
      */
     protected function completeMultipartUpload(MemoryWallUpload $upload): void
     {
+        if (blank($upload->multipart_upload_id)) {
+            return;
+        }
+
         // Object storage is authoritative; browser progress alone cannot prove
         // that every requested part reached the provider.
         $parts = $this->getParts($upload);
@@ -108,6 +160,8 @@ final readonly class CompleteMemoryWallUpload
             (string) $upload->multipart_upload_id,
             $parts,
         );
+
+        $upload->update(['multipart_upload_id' => null]);
     }
 
     /**

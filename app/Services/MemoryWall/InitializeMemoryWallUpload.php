@@ -54,13 +54,7 @@ final readonly class InitializeMemoryWallUpload
         if ($existingUpload !== null) {
             $this->authorizer->ensureTokenIsValid($existingUpload, $data->uploadToken);
 
-            if ($existingUpload->status->isCompleted()) {
-                $existingUpload->load('media');
-
-                return $existingUpload;
-            }
-
-            if ($existingUpload->status->isUploading()) {
+            if (! $existingUpload->status->isFailed()) {
                 $existingUpload->load('media');
 
                 return $existingUpload;
@@ -102,9 +96,12 @@ final readonly class InitializeMemoryWallUpload
      */
     protected function existingUpload(Wedding $wedding, string $clientUploadId): ?MemoryWallUpload
     {
-        return $wedding->memoryWallUploads()
+        /** @var MemoryWallUpload|null $upload */
+        $upload = $wedding->memoryWallUploads()
             ->where('client_upload_id', $clientUploadId)
             ->first();
+
+        return $upload;
     }
 
     /**

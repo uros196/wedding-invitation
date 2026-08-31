@@ -31,7 +31,9 @@ class MemoryWallUploadsTable
             ->columns([
                 ImageColumn::make('media_preview')
                     ->label(__('Preview'))
-                    ->state(fn (MemoryWallUpload $record): ?string => MemoryWallMediaType::preview($record->media))
+                    ->state(fn (MemoryWallUpload $record): ?string => MemoryWallMediaType::isVideo($record->mime_type)
+                        ? MemoryWallMediaType::videoPlaceholderUrl()
+                        : MemoryWallMediaType::previewUrl($record->media))
                     ->imageSize(64)
                     ->square()
                     ->checkFileExistence(false),

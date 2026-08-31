@@ -34,7 +34,7 @@ final readonly class GetMemoryWallUploadPartUrls
     {
         $this->authorizer->authorize($wedding, $upload, $uploadToken);
 
-        if ($upload->status->isCompleted()) {
+        if ($upload->status->isCompleted() || $upload->status->isProcessing()) {
             return [];
         }
 

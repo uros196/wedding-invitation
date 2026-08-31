@@ -8,7 +8,8 @@ import {
 import type { Media } from '@/types';
 
 /** Lifecycle states shown for an item in the upload queue. */
-export type MemoryUploadStatus = 'queued' | 'uploading' | 'completed' | 'error';
+export type MemoryUploadStatus =
+    'queued' | 'uploading' | 'processing' | 'completed' | 'error';
 
 /** Client-side state kept for one selected image or video. */
 export interface MemoryUploadItem {
@@ -37,6 +38,7 @@ export interface MemoryWallUploadTranslations {
     fileSizeError: string;
     maxFilesError: string;
     networkError: string;
+    processing: string;
 }
 
 /** Data returned after a multipart session is initialized. */
@@ -55,9 +57,22 @@ interface PartsResponse {
     };
 }
 
+/** Completion response returned while the queue job is still processing. */
+interface ProcessingResponse {
+    data: {
+        status: 'processing';
+    };
+}
+
 /** Media resource returned after S3 assembly and server-side validation. */
-interface CompleteResponse {
-    data: Media;
+type CompleteResponse = { data: Media } | ProcessingResponse;
+
+/** Terminal status notification published for one upload session. */
+export interface MemoryWallUploadProcessedEvent {
+    upload_uuid: string;
+    status: 'completed' | 'failed';
+    media: Media | null;
+    error: string | null;
 }
 
 /** Configuration and localized messages required by the upload coordinator. */
@@ -77,6 +92,7 @@ interface UseMemoryWallUploadResult {
     startUploads: () => void;
     retryUpload: (id: string) => void;
     removeItem: (id: string) => void;
+    handleProcessedEvent: (event: MemoryWallUploadProcessedEvent) => void;
 }
 
 /** Supported error shapes returned by Laravel validation and JSON endpoints. */
@@ -90,13 +106,19 @@ function createUploadToken(): string {
     const bytes = new Uint8Array(32);
     crypto.getRandomValues(bytes);
 
-    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(
+        '',
+    );
 }
 
 /** Extract the most useful message from Laravel's JSON validation response. */
 async function readError(response: Response, fallback: string): Promise<Error> {
-    const body = (await response.json().catch(() => null)) as UploadErrorResponse | null;
-    const message = body?.errors ? Object.values(body.errors).flat()[0] : body?.message;
+    const body = (await response
+        .json()
+        .catch(() => null)) as UploadErrorResponse | null;
+    const message = body?.errors
+        ? Object.values(body.errors).flat()[0]
+        : body?.message;
 
     return new Error(message ?? fallback);
 }
@@ -108,7 +130,9 @@ async function postJson<T>(
     signal: AbortSignal,
     fallback: string,
 ): Promise<T> {
-    const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
+    const csrfToken =
+        document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')
+            ?.content ?? '';
     const response = await fetch(url, {
         method: 'POST',
         credentials: 'same-origin',
@@ -216,20 +240,60 @@ export function useMemoryWallUpload({
     const itemsRef = useRef<MemoryUploadItem[]>([]);
 
     /** Merge a partial state update without replacing the rest of an item. */
-    const updateItem = useCallback((id: string, update: Partial<MemoryUploadItem>) => {
-        setItems((currentItems) => currentItems.map((item) => (item.id === id ? { ...item, ...update } : item)));
-    }, []);
+    const updateItem = useCallback(
+        (id: string, update: Partial<MemoryUploadItem>) => {
+            setItems((currentItems) =>
+                currentItems.map((item) =>
+                    item.id === id ? { ...item, ...update } : item,
+                ),
+            );
+        },
+        [],
+    );
+
+    /** Apply the terminal state sent by Pusher to its matching upload item. */
+    const handleProcessedEvent = useCallback(
+        (event: MemoryWallUploadProcessedEvent): void => {
+            const item = itemsRef.current.find(
+                (candidate) => candidate.uploadUuid === event.upload_uuid,
+            );
+
+            if (!item) {
+                return;
+            }
+
+            if (event.status === 'completed' && event.media) {
+                updateItem(item.id, {
+                    status: 'completed',
+                    progress: 100,
+                    media: event.media,
+                });
+
+                return;
+            }
+
+            updateItem(item.id, {
+                status: 'error',
+                error: event.error ?? translations.networkError,
+            });
+        },
+        [translations.networkError, updateItem],
+    );
 
     /** Track an active part request and return its unregister callback. */
-    const registerRequest = useCallback((id: string, request: XMLHttpRequest): (() => void) => {
-        const itemRequests = requests.current.get(id) ?? new Set<XMLHttpRequest>();
-        itemRequests.add(request);
-        requests.current.set(id, itemRequests);
+    const registerRequest = useCallback(
+        (id: string, request: XMLHttpRequest): (() => void) => {
+            const itemRequests =
+                requests.current.get(id) ?? new Set<XMLHttpRequest>();
+            itemRequests.add(request);
+            requests.current.set(id, itemRequests);
 
-        return () => {
-            itemRequests.delete(request);
-        };
-    }, []);
+            return () => {
+                itemRequests.delete(request);
+            };
+        },
+        [],
+    );
 
     /** Tell Laravel to abort the remote session after a local cancellation. */
     const cancelSession = useCallback(
@@ -238,20 +302,27 @@ export function useMemoryWallUpload({
                 return;
             }
 
-            const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
+            const csrfToken =
+                document.querySelector<HTMLMetaElement>(
+                    'meta[name="csrf-token"]',
+                )?.content ?? '';
             // Cancellation is best effort here: the item is already removed
             // locally, and a transient cleanup failure must not block the UI.
-            await fetch(cancelUpload({ wedding: weddingUuid, upload: item.uploadUuid }).url, {
-                method: 'DELETE',
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
+            await fetch(
+                cancelUpload({ wedding: weddingUuid, upload: item.uploadUuid })
+                    .url,
+                {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ upload_token: item.uploadToken }),
                 },
-                body: JSON.stringify({ upload_token: item.uploadToken }),
-            });
+            );
         },
         [weddingUuid],
     );
@@ -265,7 +336,11 @@ export function useMemoryWallUpload({
             // does not interrupt the other files in the queue.
             const controller = new AbortController();
             controllers.current.set(item.id, controller);
-            updateItem(item.id, { status: 'uploading', error: null, progress: 0 });
+            updateItem(item.id, {
+                status: 'uploading',
+                error: null,
+                progress: 0,
+            });
 
             try {
                 const initializeResponse = await postJson<InitializeResponse>(
@@ -286,7 +361,10 @@ export function useMemoryWallUpload({
                 // Laravel signs each part separately; the file bytes never pass
                 // through the application server.
                 const partsResponse = await postJson<PartsResponse>(
-                    getUploadPartUrls({ wedding: weddingUuid, upload: uploadUuid }).url,
+                    getUploadPartUrls({
+                        wedding: weddingUuid,
+                        upload: uploadUuid,
+                    }).url,
                     { upload_token: item.uploadToken },
                     controller.signal,
                     translations.networkError,
@@ -298,11 +376,17 @@ export function useMemoryWallUpload({
                 const workers = Array.from(
                     { length: Math.min(3, partsResponse.data.parts.length) },
                     async (): Promise<void> => {
-                        while (nextPartIndex < partsResponse.data.parts.length) {
+                        while (
+                            nextPartIndex < partsResponse.data.parts.length
+                        ) {
                             const partIndex = nextPartIndex++;
                             const part = partsResponse.data.parts[partIndex];
-                            const start = partIndex * initializeResponse.data.part_size;
-                            const end = Math.min(start + initializeResponse.data.part_size, item.file.size);
+                            const start =
+                                partIndex * initializeResponse.data.part_size;
+                            const end = Math.min(
+                                start + initializeResponse.data.part_size,
+                                item.file.size,
+                            );
                             await uploadPart(
                                 part.url,
                                 item.file,
@@ -311,14 +395,23 @@ export function useMemoryWallUpload({
                                 controller.signal,
                                 (loaded) => {
                                     loadedParts.set(part.part_number, loaded);
-                                    const uploadedBytes = Array.from(loadedParts.values()).reduce(
+                                    const uploadedBytes = Array.from(
+                                        loadedParts.values(),
+                                    ).reduce(
                                         (total, value) => total + value,
                                         0,
                                     );
                                     // Reserve 100% for the completion response;
                                     // reaching the end of a PUT is not publication.
                                     updateItem(item.id, {
-                                        progress: Math.min(99, Math.round((uploadedBytes / item.file.size) * 100)),
+                                        progress: Math.min(
+                                            99,
+                                            Math.round(
+                                                (uploadedBytes /
+                                                    item.file.size) *
+                                                    100,
+                                            ),
+                                        ),
                                     });
                                 },
                                 translations.networkError,
@@ -330,27 +423,39 @@ export function useMemoryWallUpload({
                 );
                 await Promise.all(workers);
 
-                // The server verifies the assembled object before returning
-                // the media resource that can be shown in the gallery.
-                const completeResponse = await postJson<CompleteResponse>(
-                    completeUpload({ wedding: weddingUuid, upload: uploadUuid }).url,
+                // The server verifies and publishes the object asynchronously.
+                updateItem(item.id, { status: 'processing' });
+                const completionResponse = await postJson<CompleteResponse>(
+                    completeUpload({ wedding: weddingUuid, upload: uploadUuid })
+                        .url,
                     { upload_token: item.uploadToken },
                     controller.signal,
                     translations.networkError,
                 );
-                updateItem(item.id, {
-                    status: 'completed',
-                    progress: 100,
-                    media: completeResponse.data,
-                });
+
+                // Existing completed sessions can return the media directly;
+                // newly queued sessions finish through the Echo event.
+                if ('id' in completionResponse.data) {
+                    updateItem(item.id, {
+                        status: 'completed',
+                        progress: 100,
+                        media: completionResponse.data,
+                    });
+                }
             } catch (error) {
-                if (error instanceof DOMException && error.name === 'AbortError') {
+                if (
+                    error instanceof DOMException &&
+                    error.name === 'AbortError'
+                ) {
                     return;
                 }
 
                 updateItem(item.id, {
                     status: 'error',
-                    error: error instanceof Error ? error.message : translations.networkError,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : translations.networkError,
                 });
             } finally {
                 controllers.current.delete(item.id);
@@ -363,10 +468,16 @@ export function useMemoryWallUpload({
     const addFiles = useCallback(
         (files: FileList | File[]): void => {
             const incomingFiles = Array.from(files);
-            const rejectedByType = incomingFiles.some((file) => !config.acceptedTypes.includes(file.type));
-            const rejectedBySize = incomingFiles.some((file) => file.size > config.maxFileSize);
+            const rejectedByType = incomingFiles.some(
+                (file) => !config.acceptedTypes.includes(file.type),
+            );
+            const rejectedBySize = incomingFiles.some(
+                (file) => file.size > config.maxFileSize,
+            );
             const acceptedFiles = incomingFiles.filter(
-                (file) => config.acceptedTypes.includes(file.type) && file.size <= config.maxFileSize,
+                (file) =>
+                    config.acceptedTypes.includes(file.type) &&
+                    file.size <= config.maxFileSize,
             );
             const availableSlots = Math.max(0, config.maxFiles - items.length);
 
@@ -434,12 +545,14 @@ export function useMemoryWallUpload({
             requests.current.get(id)?.forEach((request) => request.abort());
             requests.current.delete(id);
 
-            if (item.status !== 'completed') {
+            if (item.status === 'uploading') {
                 void cancelSession(item).catch(() => undefined);
             }
 
             URL.revokeObjectURL(item.previewUrl);
-            setItems((currentItems) => currentItems.filter((candidate) => candidate.id !== id));
+            setItems((currentItems) =>
+                currentItems.filter((candidate) => candidate.id !== id),
+            );
         },
         [cancelSession, items],
     );
@@ -458,8 +571,12 @@ export function useMemoryWallUpload({
 
         return () => {
             controllersOnUnmount.forEach((controller) => controller.abort());
-            requestsOnUnmount.forEach((itemRequests) => itemRequests.forEach((request) => request.abort()));
-            itemsRef.current.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+            requestsOnUnmount.forEach((itemRequests) =>
+                itemRequests.forEach((request) => request.abort()),
+            );
+            itemsRef.current.forEach((item) =>
+                URL.revokeObjectURL(item.previewUrl),
+            );
         };
     }, []);
 
@@ -467,10 +584,14 @@ export function useMemoryWallUpload({
         items,
         inputError,
         hasQueuedItems: items.some((item) => item.status === 'queued'),
-        isUploading: items.some((item) => item.status === 'uploading'),
+        isUploading: items.some(
+            (item) =>
+                item.status === 'uploading' || item.status === 'processing',
+        ),
         addFiles,
         startUploads,
         retryUpload,
         removeItem,
+        handleProcessedEvent,
     };
 }

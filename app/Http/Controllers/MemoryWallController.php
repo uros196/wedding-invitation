@@ -9,18 +9,21 @@ use App\Http\Requests\MemoryWall\UploadSessionRequest;
 use App\Http\Resources\Media\MediaResource;
 use App\Http\Resources\MetaDataResource;
 use App\Http\Resources\WeddingResource;
+use App\Jobs\CompleteMemoryWallUploadJob;
 use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
 use App\Services\MemoryWall\CancelMemoryWallUpload;
-use App\Services\MemoryWall\CompleteMemoryWallUpload;
 use App\Services\MemoryWall\GetMemoryWallUploadPartUrls;
 use App\Services\MemoryWall\InitializeMemoryWallUpload;
+use App\Services\MemoryWall\Upload\Authorizer;
 use App\Services\MemoryWallService;
 use App\Support\MetaFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Serves the public memory wall and coordinates its JSON upload endpoints.
@@ -35,7 +38,7 @@ final class MemoryWallController extends Controller
         protected MetaFactory $metaFactory,
         protected InitializeMemoryWallUpload $initializeUpload,
         protected GetMemoryWallUploadPartUrls $getPartUrls,
-        protected CompleteMemoryWallUpload $completeUpload,
+        protected Authorizer $authorizer,
         protected CancelMemoryWallUpload $cancelUpload,
     ) {}
 
@@ -68,6 +71,7 @@ final class MemoryWallController extends Controller
                     'selected' => __('wedding.memory_wall.upload.selected'),
                     'uploadAction' => __('wedding.memory_wall.upload.upload_action'),
                     'uploading' => __('wedding.memory_wall.upload.uploading'),
+                    'processing' => __('wedding.memory_wall.status.processing'),
                     'queued' => __('wedding.memory_wall.upload.queued'),
                     'completed' => __('wedding.memory_wall.upload.completed'),
                     'failed' => __('wedding.memory_wall.upload.failed'),
@@ -128,8 +132,35 @@ final class MemoryWallController extends Controller
      */
     public function completeUpload(UploadSessionRequest $request, Wedding $wedding, MemoryWallUpload $upload): JsonResponse
     {
-        $media = $this->completeUpload->handle($wedding, $upload, $request->token());
+        $this->authorizer->authorize($wedding, $upload, $request->token());
 
+        if ($upload->status->isFailed()) {
+            throw ValidationException::withMessages([
+                'file' => $upload->error_message ?? __('wedding.memory_wall.validation.processing_failed'),
+            ]);
+        }
+
+        if ($upload->status->isCompleted()) {
+            /** @var Media $media */
+            $media = $upload->media()->firstOrFail();
+
+            return $this->mediaResponse($request, $media);
+        }
+
+        if ($upload->status->isUploading()) {
+            CompleteMemoryWallUploadJob::dispatch($wedding, $upload);
+        }
+
+        return response()->json([
+            'data' => ['status' => 'processing'],
+        ], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * Return a completed media resource from the upload completion endpoint.
+     */
+    private function mediaResponse(UploadSessionRequest $request, Media $media): JsonResponse
+    {
         return response()->json([
             'data' => MediaResource::make($media)->resolve($request),
         ]);

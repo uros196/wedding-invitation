@@ -5,18 +5,21 @@ declare(strict_types=1);
 use App\Contracts\MemoryWallMultipartStorage;
 use App\DTOs\MemoryWallUploadInitializeData;
 use App\Enums\MemoryWallUploadStatus;
+use App\Events\MemoryWallUploadProcessed;
 use App\Http\Requests\MemoryWall\UploadRequest;
+use App\Jobs\CompleteMemoryWallUploadJob;
 use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
+use App\Services\MemoryWall\CompleteMemoryWallUpload;
 use App\Services\MemoryWall\MemoryWallUploadService;
 use App\Services\MemoryWall\S3MultipartUploadStorage;
+use App\Services\MemoryWall\Upload\Cleanup;
 use Aws\S3\S3Client;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
-use Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 
 function openMemoryWallWedding(): Wedding
@@ -176,6 +179,79 @@ test('does not initialize an upload while the memory wall is closed', function (
     ])->assertForbidden();
 });
 
+test('queues completion instead of processing the upload in the HTTP request', function (): void {
+    $wedding = openMemoryWallWedding();
+    $token = str_repeat('d', 64);
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'upload_token_hash' => hash('sha256', $token),
+        'status' => MemoryWallUploadStatus::Uploading,
+        'multipart_upload_id' => 'multipart-upload-id',
+    ]);
+    Queue::fake();
+
+    $this->postJson(route('memory-wall.upload.complete', [$wedding, $upload]), [
+        'upload_token' => $token,
+    ])->assertAccepted()
+        ->assertJsonPath('data.status', 'processing');
+
+    Queue::assertPushed(
+        CompleteMemoryWallUploadJob::class,
+        fn (CompleteMemoryWallUploadJob $job): bool => $job->upload->is($upload)
+            && $job->wedding->is($wedding),
+    );
+
+    expect($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Uploading);
+});
+
+test('does not queue another completion while an upload is processing', function (): void {
+    $wedding = openMemoryWallWedding();
+    $token = str_repeat('f', 64);
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'upload_token_hash' => hash('sha256', $token),
+        'status' => MemoryWallUploadStatus::Processing,
+    ]);
+    Queue::fake();
+
+    $this->postJson(route('memory-wall.upload.complete', [$wedding, $upload]), [
+        'upload_token' => $token,
+    ])->assertAccepted()
+        ->assertJsonPath('data.status', 'processing');
+
+    Queue::assertNothingPushed();
+});
+
+test('returns the completed media for an already completed upload', function (): void {
+    Storage::fake('public');
+    $wedding = openMemoryWallWedding();
+    $media = $wedding->addMedia(UploadedFile::fake()->image('memory.jpg'))
+        ->toMediaCollection('MemoryWall', 'public');
+    $token = str_repeat('e', 64);
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'media_id' => $media->id,
+        'upload_token_hash' => hash('sha256', $token),
+        'status' => MemoryWallUploadStatus::Completed,
+    ]);
+    Queue::fake();
+
+    $this->postJson(route('memory-wall.upload.complete', [$wedding, $upload]), [
+        'upload_token' => $token,
+    ])->assertOk()
+        ->assertJsonPath('data.id', $media->id);
+});
+
+test('does not repeat completion for an upload already completed by a previous job attempt', function (): void {
+    $wedding = openMemoryWallWedding();
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'status' => MemoryWallUploadStatus::Completed,
+    ]);
+    $completion = app(CompleteMemoryWallUpload::class);
+
+    (new CompleteMemoryWallUploadJob($wedding, $upload))
+        ->handle($completion, app(Cleanup::class));
+
+    expect($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Completed);
+});
+
 test('creates wedding media through media library after every part and metadata are verified', function (): void {
     $originalMediaDisk = config('memory-wall.media_disk');
     $originalConversionsDisk = config('memory-wall.conversions_disk');
@@ -229,7 +305,7 @@ test('creates wedding media through media library after every part and metadata 
             'mime_type' => 'image/jpeg',
         ]);
         $this->app->instance(MemoryWallMultipartStorage::class, $storage);
-        Event::fake([MediaHasBeenAddedEvent::class]);
+        Event::fake([MediaHasBeenAddedEvent::class, MemoryWallUploadProcessed::class]);
         Queue::fake();
 
         $completedMedia = app(MemoryWallUploadService::class)->complete($wedding, $upload, $token);
@@ -247,7 +323,27 @@ test('creates wedding media through media library after every part and metadata 
             MediaHasBeenAddedEvent::class,
             fn (MediaHasBeenAddedEvent $event): bool => $event->media->is($completedMedia),
         );
-        Queue::assertPushed(PerformConversionsJob::class);
+        $upload->forceFill([
+            'media_id' => null,
+            'status' => MemoryWallUploadStatus::Processing,
+        ])->save();
+
+        (new CompleteMemoryWallUploadJob($wedding, $upload))
+            ->handle(
+                app(CompleteMemoryWallUpload::class),
+                app(Cleanup::class),
+            );
+
+        expect($wedding->media()->where('collection_name', 'MemoryWall')->count())->toBe(1)
+            ->and($upload->fresh()->media_id)->toBe($completedMedia->id)
+            ->and($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Completed);
+
+        Event::assertDispatched(
+            MemoryWallUploadProcessed::class,
+            fn (MemoryWallUploadProcessed $event): bool => $event->uploadUuid === $upload->uuid
+                && $event->status === MemoryWallUploadStatus::Completed
+                && $event->media['id'] === $completedMedia->id,
+        );
     } finally {
         config([
             'memory-wall.media_disk' => $originalMediaDisk,

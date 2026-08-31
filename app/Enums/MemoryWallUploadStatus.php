@@ -16,6 +16,9 @@ enum MemoryWallUploadStatus: string implements HasColor, HasLabel
     /** The object-storage multipart session is still receiving parts. */
     case Uploading = 'uploading';
 
+    /** The multipart session is being validated and published by a queue job. */
+    case Processing = 'processing';
+
     /** All validations passed and the media is visible on the memory wall. */
     case Completed = 'completed';
 
@@ -37,6 +40,7 @@ enum MemoryWallUploadStatus: string implements HasColor, HasLabel
     {
         return match ($this) {
             self::Uploading => 'warning',
+            self::Processing => 'info',
             self::Completed => 'success',
             self::Failed => 'danger',
         };
@@ -48,6 +52,14 @@ enum MemoryWallUploadStatus: string implements HasColor, HasLabel
     public function isUploading(): bool
     {
         return $this === self::Uploading;
+    }
+
+    /**
+     * Determine if the current instance is being finalized by a queue job.
+     */
+    public function isProcessing(): bool
+    {
+        return $this === self::Processing;
     }
 
     /**
