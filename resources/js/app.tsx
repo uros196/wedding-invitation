@@ -5,7 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 // import { initializeTheme } from '@/hooks/use-appearance';
 
 configureEcho({
-    broadcaster: import.meta.env.BROADCAST_CONNECTION,
+    broadcaster: 'pusher',
 });
 
 const appName = import.meta.env.VITE_APP_NAME || 'Wedding Invitation';
