@@ -27,18 +27,18 @@ Route::prefix('wedding')->group(function () {
 
             // Wedding's memory wall upload API
             Route::post('/upload/initialize', 'initializeUpload')->name('upload.initialize')
-                ->middleware('throttle:20,1');
+                ->middleware('throttle:120,1');
 
             // Upload sessions are resolved by UUID and then authorized against the wedding
             // and private token in the upload actions; they are not nested bindings.
             Route::post('/upload/{upload:uuid}/parts', 'getUploadPartUrls')->name('upload.parts')
                 ->withoutScopedBindings()
-                ->middleware('throttle:60,1');
+                ->middleware('throttle:120,1');
             Route::post('/upload/{upload:uuid}/complete', 'completeUpload')->name('upload.complete')
                 ->withoutScopedBindings()
-                ->middleware('throttle:20,1');
+                ->middleware('throttle:120,1');
             Route::delete('/upload/{upload:uuid}', 'cancelUpload')->name('upload.cancel')
                 ->withoutScopedBindings()
-                ->middleware('throttle:20,1');
+                ->middleware('throttle:120,1');
         });
 });
