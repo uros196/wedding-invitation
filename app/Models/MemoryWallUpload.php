@@ -7,18 +7,19 @@ namespace App\Models;
 use App\Enums\MemoryWallUploadStatus;
 use App\Observers\MemoryWallUploadObserver;
 use App\Policies\MemoryWallUploadPolicy;
+use Database\Factories\MemoryWallUploadFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Tracks the control-plane state for one memory wall multipart upload.
  *
- * The related media row is created only after the assembled object passes final
- * validation and is added to the Wedding-owned Media Library collection.
+ * The related media row is normally created after the assembled object passes
+ * validation; direct-upload adapters may create it earlier and keep it hidden
+ * until the object is complete.
  *
  * @property MemoryWallUploadStatus $status
  */
@@ -27,12 +28,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MemoryWallUpload extends Model
 {
+    /** @use HasFactory<MemoryWallUploadFactory> */
     use HasFactory;
 
     /**
      * The attributes that are mass-assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
         'wedding_id',

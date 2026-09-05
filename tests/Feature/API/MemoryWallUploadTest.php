@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 use App\Contracts\MemoryWallMultipartStorage;
 use App\DTOs\MemoryWallUploadInitializeData;
+use App\Enums\MediaStatus;
 use App\Enums\MemoryWallUploadStatus;
 use App\Events\MemoryWallUploadProcessed;
 use App\Http\Requests\MemoryWall\UploadRequest;
 use App\Jobs\CompleteMemoryWallUploadJob;
+use App\Models\Media;
 use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
 use App\Services\MemoryWall\CompleteMemoryWallUpload;
@@ -146,6 +148,85 @@ test('initializes a one gigabyte multipart upload', function (): void {
 
     expect($upload->status)->toBe(MemoryWallUploadStatus::Uploading)
         ->and($upload->wedding_id)->toBe($wedding->id);
+});
+
+test('reserves a hidden final Media path before initializing a video upload', function (): void {
+    $wedding = openMemoryWallWedding();
+    $storage = mock(MemoryWallMultipartStorage::class);
+    $storage->shouldReceive('createMultipartUpload')
+        ->once()
+        ->withArgs(fn (string $path, string $mimeType): bool => $mimeType === 'video/mp4'
+            && str_starts_with($path, "wedding/{$wedding->uuid}/")
+            && ! str_contains($path, 'memory-wall/pending/'))
+        ->andReturn('multipart-upload-id');
+    $this->app->instance(MemoryWallMultipartStorage::class, $storage);
+
+    $this->postJson(route('memory-wall.upload.initialize', $wedding), [
+        'client_upload_id' => '0f7b3db7-4e4c-4b9c-9f42-e4c05bd9349d',
+        'upload_token' => str_repeat('a', 64),
+        'file_name' => 'phone-video.mp4',
+        'size' => 1024,
+        'mime_type' => 'video/mp4',
+    ])->assertCreated();
+
+    $upload = MemoryWallUpload::query()
+        ->where('client_upload_id', '0f7b3db7-4e4c-4b9c-9f42-e4c05bd9349d')
+        ->firstOrFail();
+    $media = Media::withoutReady()->findOrFail($upload->media_id);
+
+    expect($media->status)->toBe(MediaStatus::Pending)
+        ->and($upload->object_path)->toBe($media->getPathRelativeToRoot())
+        ->and($upload->media)->toBeNull()
+        ->and(Media::query()->whereKey($media->getKey())->exists())->toBeFalse()
+        ->and(Media::onlyPending()->whereKey($media->getKey())->exists())->toBeTrue()
+        ->and($wedding->media()->whereKey($media->getKey())->exists())->toBeFalse();
+});
+
+test('publishes a video by making its reserved Media row ready', function (): void {
+    $wedding = openMemoryWallWedding();
+    $storage = mock(MemoryWallMultipartStorage::class);
+    $storage->shouldReceive('createMultipartUpload')
+        ->once()
+        ->andReturn('multipart-upload-id');
+    $storage->shouldReceive('listParts')
+        ->once()
+        ->andReturn([
+            ['part_number' => 1, 'etag' => 'etag', 'size' => 1024],
+        ]);
+    $storage->shouldReceive('completeMultipartUpload')
+        ->once()
+        ->withArgs(fn (string $path): bool => ! str_contains($path, 'memory-wall/pending/'));
+    $storage->shouldReceive('objectMetadata')
+        ->once()
+        ->andReturn(['size' => 1024, 'mime_type' => 'video/mp4']);
+    $this->app->instance(MemoryWallMultipartStorage::class, $storage);
+
+    $token = str_repeat('a', 64);
+    $this->postJson(route('memory-wall.upload.initialize', $wedding), [
+        'client_upload_id' => '0f7b3db7-4e4c-4b9c-9f42-e4c05bd9349d',
+        'upload_token' => $token,
+        'file_name' => 'phone-video.mp4',
+        'size' => 1024,
+        'mime_type' => 'video/mp4',
+    ])->assertCreated();
+
+    $upload = MemoryWallUpload::query()
+        ->where('client_upload_id', '0f7b3db7-4e4c-4b9c-9f42-e4c05bd9349d')
+        ->firstOrFail();
+    $reservedMediaId = $upload->media_id;
+    Event::fake([MediaHasBeenAddedEvent::class]);
+
+    $media = app(MemoryWallUploadService::class)->complete($wedding, $upload, $token);
+
+    expect($media->getKey())->toBe($reservedMediaId)
+        ->and($media->status)->toBe(MediaStatus::Ready)
+        ->and($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Completed)
+        ->and($upload->fresh()->media_id)->toBe($reservedMediaId)
+        ->and(Media::withReady()->whereKey($reservedMediaId)->exists())->toBeTrue()
+        ->and(Media::ready()->whereKey($reservedMediaId)->exists())->toBeTrue()
+        ->and(Media::onlyPending()->whereKey($reservedMediaId)->exists())->toBeFalse();
+
+    Event::assertNotDispatched(MediaHasBeenAddedEvent::class);
 });
 
 test('rejects files above the one gigabyte limit before creating an upload', function (): void {

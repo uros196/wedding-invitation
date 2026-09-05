@@ -15,6 +15,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\Rule;
 
 class SetupWedding extends Page implements HasForms
 {
@@ -95,18 +96,26 @@ class SetupWedding extends Page implements HasForms
      */
     public function publish(): void
     {
+        $heroState = $this->data['Hero'] ?? null;
+
         $this->validate([
             'data.bride_name' => ['required'],
             'data.groom_name' => ['required'],
             'data.wedding_date' => ['required'],
             'data.rsvp_deadline' => ['required'],
             'data.welcome_text' => ['required'],
-            'data.Hero' => ['required'],
+            'data.Hero' => [
+                Rule::requiredIf(fn (): bool => $this->wedding()?->getFirstMedia('Hero') === null),
+            ],
         ]);
 
-        $wedding = $this->saveWedding($this->form->getState());
+        $wedding = $this->saveWedding($this->data);
 
-        $this->form->model($wedding)->saveRelationships();
+        if ($wedding->getFirstMedia('Hero') === null && filled($heroState)) {
+            $this->form->model($wedding)->saveRelationships();
+        }
+
+        $wedding->refresh();
 
         resolve(WeddingService::class)->publishWedding($wedding, $this->getUser());
 

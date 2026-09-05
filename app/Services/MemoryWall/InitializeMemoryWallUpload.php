@@ -9,6 +9,7 @@ use App\DTOs\MemoryWallUploadInitializeData;
 use App\Enums\MemoryWallUploadStatus;
 use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
+use App\Services\MemoryWall\Adapters\MemoryWallUploadAdapterFactory;
 use App\Services\MemoryWall\Upload\Authorizer;
 use App\Services\MemoryWall\Upload\Cleanup;
 use App\Services\MemoryWall\Upload\MetadataValidator;
@@ -35,6 +36,7 @@ final readonly class InitializeMemoryWallUpload
         private RecordCreator $recordCreator,
         private Cleanup $cleanup,
         private MemoryWallMultipartStorage $storage,
+        private MemoryWallUploadAdapterFactory $adapterFactory,
     ) {}
 
     /**
@@ -48,6 +50,7 @@ final readonly class InitializeMemoryWallUpload
     {
         $this->ensureMemoryWallIsOpen($wedding);
         $this->metadataValidator->validate($data->originalName, $data->size, $data->mimeType);
+        $adapter = $this->adapterFactory->forMimeType($data->mimeType);
 
         $existingUpload = $this->existingUpload($wedding, $data->clientUploadId);
 
@@ -66,9 +69,11 @@ final readonly class InitializeMemoryWallUpload
             $upload = $this->recordCreator->create($wedding, $data);
         }
 
-        // A database row without a matching remote session cannot be resumed.
-        // Remove only the newly created state when object-storage initialization fails.
         try {
+            $adapter->prepare($wedding, $upload);
+
+            // A database row without a matching remote session cannot be resumed.
+            // Remove only the newly created state when object-storage initialization fails.
             $multipartUploadId = $this->storage->createMultipartUpload($upload->object_path, $data->mimeType);
         } catch (Throwable $exception) {
             if ($existingUpload === null) {

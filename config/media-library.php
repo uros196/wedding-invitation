@@ -1,12 +1,19 @@
 <?php
 
 use App\Models\Group;
+use App\Models\Media;
 use App\Models\Wedding;
 use App\Support\MediaLibrary\ModelPathGenerator;
 use App\Support\MediaLibrary\WeddingPathGenerator;
 use Spatie\MediaLibrary\Support\PathGenerator\DefaultPathGenerator;
 
 return [
+
+    /*
+     * The fully qualified class name of the media model.
+     */
+    'media_model' => Media::class,
+
     /*
      * Keep the Media Library limit aligned with the Memory Wall multipart limit.
      */

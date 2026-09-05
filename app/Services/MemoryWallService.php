@@ -59,6 +59,8 @@ readonly class MemoryWallService
 
         return $wedding->media()
             ->where('collection_name', 'MemoryWall')
+            ->where('mime_type', 'like', 'image/%')
+            ->whereJsonContains('generated_conversions->preview', true)
             ->where(function (Builder $query) use ($uploadTable, $mediaTable): void {
                 $query
                     ->whereNotExists(function (QueryBuilder $query) use ($uploadTable, $mediaTable): void {

@@ -36,7 +36,8 @@ test('shows the generated image conversion on the details page', function (): vo
     ]);
 
     Livewire::test(ViewMemoryWallUpload::class, ['record' => $upload->id])
-        ->assertSee($media->fresh()->getUrl('preview'), false);
+        ->assertSee($media->fresh()->getUrl('preview'), false)
+        ->assertSee('height: auto; width: 400px', false);
 });
 
 test('plays a video on the details page', function (): void {

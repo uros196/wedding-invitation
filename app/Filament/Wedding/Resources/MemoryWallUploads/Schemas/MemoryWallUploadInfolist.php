@@ -57,7 +57,8 @@ class MemoryWallUploadInfolist
                 ImageEntry::make('media_preview')
                     ->label(__('Preview'))
                     ->state(fn (MemoryWallUpload $record): ?string => MemoryWallMediaType::preview($record->media))
-                    ->imageSize(368)
+                    ->imageWidth(400)
+                    ->imageHeight('auto')
                     ->checkFileExistence(false)
                     ->visible(fn (MemoryWallUpload $record): bool => ! static::isVideo($record)),
 

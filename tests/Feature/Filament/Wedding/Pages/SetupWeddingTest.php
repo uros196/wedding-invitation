@@ -80,7 +80,38 @@ test('publishes a wedding after the complete setup form is valid', function (): 
         ->toBe(Status::Published);
 
     $component->assertNotified();
+});
 
+test('publishes a wedding after saving each setup wizard step', function (): void {
+    Storage::fake('public');
+    $this->user->team->wedding->update(['status' => Status::Draft]);
+
+    $component = Livewire::test(SetupWedding::class)
+        ->fillForm([
+            'bride_name' => 'Ana',
+            'groom_name' => 'Marko',
+            'wedding_date' => '2027-07-10',
+        ])
+        ->call('callSchemaComponentMethod', 'form.data::wizard', 'nextStep', [0])
+        ->fillForm([
+            'welcome_text' => '<p>Welcome to our wedding.</p>',
+            'Hero' => [UploadedFile::fake()->image('hero.jpg', 800, 1000)],
+        ])
+        ->call('callSchemaComponentMethod', 'form.data::wizard', 'nextStep', [1])
+        ->set('data.rsvp_deadline', '2027-06-30 18:00:00');
+
+    expect($component->get('data.Hero'))->toBeArray()
+        ->and($this->user->team->wedding->refresh()->getFirstMedia('Hero'))->not->toBeNull();
+
+    $component
+        ->call('publish')
+        ->assertRedirect(Dashboard::getUrl())
+        ->assertNotified();
+
+    $wedding = Wedding::query()->where('team_id', $this->user->team_id)->firstOrFail();
+
+    expect($wedding->status)->toBe(Status::Published)
+        ->and($wedding->getFirstMedia('Hero'))->not->toBeNull();
 });
 
 test('does not publish a wedding when required setup information is missing', function (): void {

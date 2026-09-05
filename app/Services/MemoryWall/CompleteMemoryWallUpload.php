@@ -8,6 +8,7 @@ use App\Contracts\MemoryWallMultipartStorage;
 use App\Enums\MemoryWallUploadStatus;
 use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
+use App\Services\MemoryWall\Adapters\MemoryWallUploadAdapterFactory;
 use App\Services\MemoryWall\Upload\Authorizer;
 use App\Services\MemoryWall\Upload\Cleanup;
 use App\Services\MemoryWall\Upload\PartValidator;
@@ -30,6 +31,7 @@ final readonly class CompleteMemoryWallUpload
         private PartValidator $partValidator,
         private Cleanup $cleanup,
         private MemoryWallMultipartStorage $storage,
+        private MemoryWallUploadAdapterFactory $adapterFactory,
     ) {}
 
     /**
@@ -76,7 +78,9 @@ final readonly class CompleteMemoryWallUpload
             $this->failUpload($upload, __('wedding.memory_wall.validation.file_type'));
         }
 
-        $media = $this->addMedia($wedding, $upload, $metadata);
+        $media = $this->adapterFactory
+            ->forUpload($upload)
+            ->finalize($wedding, $upload, $metadata);
 
         $this->markAsCompleted($upload, $media);
 
@@ -118,28 +122,6 @@ final readonly class CompleteMemoryWallUpload
     }
 
     /**
-     * Move the validated object into the Wedding-owned Media Library collection.
-     *
-     * @param  array{size: int, mime_type: string|null}  $metadata
-     */
-    protected function addMedia(Wedding $wedding, MemoryWallUpload $upload, array $metadata): Media
-    {
-        $mediaDisk = (string) config('memory-wall.media_disk', 's3');
-        $conversationDisk = (string) config('memory-wall.conversions_disk', 's3');
-
-        return $wedding
-            ->addMediaFromDisk($upload->object_path, $mediaDisk)
-            ->usingName(pathinfo($upload->original_name, PATHINFO_FILENAME))
-            ->usingFileName(basename($upload->object_path))
-            ->setFileSize($metadata['size'])
-            ->storingConversionsOnDisk($conversationDisk)
-            ->withProperties([
-                'mime_type' => $metadata['mime_type'] ?: $upload->mime_type,
-            ])
-            ->toMediaCollection('MemoryWall', $mediaDisk);
-    }
-
-    /**
      * Finalize a multipart upload by completing the process through the object storage provider.
      *
      * Ensures that all parts uploaded during the multipart upload process are confirmed and
@@ -166,6 +148,8 @@ final readonly class CompleteMemoryWallUpload
 
     /**
      * Retrieve and validate the parts of a multipart upload.
+     *
+     * @return array<int, array{part_number: int, etag: string, size: int}>
      */
     protected function getParts(MemoryWallUpload $upload): array
     {

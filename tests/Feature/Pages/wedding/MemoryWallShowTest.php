@@ -86,20 +86,39 @@ test('returns not found for an unknown wedding uuid', function (): void {
     ]))->assertNotFound();
 });
 
-test('shows completed memory wall media and hides incomplete uploads', function (): void {
+test('shows only completed images with generated previews', function (): void {
     Storage::fake('public');
     $wedding = Wedding::factory()->create();
     $visibleMedia = $wedding->addMedia(UploadedFile::fake()->image('visible.jpg'))
         ->toMediaCollection('MemoryWall');
-    $hiddenMedia = $wedding->addMedia(UploadedFile::fake()->image('pending.jpg'))
+    $visibleMedia->forceFill(['generated_conversions' => ['preview' => true]])->save();
+
+    $unconvertedMedia = $wedding->addMedia(UploadedFile::fake()->image('unconverted.jpg'))
         ->toMediaCollection('MemoryWall');
+    $unconvertedMedia->forceFill(['generated_conversions' => []])->save();
+
+    $videoMedia = $wedding->addMedia(UploadedFile::fake()->create('video.mp4', 32, 'video/mp4'))
+        ->toMediaCollection('MemoryWall');
+    $videoMedia->forceFill(['generated_conversions' => ['preview' => true]])->save();
+
+    $pendingMedia = $wedding->addMedia(UploadedFile::fake()->image('pending.jpg'))
+        ->toMediaCollection('MemoryWall');
+    $pendingMedia->forceFill(['generated_conversions' => ['preview' => true]])->save();
 
     MemoryWallUpload::factory()->for($wedding)->create([
         'media_id' => $visibleMedia->id,
         'status' => MemoryWallUploadStatus::Completed,
     ]);
     MemoryWallUpload::factory()->for($wedding)->create([
-        'media_id' => $hiddenMedia->id,
+        'media_id' => $unconvertedMedia->id,
+        'status' => MemoryWallUploadStatus::Completed,
+    ]);
+    MemoryWallUpload::factory()->for($wedding)->create([
+        'media_id' => $videoMedia->id,
+        'status' => MemoryWallUploadStatus::Completed,
+    ]);
+    MemoryWallUpload::factory()->for($wedding)->create([
+        'media_id' => $pendingMedia->id,
         'status' => MemoryWallUploadStatus::Uploading,
     ]);
 

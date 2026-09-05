@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
+use App\Models\Media;
 use App\Models\MemoryWallUpload;
 
 class MemoryWallUploadObserver
@@ -14,6 +15,10 @@ class MemoryWallUploadObserver
      */
     public function deleting(MemoryWallUpload $model): void
     {
-        $model->media?->delete();
+        if ($model->media_id === null) {
+            return;
+        }
+
+        Media::withoutReady()->find($model->media_id)?->delete();
     }
 }

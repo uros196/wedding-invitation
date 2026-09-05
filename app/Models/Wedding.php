@@ -32,6 +32,8 @@ class Wedding extends Model implements HasMedia
     use InteractsWithMedia;
     use IsPublished;
 
+    public const string MEMORY_WALL_COLLECTION = 'MemoryWall';
+
     /**
      * The attributes that are mass-assignable.
      *
@@ -246,7 +248,7 @@ class Wedding extends Model implements HasMedia
             });
 
         // Declare the MemoryWall media collection
-        $this->addMediaCollection('MemoryWall')
+        $this->addMediaCollection(self::MEMORY_WALL_COLLECTION)
             ->registerMediaConversions(function (Media $media) {
                 $this->addMediaConversion('preview')
                     ->fit(Fit::Contain, 700, 700)
