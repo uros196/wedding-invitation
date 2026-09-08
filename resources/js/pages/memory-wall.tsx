@@ -58,7 +58,7 @@ export default function MemoryWallPage({
                 />
             )}
 
-            {!wedding.is_wedding_coming && (
+            {(wedding.is_memory_wall_form_open || wedding.is_finished) && (
                 <MemoryGallery
                     media={visibleMedia}
                     title={translations.gallery.title}

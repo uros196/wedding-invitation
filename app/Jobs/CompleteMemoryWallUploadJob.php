@@ -32,11 +32,6 @@ final class CompleteMemoryWallUploadJob implements ShouldBeUnique, ShouldQueue
     public int $tries = 3;
 
     /**
-     * Maximum runtime needed for large object-storage operations.
-     */
-    public int $timeout = 900;
-
-    /**
      * Duration for which another completion job for this upload is locked.
      */
     public int $uniqueFor = 3600;
@@ -157,6 +152,7 @@ final class CompleteMemoryWallUploadJob implements ShouldBeUnique, ShouldQueue
     private function broadcastCompletion(MemoryWallUpload $upload, Media $media): void
     {
         MemoryWallUploadProcessed::dispatch(
+            $this->wedding->uuid,
             $upload->uuid,
             MemoryWallUploadStatus::Completed,
             MediaResource::make($media)->resolve(request()),
@@ -169,6 +165,7 @@ final class CompleteMemoryWallUploadJob implements ShouldBeUnique, ShouldQueue
     private function broadcastFailure(MemoryWallUpload $upload): void
     {
         MemoryWallUploadProcessed::dispatch(
+            $this->wedding->uuid,
             $upload->uuid,
             MemoryWallUploadStatus::Failed,
             error: $upload->error_message ?? __('wedding.memory_wall.validation.processing_failed'),

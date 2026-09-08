@@ -1,6 +1,18 @@
 import { useEchoPublic } from '@laravel/echo-react';
-import { Image as ImageIcon, Loader2, Upload, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    ChevronDown,
+    Image as ImageIcon,
+    Loader2,
+    Upload,
+    X,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { useMemoryWallUpload } from '@/hooks/use-memory-wall-upload';
 import type {
     MemoryUploadItem,
@@ -94,16 +106,16 @@ function Preview({
     );
 }
 
-/** Listen for the queued completion result for one upload session. */
+/** Listen for queued completion results for all uploads in one wedding. */
 function MemoryUploadStatusListener({
-    uploadUuid,
+    weddingUuid,
     onProcessed,
 }: {
-    uploadUuid: string;
+    weddingUuid: string;
     onProcessed: (event: MemoryWallUploadProcessedEvent) => void;
 }) {
     useEchoPublic<MemoryWallUploadProcessedEvent>(
-        `memory-wall-upload.${uploadUuid}`,
+        `memory-wall.${weddingUuid}`,
         '.memoryWallUploadProcessed',
         onProcessed,
         [onProcessed],
@@ -122,6 +134,7 @@ export default function MemoryUpload({
     onMediaUploaded,
 }: MemoryUploadProps) {
     const [isDragActive, setIsDragActive] = useState(false);
+    const [isCompletedOpen, setIsCompletedOpen] = useState(false);
     const fileInput = useRef<HTMLInputElement>(null);
     const reportedMediaIds = useRef(new Set<number>());
     const uploadTranslations: MemoryWallUploadTranslations = {
@@ -168,25 +181,15 @@ export default function MemoryUpload({
     const hasProcessingItems = items.some(
         (item) => item.status === 'processing',
     );
+    const activeItems = items.filter((item) => item.status !== 'completed');
+    const completedItems = items.filter((item) => item.status === 'completed');
 
     return (
         <>
             <MemoryUploadStatusListener
-                uploadUuid='8dede7f4-202e-4df0-82b0-d1ae48546844'
+                weddingUuid={wedding.uuid}
                 onProcessed={handleProcessedEvent}
             />
-
-            {items.map((item) =>
-                item.uploadUuid &&
-                (item.status === 'uploading' ||
-                    item.status === 'processing') ? (
-                    <MemoryUploadStatusListener
-                        key={item.id}
-                        uploadUuid={item.uploadUuid}
-                        onProcessed={handleProcessedEvent}
-                    />
-                ) : null,
-            )}
             <section
                 className="flex w-full flex-col items-center justify-start px-4 pt-16 pb-12 sm:pt-24"
                 style={{
@@ -313,29 +316,46 @@ export default function MemoryUpload({
                             </p>
                         )}
 
-                        {items.length > 0 && (
-                            <div
-                                className="space-y-3 text-left"
-                                aria-live="polite"
-                            >
+                        <div className="space-y-3 text-left" aria-live="polite">
+                            {activeItems.length > 0 && (
                                 <p
                                     className="text-sm font-medium"
                                     style={{ color: palette.deep }}
                                 >
-                                    {items.length} {translations.selected}
+                                    {activeItems.length} {translations.selected}
                                 </p>
-                                {items.map((item) => (
-                                    <UploadItemRow
+                            )}
+                            <AnimatePresence initial={false}>
+                                {activeItems.map((item) => (
+                                    <motion.div
                                         key={item.id}
-                                        item={item}
-                                        labels={translations}
-                                        statusLabels={statusLabels}
-                                        onRetry={retryUpload}
-                                        onRemove={removeItem}
-                                    />
+                                        layout
+                                        initial={{ opacity: 0, y: -8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{
+                                            opacity: 0,
+                                            y: -8,
+                                            transition: {
+                                                duration: 0.35,
+                                                ease: 'easeOut',
+                                            },
+                                        }}
+                                        transition={{
+                                            duration: 0.25,
+                                            ease: 'easeOut',
+                                        }}
+                                    >
+                                        <UploadItemRow
+                                            item={item}
+                                            labels={translations}
+                                            statusLabels={statusLabels}
+                                            onRetry={retryUpload}
+                                            onRemove={removeItem}
+                                        />
+                                    </motion.div>
                                 ))}
-                            </div>
-                        )}
+                            </AnimatePresence>
+                        </div>
 
                         {hasQueuedItems && (
                             <button
@@ -364,13 +384,68 @@ export default function MemoryUpload({
                         )}
                     </form>
 
-                    {items.some((item) => item.status === 'completed') && (
-                        <p
-                            className="mt-4 text-xs"
-                            style={{ color: palette.dawn }}
+                    {completedItems.length > 0 && (
+                        <Collapsible
+                            open={isCompletedOpen}
+                            onOpenChange={setIsCompletedOpen}
+                            className="mt-4 text-left"
                         >
-                            {translations.completedSummary}
-                        </p>
+                            <CollapsibleTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-opacity hover:opacity-80"
+                                    style={{
+                                        color: palette.deep,
+                                        borderColor: 'rgba(67, 58, 102, 0.15)',
+                                        backgroundColor:
+                                            'rgba(255, 255, 255, 0.3)',
+                                    }}
+                                >
+                                    <span>
+                                        {translations.completedSummary} (
+                                        {completedItems.length})
+                                    </span>
+                                    <ChevronDown
+                                        size={16}
+                                        aria-hidden="true"
+                                        className={`transition-transform duration-200 ${isCompletedOpen ? 'rotate-180' : ''}`}
+                                    />
+                                </button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-3 space-y-3">
+                                <AnimatePresence>
+                                    {completedItems.map((item) => (
+                                        <motion.div
+                                            key={item.id}
+                                            layout
+                                            initial={{ opacity: 0, y: -8 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{
+                                                opacity: 0,
+                                                y: -8,
+                                                transition: {
+                                                    duration: 0.25,
+                                                    ease: 'easeOut',
+                                                },
+                                            }}
+                                            transition={{
+                                                delay: 0.35,
+                                                duration: 0.3,
+                                                ease: 'easeOut',
+                                            }}
+                                        >
+                                            <UploadItemRow
+                                                item={item}
+                                                labels={translations}
+                                                statusLabels={statusLabels}
+                                                onRetry={retryUpload}
+                                                onRemove={removeItem}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </CollapsibleContent>
+                        </Collapsible>
                     )}
                 </div>
             </section>
@@ -395,8 +470,12 @@ function UploadItemRow({
     const removeLabel =
         item.status === 'uploading' ? labels.cancel : labels.remove;
 
+    const isCompleted = item.status === 'completed';
+
     return (
-        <div className="flex items-start gap-3 rounded-xl border border-black/10 bg-white/40 p-3">
+        <div
+            className={`flex items-start gap-3 rounded-xl border p-3 ${isCompleted ? 'border-emerald-200 bg-emerald-50/60' : 'border-black/10 bg-white/40'}`}
+        >
             <Preview
                 item={item}
                 imageAlt={labels.title}
@@ -440,7 +519,7 @@ function UploadItemRow({
                     <button
                         type="button"
                         onClick={() => onRetry(item.id)}
-                        className="text-xs font-medium underline underline-offset-2"
+                        className="cursor-pointer text-xs font-medium underline underline-offset-2"
                         style={{ color: palette.deep }}
                     >
                         {labels.retry}
@@ -449,7 +528,7 @@ function UploadItemRow({
                 <button
                     type="button"
                     onClick={() => onRemove(item.id)}
-                    className="rounded-full p-1 transition-opacity hover:opacity-70"
+                    className="cursor-pointer rounded-full p-1 transition-opacity hover:opacity-70"
                     style={{ color: palette.deep }}
                     aria-label={`${removeLabel}: ${item.file.name}`}
                 >

@@ -24,6 +24,7 @@ final class MemoryWallUploadProcessed implements ShouldBroadcast
      * @param  array<string, mixed>|null  $media
      */
     public function __construct(
+        public readonly string $weddingUuid,
         public readonly string $uploadUuid,
         public readonly MemoryWallUploadStatus $status,
         public readonly ?array $media = null,
@@ -37,7 +38,7 @@ final class MemoryWallUploadProcessed implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [new Channel("memory-wall-upload.{$this->uploadUuid}")];
+        return [new Channel("memory-wall.{$this->weddingUuid}")];
     }
 
     /**

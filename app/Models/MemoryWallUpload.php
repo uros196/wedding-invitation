@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * Tracks the control-plane state for one memory wall multipart upload.
@@ -22,6 +23,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * until the object is complete.
  *
  * @property MemoryWallUploadStatus $status
+ * @property Carbon|null $completed_at
+ * @property Carbon|null $digest_sent_at
  */
 #[ObservedBy(MemoryWallUploadObserver::class)]
 #[UsePolicy(MemoryWallUploadPolicy::class)]
@@ -34,7 +37,7 @@ class MemoryWallUpload extends Model
     /**
      * The attributes that are mass-assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'wedding_id',
@@ -66,11 +69,14 @@ class MemoryWallUpload extends Model
             'part_size' => 'integer',
             'total_parts' => 'integer',
             'completed_at' => 'datetime',
+            'digest_sent_at' => 'datetime',
         ];
     }
 
     /**
      * Get the wedding that owns the upload session.
+     *
+     * @return BelongsTo<Wedding, $this>
      */
     public function wedding(): BelongsTo
     {
@@ -79,6 +85,8 @@ class MemoryWallUpload extends Model
 
     /**
      * Get the Media Library record created for the completed upload.
+     *
+     * @return BelongsTo<Media, $this>
      */
     public function media(): BelongsTo
     {

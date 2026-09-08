@@ -290,7 +290,7 @@ return [
             'max_file_size' => 'Each file can be up to 1 GB.',
             'empty' => 'No files selected yet.',
             'network_error' => 'The upload could not be completed. Check your connection and try again.',
-            'completed_summary' => 'Uploaded files remain visible below.',
+            'completed_summary' => 'Uploaded files',
         ],
         'gallery' => [
             'title' => 'A glimpse of the memories',
@@ -319,5 +319,7 @@ return [
         'group_created' => 'Group created. Now add guests one at a time.',
         'guest_added' => 'Guest added.',
         'wedding_published' => 'Your wedding invitation is published.',
+        'memory_wall_uploads_title' => 'New memories on your Memory Wall',
+        'memory_wall_uploads' => ':images photos and :videos videos have arrived on your Memory Wall.',
     ],
 ];

@@ -9,9 +9,12 @@ use App\Enums\MemoryWallUploadStatus;
 use App\Events\MemoryWallUploadProcessed;
 use App\Http\Requests\MemoryWall\UploadRequest;
 use App\Jobs\CompleteMemoryWallUploadJob;
+use App\Jobs\SendMemoryWallUploadDigestJob;
 use App\Models\Media;
 use App\Models\MemoryWallUpload;
+use App\Models\User;
 use App\Models\Wedding;
+use App\Notifications\MemoryWallUploadDigest;
 use App\Services\MemoryWall\CompleteMemoryWallUpload;
 use App\Services\MemoryWall\MemoryWallUploadService;
 use App\Services\MemoryWall\S3MultipartUploadStorage;
@@ -422,8 +425,10 @@ test('creates wedding media through media library after every part and metadata 
         Event::assertDispatched(
             MemoryWallUploadProcessed::class,
             fn (MemoryWallUploadProcessed $event): bool => $event->uploadUuid === $upload->uuid
-                && $event->status === MemoryWallUploadStatus::Completed
-                && $event->media['id'] === $completedMedia->id,
+                    && $event->weddingUuid === $wedding->uuid
+                    && $event->status === MemoryWallUploadStatus::Completed
+                    && $event->broadcastOn()[0]->name === "memory-wall.{$wedding->uuid}"
+                    && $event->media['id'] === $completedMedia->id,
         );
     } finally {
         config([
@@ -451,4 +456,70 @@ test('does not expose an upload session through another wedding', function (): v
     $this->postJson(route('memory-wall.upload.parts', [$wedding, $upload]), [
         'upload_token' => $token,
     ])->assertNotFound();
+});
+
+test('queues a delayed digest when an upload becomes completed', function (): void {
+    $wedding = openMemoryWallWedding();
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'status' => MemoryWallUploadStatus::Processing,
+    ]);
+    Queue::fake();
+
+    $upload->update([
+        'status' => MemoryWallUploadStatus::Completed,
+        'completed_at' => now(),
+    ]);
+
+    Queue::assertPushed(
+        SendMemoryWallUploadDigestJob::class,
+        fn (SendMemoryWallUploadDigestJob $job): bool => $job->weddingId === $wedding->id
+            && $job->delay !== null,
+    );
+});
+
+test('coalesces quiet-period uploads into one notification', function (): void {
+    $wedding = openMemoryWallWedding();
+    $admin = User::factory()->for($wedding->team)->create();
+    $completedAt = now()->subMinutes(config('memory-wall.digest_delay_minutes') + 1);
+
+    MemoryWallUpload::factory()->for($wedding)->count(15)->create([
+        'mime_type' => 'image/jpeg',
+        'completed_at' => $completedAt,
+    ]);
+    MemoryWallUpload::factory()->for($wedding)->count(5)->create([
+        'mime_type' => 'video/mp4',
+        'completed_at' => $completedAt,
+    ]);
+
+    (new SendMemoryWallUploadDigestJob($wedding->id))->handle();
+
+    $notification = $admin->notifications()->firstOrFail();
+
+    expect($admin->notifications()->where('type', MemoryWallUploadDigest::class)->count())->toBe(1)
+        ->and($notification->data['image_count'])->toBe(15)
+        ->and($notification->data['video_count'])->toBe(5)
+        ->and(MemoryWallUpload::query()->whereNull('digest_sent_at')->count())->toBe(0);
+
+    (new SendMemoryWallUploadDigestJob($wedding->id))->handle();
+
+    expect($admin->notifications()->where('type', MemoryWallUploadDigest::class)->count())->toBe(1);
+});
+
+test('waits until the latest completed upload has left the quiet period', function (): void {
+    $wedding = openMemoryWallWedding();
+    $admin = User::factory()->for($wedding->team)->create();
+    $oldUpload = MemoryWallUpload::factory()->for($wedding)->create([
+        'mime_type' => 'image/jpeg',
+        'completed_at' => now()->subMinutes(config('memory-wall.digest_delay_minutes') + 1),
+    ]);
+    $recentUpload = MemoryWallUpload::factory()->for($wedding)->create([
+        'mime_type' => 'video/mp4',
+        'completed_at' => now()->subMinutes(config('memory-wall.digest_delay_minutes') - 1),
+    ]);
+
+    (new SendMemoryWallUploadDigestJob($wedding->id))->handle();
+
+    expect($admin->notifications()->where('type', MemoryWallUploadDigest::class)->count())->toBe(0)
+        ->and($oldUpload->fresh()->digest_sent_at)->toBeNull()
+        ->and($recentUpload->fresh()->digest_sent_at)->toBeNull();
 });

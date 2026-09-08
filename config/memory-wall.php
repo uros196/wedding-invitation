@@ -33,6 +33,9 @@ return [
     // Number of completed media items shown in the random public preview.
     'preview_limit' => 10,
 
+    // Wait for a quiet period before combining completed uploads into one notification.
+    'digest_delay_minutes' => (int) env('MEMORY_WALL_DIGEST_DELAY_MINUTES', 10),
+
     // Maximum number of files that one wedding can accept from the drop zone.
     'max_files' => 20,
 

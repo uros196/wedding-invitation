@@ -290,7 +290,7 @@ return [
             'max_file_size' => 'Svaki fajl može imati do 1 GB.',
             'empty' => 'Još nema izabranih fajlova.',
             'network_error' => 'Slanje nije završeno. Proverite internet vezu i pokušajte ponovo.',
-            'completed_summary' => 'Poslati fajlovi ostaju prikazani ispod.',
+            'completed_summary' => 'Poslate uspomene',
         ],
         'gallery' => [
             'title' => 'Mali prikaz uspomena',
@@ -319,5 +319,7 @@ return [
         'group_created' => 'Grupa je napravljena. Sada dodajte goste jednog po jednog.',
         'guest_added' => 'Gost je dodat.',
         'wedding_published' => 'Vaša pozivnica za venčanje je objavljena.',
+        'memory_wall_uploads_title' => 'Nove uspomene na zidu uspomena',
+        'memory_wall_uploads' => 'Na vaš zid uspomena pristiglo je :images slika i :videos video zapisa.',
     ],
 ];

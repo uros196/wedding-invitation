@@ -464,7 +464,7 @@ export function useMemoryWallUpload({
         [registerRequest, translations.networkError, updateItem, weddingUuid],
     );
 
-    /** Validate and append selected files without starting network requests. */
+    /** Validate and add selected files without starting network requests. */
     const addFiles = useCallback(
         (files: FileList | File[]): void => {
             const incomingFiles = Array.from(files);
@@ -479,7 +479,13 @@ export function useMemoryWallUpload({
                     config.acceptedTypes.includes(file.type) &&
                     file.size <= config.maxFileSize,
             );
-            const availableSlots = Math.max(0, config.maxFiles - items.length);
+            const activeItemsCount = items.filter(
+                (item) => item.status !== 'completed',
+            ).length;
+            const availableSlots = Math.max(
+                0,
+                config.maxFiles - activeItemsCount,
+            );
 
             if (rejectedByType) {
                 setInputError(translations.fileTypeError);
@@ -496,11 +502,11 @@ export function useMemoryWallUpload({
             }
 
             setItems((currentItems) => [
-                ...currentItems,
                 ...acceptedFiles.slice(0, availableSlots).map(createItem),
+                ...currentItems,
             ]);
         },
-        [config, items.length, translations],
+        [config, items, translations],
     );
 
     /** Start queued files with a maximum of three independent file sessions. */
