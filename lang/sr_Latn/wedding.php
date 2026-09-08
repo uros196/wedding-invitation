@@ -320,6 +320,8 @@ return [
         'guest_added' => 'Gost je dodat.',
         'wedding_published' => 'Vaša pozivnica za venčanje je objavljena.',
         'memory_wall_uploads_title' => 'Nove uspomene na zidu uspomena',
-        'memory_wall_uploads' => 'Na vaš zid uspomena pristiglo je :images slika i :videos video zapisa.',
+        'memory_wall_uploads' => 'Na vašem zidu uspomena: :media.',
+        'memory_wall_uploads_images' => ':count slika|:count slike|:count slika',
+        'memory_wall_uploads_videos' => ':count video zapis|:count video zapisa|:count video zapisa',
     ],
 ];

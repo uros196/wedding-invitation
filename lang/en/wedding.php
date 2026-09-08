@@ -320,6 +320,8 @@ return [
         'guest_added' => 'Guest added.',
         'wedding_published' => 'Your wedding invitation is published.',
         'memory_wall_uploads_title' => 'New memories on your Memory Wall',
-        'memory_wall_uploads' => ':images photos and :videos videos have arrived on your Memory Wall.',
+        'memory_wall_uploads' => 'New on your Memory Wall: :media.',
+        'memory_wall_uploads_images' => ':count photo|:count photos',
+        'memory_wall_uploads_videos' => ':count video|:count videos',
     ],
 ];

@@ -9,18 +9,16 @@ use App\Http\Requests\MemoryWall\UploadSessionRequest;
 use App\Http\Resources\Media\MediaResource;
 use App\Http\Resources\MetaDataResource;
 use App\Http\Resources\WeddingResource;
-use App\Jobs\CompleteMemoryWallUploadJob;
 use App\Models\MemoryWallUpload;
 use App\Models\Wedding;
 use App\Services\MemoryWall\CancelMemoryWallUpload;
 use App\Services\MemoryWall\GetMemoryWallUploadPartUrls;
 use App\Services\MemoryWall\InitializeMemoryWallUpload;
-use App\Services\MemoryWall\Upload\Authorizer;
+use App\Services\MemoryWall\RequestMemoryWallUploadCompletion;
 use App\Services\MemoryWallService;
 use App\Support\MetaFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -38,7 +36,7 @@ final class MemoryWallController extends Controller
         protected MetaFactory $metaFactory,
         protected InitializeMemoryWallUpload $initializeUpload,
         protected GetMemoryWallUploadPartUrls $getPartUrls,
-        protected Authorizer $authorizer,
+        protected RequestMemoryWallUploadCompletion $requestCompletion,
         protected CancelMemoryWallUpload $cancelUpload,
     ) {}
 
@@ -128,42 +126,22 @@ final class MemoryWallController extends Controller
     }
 
     /**
-     * Validate and publish a multipart session after all parts are uploaded.
+     * Request background completion or return the already completed media.
      */
     public function completeUpload(UploadSessionRequest $request, Wedding $wedding, MemoryWallUpload $upload): JsonResponse
     {
-        $this->authorizer->authorize($wedding, $upload, $request->token());
+        $media = $this->requestCompletion->handle($wedding, $upload, $request->token());
 
-        if ($upload->status->isFailed()) {
-            throw ValidationException::withMessages([
-                'file' => $upload->error_message ?? __('wedding.memory_wall.validation.processing_failed'),
+        if ($media !== null) {
+            // Return a completed media resource from the upload completion endpoint.
+            return response()->json([
+                'data' => MediaResource::make($media),
             ]);
-        }
-
-        if ($upload->status->isCompleted()) {
-            /** @var Media $media */
-            $media = $upload->media()->firstOrFail();
-
-            return $this->mediaResponse($request, $media);
-        }
-
-        if ($upload->status->isUploading()) {
-            CompleteMemoryWallUploadJob::dispatch($wedding, $upload);
         }
 
         return response()->json([
             'data' => ['status' => 'processing'],
         ], Response::HTTP_ACCEPTED);
-    }
-
-    /**
-     * Return a completed media resource from the upload completion endpoint.
-     */
-    private function mediaResponse(UploadSessionRequest $request, Media $media): JsonResponse
-    {
-        return response()->json([
-            'data' => MediaResource::make($media)->resolve($request),
-        ]);
     }
 
     /**

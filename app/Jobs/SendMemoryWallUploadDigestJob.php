@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Enums\MemoryWallUploadStatus;
-use App\Models\MemoryWallUpload;
-use App\Models\Wedding;
-use App\Notifications\MemoryWallUploadDigest;
+use App\Services\MemoryWall\SendMemoryWallUploadDigest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -52,7 +46,7 @@ final class SendMemoryWallUploadDigestJob implements ShouldQueue
     /**
      * Serialize competing digest jobs for the same wedding across workers.
      */
-    public function handle(): void
+    public function handle(SendMemoryWallUploadDigest $sendDigest): void
     {
         $lock = Cache::lock($this->lockKey(), 60);
 
@@ -61,7 +55,7 @@ final class SendMemoryWallUploadDigestJob implements ShouldQueue
         }
 
         try {
-            $this->sendPendingDigest();
+            $sendDigest->handle($this->weddingId);
         } finally {
             $lock->release();
         }
@@ -76,72 +70,6 @@ final class SendMemoryWallUploadDigestJob implements ShouldQueue
             'wedding_id' => $this->weddingId,
             'exception' => $exception?->getMessage(),
         ]);
-    }
-
-    /**
-     * Find and mark one complete quiet-period group atomically with its notification.
-     *
-     * Every completion schedules a job for the end of the quiet period. Older
-     * jobs are intentionally not cancelled: this method re-reads all pending
-     * uploads and exits when the newest one is still inside that period. The
-     * newest scheduled job can therefore act as the trailing-edge debounce,
-     * while the wedding lock prevents concurrent workers from sending the same
-     * digest. The row lock and transaction keep selecting and marking the same
-     * upload group together, so a retry cannot include an already-notified
-     * upload twice.
-     */
-    private function sendPendingDigest(): void
-    {
-        $cutoff = now()->subMinutes((int) config('memory-wall.digest_delay_minutes', 10));
-
-        DB::transaction(function () use ($cutoff): void {
-            $uploads = MemoryWallUpload::query()
-                ->where('wedding_id', $this->weddingId)
-                ->where('status', MemoryWallUploadStatus::Completed)
-                ->whereNull('digest_sent_at')
-                ->whereNotNull('completed_at')
-                ->lockForUpdate()
-                ->orderBy('completed_at')
-                ->get();
-
-            if ($uploads->isEmpty()) {
-                return;
-            }
-
-            $latestUpload = $uploads->last();
-
-            if ($latestUpload->completed_at->isAfter($cutoff)) {
-                return;
-            }
-
-            $wedding = Wedding::query()->find($this->weddingId);
-
-            if ($wedding === null) {
-                return;
-            }
-
-            $users = $wedding->users()->get();
-
-            if ($users->isEmpty()) {
-                return;
-            }
-
-            $imageCount = $uploads
-                ->filter(fn (MemoryWallUpload $upload): bool => Str::startsWith($upload->mime_type, 'image/'))
-                ->count();
-            $videoCount = $uploads
-                ->filter(fn (MemoryWallUpload $upload): bool => Str::startsWith($upload->mime_type, 'video/'))
-                ->count();
-
-            Notification::sendNow(
-                $users,
-                new MemoryWallUploadDigest($imageCount, $videoCount),
-            );
-
-            MemoryWallUpload::query()
-                ->whereKey($uploads->modelKeys())
-                ->update(['digest_sent_at' => now()]);
-        });
     }
 
     /**

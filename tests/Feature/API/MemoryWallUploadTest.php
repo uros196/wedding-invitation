@@ -22,7 +22,9 @@ use App\Services\MemoryWall\Upload\Cleanup;
 use Aws\S3\S3Client;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
@@ -321,7 +323,69 @@ test('returns the completed media for an already completed upload', function ():
         'upload_token' => $token,
     ])->assertOk()
         ->assertJsonPath('data.id', $media->id);
+
+    Queue::assertNothingPushed();
 });
+
+test('returns the failure message without queueing completion for a failed upload', function (?string $message): void {
+    $wedding = openMemoryWallWedding();
+    $token = str_repeat('d', 64);
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'upload_token_hash' => hash('sha256', $token),
+        'status' => MemoryWallUploadStatus::Failed,
+        'error_message' => $message,
+    ]);
+    Queue::fake();
+
+    $this->postJson(route('memory-wall.upload.complete', [$wedding, $upload]), [
+        'upload_token' => $token,
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors([
+            'file' => $message ?? __('wedding.memory_wall.validation.processing_failed'),
+        ]);
+
+    Queue::assertNothingPushed();
+    expect($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Failed)
+        ->and($upload->fresh()->error_message)->toBe($message);
+})->with([
+    'stored error' => 'Original validation error',
+    'fallback error' => null,
+]);
+
+test('rejects an invalid completion token before inspecting upload status', function (MemoryWallUploadStatus $status): void {
+    $wedding = openMemoryWallWedding();
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'upload_token_hash' => hash('sha256', str_repeat('a', 64)),
+        'status' => $status,
+    ]);
+    Queue::fake();
+
+    $this->postJson(route('memory-wall.upload.complete', [$wedding, $upload]), [
+        'upload_token' => str_repeat('b', 64),
+    ])->assertForbidden();
+
+    Queue::assertNothingPushed();
+    expect($upload->fresh()->status)->toBe($status);
+})->with(MemoryWallUploadStatus::cases());
+
+test('rejects completion through another wedding before inspecting upload status', function (MemoryWallUploadStatus $status): void {
+    $wedding = openMemoryWallWedding();
+    $otherWedding = openMemoryWallWedding();
+    $token = str_repeat('c', 64);
+    $upload = MemoryWallUpload::factory()->for($otherWedding)->create([
+        'upload_token_hash' => hash('sha256', $token),
+        'status' => $status,
+    ]);
+    Queue::fake();
+
+    $this->postJson(route('memory-wall.upload.complete', [$wedding, $upload]), [
+        'upload_token' => $token,
+    ])->assertNotFound();
+
+    Queue::assertNothingPushed();
+    expect($upload->fresh()->status)->toBe($status)
+        ->and($upload->fresh()->wedding_id)->toBe($otherWedding->id);
+})->with(MemoryWallUploadStatus::cases());
 
 test('does not repeat completion for an upload already completed by a previous job attempt', function (): void {
     $wedding = openMemoryWallWedding();
@@ -335,6 +399,65 @@ test('does not repeat completion for an upload already completed by a previous j
 
     expect($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Completed);
 });
+
+test('marks an upload as processing and preserves its final validation error', function (): void {
+    $wedding = openMemoryWallWedding();
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'status' => MemoryWallUploadStatus::Uploading,
+    ]);
+    $storage = mock(MemoryWallMultipartStorage::class);
+    $storage->shouldReceive('objectMetadata')->once()->andReturnUsing(function () use ($upload): array {
+        expect($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Processing);
+
+        return ['size' => 0, 'mime_type' => 'image/jpeg'];
+    });
+    $storage->shouldReceive('deleteObject')->once()->with($upload->object_path);
+    $this->app->instance(MemoryWallMultipartStorage::class, $storage);
+    Event::fake([MemoryWallUploadProcessed::class]);
+
+    $this->app->call([new CompleteMemoryWallUploadJob($wedding, $upload), 'handle']);
+
+    $message = __('wedding.memory_wall.validation.upload_size_mismatch');
+    expect($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Failed)
+        ->and($upload->fresh()->error_message)->toBe($message);
+    Event::assertDispatched(
+        MemoryWallUploadProcessed::class,
+        fn (MemoryWallUploadProcessed $event): bool => $event->uploadUuid === $upload->uuid
+            && $event->status === MemoryWallUploadStatus::Failed
+            && $event->error === $message,
+    );
+});
+
+test('reports exhausted completion attempts without overwriting an existing failure', function (MemoryWallUploadStatus $status): void {
+    $wedding = openMemoryWallWedding();
+    $message = $status->isFailed() ? 'Original validation error' : null;
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'status' => $status,
+        'error_message' => $message,
+    ]);
+    $storage = mock(MemoryWallMultipartStorage::class);
+
+    if ($status->isFailed()) {
+        $storage->shouldNotReceive('deleteObject');
+    } else {
+        $storage->shouldReceive('deleteObject')->once()->with($upload->object_path);
+    }
+
+    $this->app->instance(MemoryWallMultipartStorage::class, $storage);
+    Event::fake([MemoryWallUploadProcessed::class]);
+
+    (new CompleteMemoryWallUploadJob($wedding, $upload))->failed(new RuntimeException('Storage unavailable'));
+
+    $expectedMessage = $message ?? __('wedding.memory_wall.validation.processing_failed');
+    expect($upload->fresh()->status)->toBe(MemoryWallUploadStatus::Failed)
+        ->and($upload->fresh()->error_message)->toBe($expectedMessage);
+    Event::assertDispatched(
+        MemoryWallUploadProcessed::class,
+        fn (MemoryWallUploadProcessed $event): bool => $event->uploadUuid === $upload->uuid
+            && $event->status === MemoryWallUploadStatus::Failed
+            && $event->error === $expectedMessage,
+    );
+})->with([MemoryWallUploadStatus::Processing, MemoryWallUploadStatus::Failed]);
 
 test('creates wedding media through media library after every part and metadata are verified', function (): void {
     $originalMediaDisk = config('memory-wall.media_disk');
@@ -491,7 +614,7 @@ test('coalesces quiet-period uploads into one notification', function (): void {
         'completed_at' => $completedAt,
     ]);
 
-    (new SendMemoryWallUploadDigestJob($wedding->id))->handle();
+    $this->app->call([new SendMemoryWallUploadDigestJob($wedding->id), 'handle']);
 
     $notification = $admin->notifications()->firstOrFail();
 
@@ -500,7 +623,7 @@ test('coalesces quiet-period uploads into one notification', function (): void {
         ->and($notification->data['video_count'])->toBe(5)
         ->and(MemoryWallUpload::query()->whereNull('digest_sent_at')->count())->toBe(0);
 
-    (new SendMemoryWallUploadDigestJob($wedding->id))->handle();
+    $this->app->call([new SendMemoryWallUploadDigestJob($wedding->id), 'handle']);
 
     expect($admin->notifications()->where('type', MemoryWallUploadDigest::class)->count())->toBe(1);
 });
@@ -517,9 +640,61 @@ test('waits until the latest completed upload has left the quiet period', functi
         'completed_at' => now()->subMinutes(config('memory-wall.digest_delay_minutes') - 1),
     ]);
 
-    (new SendMemoryWallUploadDigestJob($wedding->id))->handle();
+    $this->app->call([new SendMemoryWallUploadDigestJob($wedding->id), 'handle']);
 
     expect($admin->notifications()->where('type', MemoryWallUploadDigest::class)->count())->toBe(0)
         ->and($oldUpload->fresh()->digest_sent_at)->toBeNull()
         ->and($recentUpload->fresh()->digest_sent_at)->toBeNull();
+});
+
+test('leaves uploads pending when another digest job holds the wedding lock', function (): void {
+    $wedding = openMemoryWallWedding();
+    User::factory()->for($wedding->team)->create();
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'completed_at' => now()->subMinutes(config('memory-wall.digest_delay_minutes') + 1),
+    ]);
+    Notification::fake();
+    $lock = Cache::lock("memory-wall-upload-digest:{$wedding->id}", 60);
+    expect($lock->get())->toBeTrue();
+
+    try {
+        $this->app->call([new SendMemoryWallUploadDigestJob($wedding->id), 'handle']);
+
+        Notification::assertNothingSent();
+        expect($upload->fresh()->digest_sent_at)->toBeNull();
+    } finally {
+        $lock->release();
+    }
+});
+
+test('keeps failed digests pending and releases the lock for a retry', function (): void {
+    $wedding = openMemoryWallWedding();
+    $admin = User::factory()->for($wedding->team)->create();
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'completed_at' => now()->subMinutes(config('memory-wall.digest_delay_minutes') + 1),
+    ]);
+    Notification::shouldReceive('sendNow')->once()->andThrow(new RuntimeException('Notification unavailable'));
+
+    expect(fn () => $this->app->call([new SendMemoryWallUploadDigestJob($wedding->id), 'handle']))
+        ->toThrow(RuntimeException::class, 'Notification unavailable');
+    expect($upload->fresh()->digest_sent_at)->toBeNull();
+
+    Notification::fake();
+    $this->app->call([new SendMemoryWallUploadDigestJob($wedding->id), 'handle']);
+
+    Notification::assertSentTo($admin, MemoryWallUploadDigest::class);
+    expect($upload->fresh()->digest_sent_at)->not->toBeNull();
+});
+
+test('leaves uploads pending when the wedding has no digest recipients', function (): void {
+    $wedding = openMemoryWallWedding();
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'completed_at' => now()->subMinutes(config('memory-wall.digest_delay_minutes') + 1),
+    ]);
+    Notification::fake();
+
+    $this->app->call([new SendMemoryWallUploadDigestJob($wedding->id), 'handle']);
+
+    Notification::assertNothingSent();
+    expect($upload->fresh()->digest_sent_at)->toBeNull();
 });

@@ -14,6 +14,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Translation\MessageSelector;
 
 /**
  * A coalesced summary of completed Memory Wall uploads.
@@ -78,12 +79,31 @@ final class MemoryWallUploadDigest extends Notification implements ShouldQueue
      */
     protected function makeNotification(): FilamentNotification
     {
+        $media = $this->mediaSummary();
+
         return FilamentNotification::make()
             ->title(__('wedding.notifications.memory_wall_uploads_title'))
-            ->body(__('wedding.notifications.memory_wall_uploads', [
-                'images' => $this->imageCount,
-                'videos' => $this->videoCount,
-            ]))
+            ->body($media === '' ? null : __('wedding.notifications.memory_wall_uploads', ['media' => $media]))
             ->info();
+    }
+
+    /**
+     * Summarize non-empty media types using Laravel's native plural rules.
+     * The sr_Latn translations use the plural rules registered under sr.
+     */
+    private function mediaSummary(): string
+    {
+        $locale = app()->getLocale();
+        $pluralLocale = $locale === 'sr_Latn' ? 'sr' : $locale;
+        $selector = app(MessageSelector::class);
+
+        return collect(['images' => $this->imageCount, 'videos' => $this->videoCount])
+            ->filter(fn (int $count): bool => $count > 0)
+            ->map(fn (int $count, string $type): string => $selector->choose(
+                __("wedding.notifications.memory_wall_uploads_{$type}", ['count' => $count]),
+                $count,
+                $pluralLocale,
+            ))
+            ->implode(', ');
     }
 }

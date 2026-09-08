@@ -61,14 +61,7 @@ final class CompleteMemoryWallUploadJob implements ShouldBeUnique, ShouldQueue
             return;
         }
 
-        if ($upload->status->isUploading()) {
-            MemoryWallUpload::query()
-                ->whereKey($upload->getKey())
-                ->where('status', MemoryWallUploadStatus::Uploading->value)
-                ->update(['status' => MemoryWallUploadStatus::Processing]);
-
-            $upload->refresh();
-        }
+        $this->markAsProcessing($upload);
 
         if (! $upload->status->isProcessing()) {
             return;
@@ -84,15 +77,7 @@ final class CompleteMemoryWallUploadJob implements ShouldBeUnique, ShouldQueue
             $media = $completeUpload->finalize($wedding, $upload);
         } catch (ValidationException) {
             $upload->refresh();
-
-            if (! $upload->status->isFailed()) {
-                $cleanup->markAsFailed(
-                    $upload,
-                    __('wedding.memory_wall.validation.processing_failed'),
-                );
-            }
-
-            $this->broadcastFailure($upload->fresh() ?? $upload);
+            $this->failAndBroadcast($upload, $cleanup);
 
             return;
         }
@@ -128,14 +113,7 @@ final class CompleteMemoryWallUploadJob implements ShouldBeUnique, ShouldQueue
             'exception' => $exception?->getMessage(),
         ]);
 
-        if (! $upload->status->isFailed()) {
-            app(Cleanup::class)->markAsFailed(
-                $upload,
-                __('wedding.memory_wall.validation.processing_failed'),
-            );
-        }
-
-        $this->broadcastFailure($upload->fresh() ?? $upload);
+        $this->failAndBroadcast($upload, app(Cleanup::class));
     }
 
     /**
@@ -144,6 +122,38 @@ final class CompleteMemoryWallUploadJob implements ShouldBeUnique, ShouldQueue
     public function uniqueId(): string
     {
         return $this->upload->uuid;
+    }
+
+    /**
+     * Begin processing only if another worker has not changed the upload state.
+     */
+    private function markAsProcessing(MemoryWallUpload $upload): void
+    {
+        if (! $upload->status->isUploading()) {
+            return;
+        }
+
+        MemoryWallUpload::query()
+            ->whereKey($upload->getKey())
+            ->where('status', MemoryWallUploadStatus::Uploading->value)
+            ->update(['status' => MemoryWallUploadStatus::Processing]);
+
+        $upload->refresh();
+    }
+
+    /**
+     * Preserve an existing failure or record one before notifying the browser.
+     */
+    private function failAndBroadcast(MemoryWallUpload $upload, Cleanup $cleanup): void
+    {
+        if (! $upload->status->isFailed()) {
+            $cleanup->markAsFailed(
+                $upload,
+                __('wedding.memory_wall.validation.processing_failed'),
+            );
+        }
+
+        $this->broadcastFailure($upload->fresh() ?? $upload);
     }
 
     /**
