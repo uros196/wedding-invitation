@@ -2,8 +2,8 @@ import { Head } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
 import MemoryGallery from '@/components/memory-wall/MemoryGallery';
 import MemoryUpcoming from '@/components/memory-wall/MemoryUpcoming';
-import MemoryUpload from '@/components/memory-wall/MemoryUpload';
 import ShownAfter from '@/components/memory-wall/ShownAfter';
+import MemoryUpload from '@/components/memory-wall/upload/MemoryUpload';
 import type { MemoryWallPageProps } from '@/types';
 
 /**

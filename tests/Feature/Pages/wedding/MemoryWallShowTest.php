@@ -128,5 +128,6 @@ test('shows only completed images with generated previews', function (): void {
             ->component('memory-wall')
             ->has('media', 1)
             ->where('media.0.id', $visibleMedia->id)
+            ->where('media.0.name', $visibleMedia->name)
         );
 });

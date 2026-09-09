@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { Fancybox } from '@fancyapps/ui';
+import '@fancyapps/ui/dist/fancybox/fancybox.css';
+import { useEffect, useRef } from 'react';
+
 import type { Media } from '@/types';
 
 /** Text and media data required by the public memory wall gallery. */
@@ -14,11 +16,40 @@ interface MemoryGalleryProps {
 /**
  * Render a lightweight random preview of completed memory wall media.
  */
-export default function MemoryGallery({ media, title, empty, imageAlt, videoLabel }: MemoryGalleryProps) {
-    const [selectedImage, setSelectedImage] = useState<Media | null>(null);
+export default function MemoryGallery({
+    media,
+    title,
+    empty,
+    imageAlt,
+    videoLabel,
+}: MemoryGalleryProps) {
+    const galleryRef = useRef<HTMLElement | null>(null);
+
+    useEffect(() => {
+        const gallery = galleryRef.current;
+
+        if (!gallery) {
+            return;
+        }
+
+        Fancybox.bind(gallery, '[data-fancybox="memory-wall-gallery"]', {
+            Carousel: {
+                infinite: false,
+            },
+        });
+
+        return () => {
+            Fancybox.unbind(gallery);
+            Fancybox.close();
+        };
+    }, []);
 
     return (
-        <section className="w-full px-4 pb-16" aria-labelledby="memory-wall-gallery-title">
+        <section
+            ref={galleryRef}
+            className="w-full px-4 pb-16"
+            aria-labelledby="memory-wall-gallery-title"
+        >
             <div className="mx-auto w-full max-w-5xl">
                 <h2 id="memory-wall-gallery-title" className="mb-6 text-center text-2xl font-medium" style={{ color: '#433a66' }}>
                     {title}
@@ -52,11 +83,12 @@ export default function MemoryGallery({ media, title, empty, imageAlt, videoLabe
                                     />
                                 </a>
                             ) : (
-                                <button
+                                <a
                                     key={item.uuid}
-                                    type="button"
+                                    href={item.original_url}
+                                    data-fancybox="memory-wall-gallery"
+                                    data-caption={item.name}
                                     aria-label={imageAlt}
-                                    onClick={() => setSelectedImage(item)}
                                     className="group relative aspect-square cursor-pointer overflow-hidden rounded-xl bg-black/5 shadow-sm"
                                 >
                                     <img
@@ -65,35 +97,10 @@ export default function MemoryGallery({ media, title, empty, imageAlt, videoLabe
                                         loading="lazy"
                                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
-                                </button>
+                                </a>
                             ),
                         )}
                     </div>
-                )}
-
-                {selectedImage && (
-                    <Dialog
-                        open
-                        onOpenChange={(open) => {
-                            if (!open) {
-                                setSelectedImage(null);
-                            }
-                        }}
-                    >
-                        <DialogContent className="flex max-h-[calc(100vh-2rem)] max-w-[calc(100%-1rem)] items-center justify-center border-0 bg-black/95 p-2 sm:max-w-6xl">
-                            <DialogTitle className="sr-only">
-                                {imageAlt}
-                            </DialogTitle>
-                            <DialogDescription className="sr-only">
-                                {selectedImage.file_name}
-                            </DialogDescription>
-                            <img
-                                src={selectedImage.original_url}
-                                alt={imageAlt}
-                                className="max-h-[calc(100vh-3rem)] max-w-full object-contain"
-                            />
-                        </DialogContent>
-                    </Dialog>
                 )}
             </div>
         </section>

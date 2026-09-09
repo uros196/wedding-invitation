@@ -19,6 +19,7 @@
         "echo-react-development",
         "echo-development",
         "tailwindcss-development",
+        "filament-development",
         "browser-testing",
         "feature-testing",
         "translation-development"
