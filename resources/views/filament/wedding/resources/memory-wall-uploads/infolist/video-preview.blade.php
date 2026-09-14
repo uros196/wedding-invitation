@@ -1,6 +1,6 @@
-<div class="flex w-full justify-center">
+<div class="flex w-full items-center justify-center overflow-hidden rounded-xl bg-gray-50 p-2 dark:bg-gray-950">
     <video
-        class="max-h-96 max-w-full rounded-lg object-contain"
+        class="max-h-[32rem] max-w-full rounded-lg bg-gray-950 object-contain"
         controls
         preload="metadata"
         poster="{{ $placeholderUrl }}"

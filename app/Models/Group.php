@@ -9,6 +9,7 @@ use App\Models\Concerns\Countable;
 use App\Observers\GroupObserver;
 use App\Policies\GroupPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -120,7 +121,8 @@ class Group extends Model implements HasCounts, HasMedia
     /**
      * Scope a query to filter by sent status.
      */
-    public function scopeSent(Builder $query, bool $sent = true): void
+    #[Scope]
+    protected function sent(Builder $query, bool $sent = true): void
     {
         $query->where('is_sent', $sent);
     }

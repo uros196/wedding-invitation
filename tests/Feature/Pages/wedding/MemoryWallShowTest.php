@@ -21,7 +21,22 @@ test('renders the enabled memory wall and its public state', function (): void {
             ->where('wedding.uuid', $wedding->uuid)
             ->where('wedding.has_memory_wall', true)
             ->where('metaData.title', $wedding->meta_title)
+            ->where('uploadConfig.autoUpload', false)
+            ->missing('translations')
             ->has('media', 0)
+        );
+});
+
+test('exposes the configured automatic upload mode without sending translations', function (): void {
+    config(['memory-wall.auto_upload' => true]);
+    $wedding = Wedding::factory()->memoryWallEnabled()->create();
+
+    $this->get(route('memory-wall.show', ['wedding' => $wedding->uuid]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('memory-wall')
+            ->where('uploadConfig.autoUpload', true)
+            ->missing('translations')
         );
 });
 

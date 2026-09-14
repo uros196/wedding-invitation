@@ -60,6 +60,8 @@ test('plays a video on the details page', function (): void {
             '<source',
             $media->fresh()->getUrl(),
         ])
+        ->assertSee('max-h-[32rem]', false)
+        ->assertSee('bg-gray-50', false)
         ->assertSee('video-placeholder.svg', false);
 });
 

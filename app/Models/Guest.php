@@ -11,6 +11,7 @@ use App\Models\Scopes\UserWeddingGuestScope;
 use App\Observers\GuestObserver;
 use App\Policies\GuestPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
@@ -94,7 +95,8 @@ class Guest extends Model
     /**
      * Apply a query scope to filter guests by their status.
      */
-    public function scopeStatus(Builder $query, GuestStatus $status): void
+    #[Scope]
+    protected function status(Builder $query, GuestStatus $status): void
     {
         $query->where('status', $status->value);
     }
@@ -102,7 +104,8 @@ class Guest extends Model
     /**
      * Scope a query to only include guests with a confirmed status.
      */
-    public function scopeConfirmed(Builder $query): void
+    #[Scope]
+    protected function confirmed(Builder $query): void
     {
         $query->status(GuestStatus::Confirmed);
     }

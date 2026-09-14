@@ -1,4 +1,7 @@
-import type { MemoryUploadItem, MemoryWallUploadConfig } from '@/hooks/use-memory-wall-upload';
+import type {
+    MemoryUploadItem,
+    MemoryWallUploadConfig,
+} from '@/hooks/use-memory-wall-upload';
 import type { Media, Wedding } from '@/types';
 
 export interface MemoryUploadLabels {
@@ -23,9 +26,9 @@ export interface MemoryUploadLabels {
     fileTypeError: string;
     fileSizeError: string;
     maxFilesError: string;
-    empty: string;
     networkError: string;
     completedSummary: string;
+    previewLoading: string;
 }
 
 export type MemoryUploadStatusLabels = Record<
@@ -36,6 +39,5 @@ export type MemoryUploadStatusLabels = Record<
 export interface MemoryUploadProps {
     wedding: Wedding;
     config: MemoryWallUploadConfig;
-    translations: MemoryUploadLabels;
     onMediaUploaded: (media: Media) => void;
 }

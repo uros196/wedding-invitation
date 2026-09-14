@@ -17,10 +17,12 @@ function Preview({
     item,
     imageAlt,
     videoLabel,
+    previewLoading,
 }: {
     item: MemoryUploadItem;
     imageAlt: string;
     videoLabel: string;
+    previewLoading: string;
 }) {
     const isVideo = item.file.type.startsWith('video/');
     const [isLoading, setIsLoading] = useState(true);
@@ -68,7 +70,7 @@ function Preview({
                 <div
                     className="absolute inset-0 flex items-center justify-center bg-black/10"
                     role="status"
-                    aria-label="Loading preview"
+                    aria-label={previewLoading}
                 >
                     <Loader2
                         size={24}
@@ -107,11 +109,14 @@ export default function MemoryUploadItemRow({
     const isCompleted = item.status === 'completed';
 
     return (
-        <div className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 rounded-xl border p-3 ${isCompleted ? 'border-emerald-200 bg-emerald-50/60' : 'border-black/10 bg-white/40'}`}>
+        <div
+            className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-2xl border p-3 shadow-[0_8px_22px_rgba(67,58,102,0.06)] ${isCompleted ? 'border-emerald-200 bg-emerald-50/60' : 'border-black/10 bg-white/40'}`}
+        >
             <Preview
                 item={item}
                 imageAlt={labels.title}
                 videoLabel={labels.videoLabel}
+                previewLoading={labels.previewLoading}
             />
             <div className="min-w-0">
                 <p
@@ -121,7 +126,10 @@ export default function MemoryUploadItemRow({
                 >
                     {item.file.name}
                 </p>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs" style={{ color: palette.dawn }}>
+                <div
+                    className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs"
+                    style={{ color: palette.dawn }}
+                >
                     <span className="whitespace-nowrap">
                         {formatFileSize(item.file.size)}
                     </span>

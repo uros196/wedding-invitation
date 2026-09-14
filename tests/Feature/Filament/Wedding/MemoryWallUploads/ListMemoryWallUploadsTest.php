@@ -8,6 +8,7 @@ use App\Filament\Wedding\Resources\MemoryWallUploads\Pages\ListMemoryWallUploads
 use App\Models\MemoryWallUpload;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Number;
 use Livewire\Livewire;
 
 test('lists only memory wall uploads belonging to the authenticated wedding', function (): void {
@@ -41,7 +42,27 @@ test('shows the generated image conversion in the table', function (): void {
 
     Livewire::test(ListMemoryWallUploads::class)
         ->assertCanSeeTableRecords([$upload])
-        ->assertSee($media->fresh()->getUrl('preview'), false);
+        ->assertSee($media->fresh()->getUrl('preview'), false)
+        ->assertSee($upload->mime_type)
+        ->assertSee(Number::fileSize($upload->expected_size));
+});
+
+test('shows the newest memory wall uploads first', function (): void {
+    $wedding = $this->user->team->wedding;
+    $olderUpload = MemoryWallUpload::factory()->for($wedding)->create([
+        'original_name' => 'older-memory.jpg',
+        'created_at' => now()->subDay(),
+    ]);
+    $newerUpload = MemoryWallUpload::factory()->for($wedding)->create([
+        'original_name' => 'newer-memory.jpg',
+        'created_at' => now(),
+    ]);
+
+    Livewire::test(ListMemoryWallUploads::class)
+        ->assertSeeHtmlInOrder([
+            $newerUpload->original_name,
+            $olderUpload->original_name,
+        ]);
 });
 
 test('shows a video placeholder in the table', function (): void {

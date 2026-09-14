@@ -13,6 +13,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -38,21 +39,20 @@ class MemoryWallUploadsTable
                     ->state(fn (MemoryWallUpload $record): ?string => MemoryWallMediaType::isVideo($record->mime_type)
                         ? MemoryWallMediaType::videoPlaceholderUrl()
                         : MemoryWallMediaType::previewUrl($record->media))
-                    ->imageSize(64)
+                    ->imageSize(72)
                     ->square()
                     ->checkFileExistence(false),
                 TextColumn::make('original_name')
                     ->label(__('File'))
                     ->searchable()
                     ->sortable()
-                    ->limit(32),
-                TextColumn::make('mime_type')
-                    ->label(__('Type'))
-                    ->sortable(),
-                TextColumn::make('expected_size')
-                    ->label(__('Size'))
-                    ->formatStateUsing(fn (int $state): string => Number::fileSize($state))
-                    ->sortable(),
+                    ->weight(FontWeight::Medium)
+                    ->description(fn (MemoryWallUpload $record): string => sprintf(
+                        '%s, %s',
+                        $record->mime_type,
+                        Number::fileSize($record->expected_size),
+                    ))
+                    ->wrap(),
                 TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
@@ -67,6 +67,7 @@ class MemoryWallUploadsTable
                     ->label(__('Status'))
                     ->options(MemoryWallUploadStatus::class),
             ])
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
                 DownloadMemoryWallUploadAction::make(),
                 ViewAction::make()->iconButton(),

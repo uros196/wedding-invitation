@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -66,7 +67,8 @@ class WeddingTimeline extends Model
     /**
      * Scope a query to only include visible records.
      */
-    public function scopeVisible(Builder $builder, bool $visible = true): void
+    #[Scope]
+    protected function visible(Builder $builder, bool $visible = true): void
     {
         $builder->where('is_visible', $visible);
     }

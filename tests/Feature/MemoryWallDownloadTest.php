@@ -313,6 +313,40 @@ test('cleans up expired archive objects', function (): void {
         ->and($download->fresh()->archive_path)->toBeNull();
 });
 
+test('cleans up stale cancellation requests after the configured retention period', function (): void {
+    config(['memory-wall.cancellation_cleanup_after_days' => 3]);
+    $user = User::factory()->weddingTeamMember()->create();
+    $staleDownload = MemoryWallDownload::create([
+        'wedding_id' => $user->team->wedding->id,
+        'user_id' => $user->id,
+        'uuid' => MemoryWallDownload::newUuid(),
+        'disk' => 's3',
+        'archive_path' => 'memory-wall/stale-cancelling.zip',
+        'archive_name' => 'stale-cancelling.zip',
+        'status' => MemoryWallDownloadStatus::Cancelling,
+        'cancellation_requested_at' => now()->subDays(3),
+    ]);
+    $recentDownload = MemoryWallDownload::create([
+        'wedding_id' => $user->team->wedding->id,
+        'user_id' => $user->id,
+        'uuid' => MemoryWallDownload::newUuid(),
+        'disk' => 's3',
+        'archive_path' => 'memory-wall/recent-cancelling.zip',
+        'archive_name' => 'recent-cancelling.zip',
+        'status' => MemoryWallDownloadStatus::Cancelling,
+        'cancellation_requested_at' => now()->subDays(2),
+    ]);
+    $storage = mock(MemoryWallArchiveStorage::class);
+    $storage->shouldReceive('deleteObject')->once()->with('memory-wall/stale-cancelling.zip');
+
+    (new CleanupExpiredMemoryWallDownloadsJob)->handle($storage);
+
+    expect($staleDownload->fresh()->status)->toBe(MemoryWallDownloadStatus::Cancelled)
+        ->and($staleDownload->fresh()->archive_path)->toBeNull()
+        ->and($recentDownload->fresh()->status)->toBe(MemoryWallDownloadStatus::Cancelling)
+        ->and($recentDownload->fresh()->archive_path)->toBe('memory-wall/recent-cancelling.zip');
+});
+
 test('requests cancellation for a processing archive from the download manager', function (): void {
     $user = User::factory()->weddingTeamMember()->create();
     $this->actingAs($user, 'wedding');

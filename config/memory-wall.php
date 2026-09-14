@@ -33,6 +33,9 @@ return [
     // Temporary archive links are intentionally short-lived.
     'download_url_minutes' => (int) env('MEMORY_WALL_DOWNLOAD_URL_MINUTES', 60),
 
+    // Force cleanup when a cancellation request remains unfinished for several days.
+    'cancellation_cleanup_after_days' => (int) env('MEMORY_WALL_CANCELLATION_CLEANUP_AFTER_DAYS', 3),
+
     // Keep the upper limit at 1 GiB for large videos from modern phones.
     'max_file_size' => 1024 * 1024 * 1024,
 
@@ -50,6 +53,10 @@ return [
 
     // Maximum number of files that one wedding can accept from the drop zone.
     'max_files' => 20,
+
+    // Start uploading as soon as a guest selects valid files instead of waiting
+    // for the manual submit button.
+    'auto_upload' => (bool) env('MEMORY_WALL_AUTO_UPLOAD', false),
 
     // Extensions are checked together with the MIME mapping below; neither is trusted alone.
     'allowed_extensions' => [

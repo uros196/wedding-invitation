@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\MemoryWallDownloadStatus;
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -67,8 +70,6 @@ class MemoryWallDownload extends Model
 
     /**
      * Get the wedding that owns this archive request.
-     *
-     * @return BelongsTo<Wedding, $this>
      */
     public function wedding(): BelongsTo
     {
@@ -77,8 +78,6 @@ class MemoryWallDownload extends Model
 
     /**
      * Get the user who requested the archive.
-     *
-     * @return BelongsTo<User, $this>
      */
     public function requestedBy(): BelongsTo
     {
@@ -87,12 +86,48 @@ class MemoryWallDownload extends Model
 
     /**
      * Get the immutable media entries included in this archive snapshot.
-     *
-     * @return HasMany<MemoryWallDownloadItem, $this>
      */
     public function items(): HasMany
     {
         return $this->hasMany(MemoryWallDownloadItem::class);
+    }
+
+    /**
+     * Scope a query to ready archives whose temporary URL has expired.
+     */
+    #[Scope]
+    protected function readyExpired(Builder $query, CarbonInterface $at): void
+    {
+        $query->where('status', MemoryWallDownloadStatus::Ready)
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', $at);
+    }
+
+    /**
+     * Scope a query to terminal downloads that still have storage artifacts.
+     */
+    #[Scope]
+    protected function terminalWithArtifacts(Builder $query): void
+    {
+        $query->whereIn('status', [
+            MemoryWallDownloadStatus::Cancelled,
+            MemoryWallDownloadStatus::Expired,
+            MemoryWallDownloadStatus::Failed,
+        ])->where(function (Builder $query): void {
+            $query->whereNotNull('archive_path')
+                ->orWhereNotNull('multipart_upload_id');
+        });
+    }
+
+    /**
+     * Scope a query to cancellation requests that have exceeded their grace period.
+     */
+    #[Scope]
+    protected function cancellingBefore(Builder $query, CarbonInterface $before): void
+    {
+        $query->where('status', MemoryWallDownloadStatus::Cancelling)
+            ->whereNotNull('cancellation_requested_at')
+            ->where('cancellation_requested_at', '<=', $before);
     }
 
     /**

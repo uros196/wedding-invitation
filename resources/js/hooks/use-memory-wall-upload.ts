@@ -30,10 +30,11 @@ export interface MemoryWallUploadConfig {
     maxFiles: number;
     maxFileSize: number;
     acceptedTypes: string[];
+    autoUpload: boolean;
 }
 
 /** Only the messages needed by the transport/orchestration layer. */
-export interface MemoryWallUploadTranslations {
+export interface MemoryWallUploadMessages {
     fileTypeError: string;
     fileSizeError: string;
     maxFilesError: string;
@@ -79,7 +80,7 @@ export interface MemoryWallUploadProcessedEvent {
 interface UseMemoryWallUploadOptions {
     weddingUuid: string;
     config: MemoryWallUploadConfig;
-    translations: MemoryWallUploadTranslations;
+    messages: MemoryWallUploadMessages;
 }
 
 /** Public operations and state exposed to the upload component. */
@@ -229,7 +230,7 @@ function createItem(file: File): MemoryUploadItem {
 export function useMemoryWallUpload({
     weddingUuid,
     config,
-    translations,
+    messages,
 }: UseMemoryWallUploadOptions): UseMemoryWallUploadResult {
     const [items, setItems] = useState<MemoryUploadItem[]>([]);
     const [inputError, setInputError] = useState<string | null>(null);
@@ -238,15 +239,24 @@ export function useMemoryWallUpload({
     // A file has several concurrent part requests, so retain all of them for cancellation.
     const requests = useRef(new Map<string, Set<XMLHttpRequest>>());
     const itemsRef = useRef<MemoryUploadItem[]>([]);
+    const startQueuedUploadsRef = useRef<
+        (candidateItems?: MemoryUploadItem[]) => void
+    >(() => undefined);
+    // Track files that have already been handed to the multipart workflow so
+    // repeated queue starts cannot upload the same file twice.
+    const activeUploadIds = useRef(new Set<string>());
 
     /** Merge a partial state update without replacing the rest of an item. */
     const updateItem = useCallback(
         (id: string, update: Partial<MemoryUploadItem>) => {
-            setItems((currentItems) =>
-                currentItems.map((item) =>
+            setItems((currentItems) => {
+                const nextItems = currentItems.map((item) =>
                     item.id === id ? { ...item, ...update } : item,
-                ),
-            );
+                );
+                itemsRef.current = nextItems;
+
+                return nextItems;
+            });
         },
         [],
     );
@@ -274,10 +284,10 @@ export function useMemoryWallUpload({
 
             updateItem(item.id, {
                 status: 'error',
-                error: event.error ?? translations.networkError,
+                error: event.error ?? messages.networkError,
             });
         },
-        [translations.networkError, updateItem],
+        [messages.networkError, updateItem],
     );
 
     /** Track an active part request and return its unregister callback. */
@@ -353,7 +363,7 @@ export function useMemoryWallUpload({
                         mime_type: item.file.type,
                     },
                     controller.signal,
-                    translations.networkError,
+                    messages.networkError,
                 );
                 const uploadUuid = initializeResponse.data.uuid;
                 updateItem(item.id, { uploadUuid });
@@ -367,7 +377,7 @@ export function useMemoryWallUpload({
                     }).url,
                     { upload_token: item.uploadToken },
                     controller.signal,
-                    translations.networkError,
+                    messages.networkError,
                 );
                 const loadedParts = new Map<number, number>();
                 let nextPartIndex = 0;
@@ -414,7 +424,7 @@ export function useMemoryWallUpload({
                                         ),
                                     });
                                 },
-                                translations.networkError,
+                                messages.networkError,
                                 (request) => registerRequest(item.id, request),
                             );
                             loadedParts.set(part.part_number, end - start);
@@ -430,7 +440,7 @@ export function useMemoryWallUpload({
                         .url,
                     { upload_token: item.uploadToken },
                     controller.signal,
-                    translations.networkError,
+                    messages.networkError,
                 );
 
                 // Existing completed sessions can return the media directly;
@@ -455,16 +465,45 @@ export function useMemoryWallUpload({
                     error:
                         error instanceof Error
                             ? error.message
-                            : translations.networkError,
+                            : messages.networkError,
                 });
             } finally {
                 controllers.current.delete(item.id);
             }
         },
-        [registerRequest, translations.networkError, updateItem, weddingUuid],
+        [registerRequest, messages.networkError, updateItem, weddingUuid],
     );
 
-    /** Validate and add selected files without starting network requests. */
+    /** Start queued files while respecting the three-file concurrency limit. */
+    const startQueuedUploads = useCallback(
+        (candidateItems: MemoryUploadItem[] = itemsRef.current): void => {
+            const availableSlots = Math.max(
+                0,
+                3 - activeUploadIds.current.size,
+            );
+            const queuedItems = candidateItems.filter(
+                (item) =>
+                    item.status === 'queued' &&
+                    !activeUploadIds.current.has(item.id),
+            );
+
+            queuedItems.slice(0, availableSlots).forEach((item) => {
+                activeUploadIds.current.add(item.id);
+
+                void uploadItem(item).finally(() => {
+                    activeUploadIds.current.delete(item.id);
+                    startQueuedUploadsRef.current();
+                });
+            });
+        },
+        [uploadItem],
+    );
+
+    useEffect(() => {
+        startQueuedUploadsRef.current = startQueuedUploads;
+    }, [startQueuedUploads]);
+
+    /** Validate selected files and optionally start them immediately. */
     const addFiles = useCallback(
         (files: FileList | File[]): void => {
             const incomingFiles = Array.from(files);
@@ -488,11 +527,11 @@ export function useMemoryWallUpload({
             );
 
             if (rejectedByType) {
-                setInputError(translations.fileTypeError);
+                setInputError(messages.fileTypeError);
             } else if (rejectedBySize) {
-                setInputError(translations.fileSizeError);
+                setInputError(messages.fileSizeError);
             } else if (acceptedFiles.length > availableSlots) {
-                setInputError(translations.maxFilesError);
+                setInputError(messages.maxFilesError);
             } else {
                 setInputError(null);
             }
@@ -501,30 +540,28 @@ export function useMemoryWallUpload({
                 return;
             }
 
-            setItems((currentItems) => [
-                ...acceptedFiles.slice(0, availableSlots).map(createItem),
-                ...currentItems,
-            ]);
+            const newItems = acceptedFiles
+                .slice(0, availableSlots)
+                .map(createItem);
+
+            setItems((currentItems) => {
+                const nextItems = [...newItems, ...currentItems];
+                itemsRef.current = nextItems;
+
+                return nextItems;
+            });
+
+            if (config.autoUpload) {
+                startQueuedUploads([...newItems, ...itemsRef.current]);
+            }
         },
-        [config, items, translations],
+        [config, items, messages, startQueuedUploads],
     );
 
     /** Start queued files with a maximum of three independent file sessions. */
     const startUploads = useCallback((): void => {
-        const queuedItems = items.filter((item) => item.status === 'queued');
-        let nextItemIndex = 0;
-        const startNext = (): void => {
-            const item = queuedItems[nextItemIndex++];
-
-            if (!item) {
-                return;
-            }
-
-            void uploadItem(item).finally(startNext);
-        };
-
-        Array.from({ length: Math.min(3, queuedItems.length) }, startNext);
-    }, [items, uploadItem]);
+        startQueuedUploads();
+    }, [startQueuedUploads]);
 
     /** Retry only the selected failed file, preserving completed siblings. */
     const retryUpload = useCallback(
@@ -532,10 +569,21 @@ export function useMemoryWallUpload({
             const item = items.find((candidate) => candidate.id === id);
 
             if (item?.status === 'error') {
-                void uploadItem(item);
+                const retryItem: MemoryUploadItem = {
+                    ...item,
+                    status: 'queued',
+                    error: null,
+                    progress: 0,
+                };
+                updateItem(id, {
+                    status: 'queued',
+                    error: null,
+                    progress: 0,
+                });
+                startQueuedUploads([retryItem, ...itemsRef.current]);
             }
         },
-        [items, uploadItem],
+        [items, startQueuedUploads, updateItem],
     );
 
     /** Remove a file locally and cancel its remote session when necessary. */
@@ -556,9 +604,14 @@ export function useMemoryWallUpload({
             }
 
             URL.revokeObjectURL(item.previewUrl);
-            setItems((currentItems) =>
-                currentItems.filter((candidate) => candidate.id !== id),
-            );
+            setItems((currentItems) => {
+                const nextItems = currentItems.filter(
+                    (candidate) => candidate.id !== id,
+                );
+                itemsRef.current = nextItems;
+
+                return nextItems;
+            });
         },
         [cancelSession, items],
     );

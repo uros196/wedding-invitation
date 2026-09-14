@@ -309,7 +309,7 @@ return [
             'requests' => ':count zahtev|:count zahteva|:count zahteva',
             'collapse' => 'Skupi preuzimanja',
             'expand' => 'Proširi preuzimanja',
-            'all' => 'Preuzmi sve',
+            'all' => 'Preuzmi sve uspomene',
             'started' => 'Priprema preuzimanja je pokrenuta',
             'started_body' => 'Možete nastaviti sa radom dok se arhiva priprema.',
             'download_file' => 'Preuzmi arhivu',

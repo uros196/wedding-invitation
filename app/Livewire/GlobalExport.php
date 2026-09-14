@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Filament\Exports\GuestExporter;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Actions\DownloadMemoryWallArchiveAction;
+use App\Models\User;
+use App\Services\MemoryWallService;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -36,12 +39,25 @@ class GlobalExport extends Component implements HasActions, HasForms
     }
 
     /**
+     * Render the memory wall archive export action when the feature is enabled.
+     */
+    public function downloadMemoryWallArchiveAction(): Action
+    {
+        $memoryWallEnabled = fn (): bool => $this->isMemoryWallEnabled();
+
+        return DownloadMemoryWallArchiveAction::make()
+            ->visible($memoryWallEnabled)
+            ->authorize($memoryWallEnabled);
+    }
+
+    /**
      * Render the export menu.
      */
     public function exportAction(): ActionGroup
     {
         return ActionGroup::make([
             $this->exportGuestsAction(),
+            $this->downloadMemoryWallArchiveAction(),
         ])
             ->livewire($this)
             ->label(__('Export'))
@@ -50,6 +66,16 @@ class GlobalExport extends Component implements HasActions, HasForms
             ->button()
             ->dropdownPlacement('bottom-end')
             ->dropdownWidth(Width::ExtraSmall);
+    }
+
+    /**
+     * Determine whether the authenticated wedding has enabled its memory wall.
+     */
+    protected function isMemoryWallEnabled(): bool
+    {
+        $user = auth()->user();
+
+        return resolve(MemoryWallService::class)->isEnabled($user->team?->wedding);
     }
 
     /**

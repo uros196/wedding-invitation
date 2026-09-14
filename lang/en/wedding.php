@@ -309,7 +309,7 @@ return [
             'requests' => ':count download|:count downloads',
             'collapse' => 'Collapse downloads',
             'expand' => 'Expand downloads',
-            'all' => 'Download all',
+            'all' => 'Download all memories',
             'started' => 'Download preparation started',
             'started_body' => 'You can continue working while the archive is prepared.',
             'download_file' => 'Download archive',

@@ -26,8 +26,6 @@ final class CleanupExpiredMemoryWallDownloadsJob implements ShouldQueue
 
     /**
      * Retry cleanup with increasing delays when storage is temporarily unavailable.
-     *
-     * @return array<int, int>
      */
     public function backoff(): array
     {
@@ -40,6 +38,8 @@ final class CleanupExpiredMemoryWallDownloadsJob implements ShouldQueue
     public function handle(MemoryWallArchiveStorage $storage): void
     {
         $now = now();
+        $cancellationCleanupAfterDays = (int) config('memory-wall.cancellation_cleanup_after_days', 3);
+        $cancellationCutoff = $now->copy()->subDays($cancellationCleanupAfterDays);
 
         MemoryWallDownload::query()
             ->select([
@@ -51,25 +51,10 @@ final class CleanupExpiredMemoryWallDownloadsJob implements ShouldQueue
                 'cancellation_requested_at',
                 'cancelled_at',
             ])
-            ->where(function (Builder $query) use ($now): void {
-                $query->where(function (Builder $query) use ($now): void {
-                    $query->where('status', MemoryWallDownloadStatus::Ready)
-                        ->whereNotNull('expires_at')
-                        ->where('expires_at', '<=', $now);
-                })->orWhere(function (Builder $query): void {
-                    $query->whereIn('status', [
-                        MemoryWallDownloadStatus::Cancelled,
-                        MemoryWallDownloadStatus::Expired,
-                        MemoryWallDownloadStatus::Failed,
-                    ])->where(function (Builder $query): void {
-                        $query->whereNotNull('archive_path')
-                            ->orWhereNotNull('multipart_upload_id');
-                    });
-                })->orWhere(function (Builder $query) use ($now): void {
-                    $query->where('status', MemoryWallDownloadStatus::Cancelling)
-                        ->whereNotNull('cancellation_requested_at')
-                        ->where('cancellation_requested_at', '<=', $now->copy()->subDay());
-                });
+            ->where(function (Builder $query) use ($now, $cancellationCutoff): void {
+                $query->where(fn (Builder $query) => $query->readyExpired($now))
+                    ->orWhere(fn (Builder $query) => $query->terminalWithArtifacts())
+                    ->orWhere(fn (Builder $query) => $query->cancellingBefore($cancellationCutoff));
             })
             ->chunkById(100, function (Collection $downloads) use ($storage): void {
                 foreach ($downloads as $download) {

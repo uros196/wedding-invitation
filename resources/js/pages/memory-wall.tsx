@@ -14,7 +14,6 @@ export default function MemoryWallPage({
     metaData,
     media,
     uploadConfig,
-    translations,
 }: MemoryWallPageProps) {
     // Keep server-provided media and newly completed uploads in one gallery list.
     const [visibleMedia, setVisibleMedia] = useState(media);
@@ -53,19 +52,12 @@ export default function MemoryWallPage({
                 <MemoryUpload
                     wedding={wedding}
                     config={uploadConfig}
-                    translations={translations.upload}
                     onMediaUploaded={handleMediaUploaded}
                 />
             )}
 
             {(wedding.is_memory_wall_form_open || wedding.is_finished) && (
-                <MemoryGallery
-                    media={visibleMedia}
-                    title={translations.gallery.title}
-                    empty={translations.gallery.empty}
-                    imageAlt={translations.gallery.imageAlt}
-                    videoLabel={translations.gallery.videoLabel}
-                />
+                <MemoryGallery media={visibleMedia} />
             )}
 
             {/* Show this component after all is finished */}
