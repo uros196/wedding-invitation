@@ -2,6 +2,8 @@
 
 @source '../../../../app/Filament/Wedding/**/*';
 @source '../../../../app/Livewire/**/*';
+@source '../../../../app/Enums/**/*';
+@source '../../../../resources/views/livewire/**/*';
 @source '../../../../resources/views/components/**/*';
 @source '../../../../resources/views/filament/wedding/**/*';
 @source '../../../../resources/views/vendor/filament-breezy/**/*';

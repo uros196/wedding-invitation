@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\MemoryWallArchiveStorage;
+use App\Contracts\MemoryWallMediaUrl;
 use App\Contracts\MemoryWallMultipartStorage;
+use App\Services\MemoryWall\MemoryWallMediaDownloadUrl;
+use App\Services\MemoryWall\S3MemoryWallArchiveStorage;
 use App\Services\MemoryWall\S3MultipartUploadStorage;
 use App\Support\MetaFactory;
 use BezhanSalleh\LanguageSwitch\Enums\TriggerStyle;
@@ -24,8 +28,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Keep the upload workflow independent of the concrete S3 SDK adapter.
+        // Keep memory wall workflows independent of concrete storage adapters.
         $this->app->bind(MemoryWallMultipartStorage::class, S3MultipartUploadStorage::class);
+        $this->app->bind(MemoryWallArchiveStorage::class, S3MemoryWallArchiveStorage::class);
+        $this->app->bind(MemoryWallMediaUrl::class, MemoryWallMediaDownloadUrl::class);
     }
 
     /**

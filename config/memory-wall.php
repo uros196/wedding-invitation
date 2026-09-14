@@ -21,6 +21,18 @@ return [
     // Generated media conversions are stored on this disk.
     'conversions_disk' => env('MEMORY_WALL_CONVERSIONS_DISK', 's3'),
 
+    // ZIP archives use a dedicated prefix on the same S3-compatible storage by default.
+    'archive_disk' => env('MEMORY_WALL_ARCHIVE_DISK', env('MEMORY_WALL_MEDIA_DISK', 's3')),
+
+    // S3 multipart parts must be at least 5 MiB except for the final part.
+    'download_part_size' => 64 * 1024 * 1024,
+
+    // Broadcast progress after each configured amount of source bytes is copied.
+    'download_progress_bytes' => 8 * 1024 * 1024,
+
+    // Temporary archive links are intentionally short-lived.
+    'download_url_minutes' => (int) env('MEMORY_WALL_DOWNLOAD_URL_MINUTES', 60),
+
     // Keep the upper limit at 1 GiB for large videos from modern phones.
     'max_file_size' => 1024 * 1024 * 1024,
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConfirmAttendanceController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MemoryWallController;
+use App\Http\Controllers\MemoryWallDownloadController;
 use App\Http\Middleware\IncreaseCounter;
 use App\Http\Middleware\XSSProtection;
 use Illuminate\Support\Facades\Route;
@@ -42,3 +43,17 @@ Route::prefix('wedding')->group(function () {
                 ->middleware('throttle:120,1');
         });
 });
+
+Route::middleware('auth:wedding')
+    ->prefix('wedding/memory-wall/{wedding:uuid}')
+    ->scopeBindings()
+    ->name('memory-wall.')
+    ->group(function (): void {
+        // Authorize the upload before redirecting to its original storage object.
+        Route::get('/download/{memoryWallUpload}', [MemoryWallDownloadController::class, 'single'])
+            ->name('download.single');
+
+        // Archive requests resolve by UUID and may redirect only after preparation.
+        Route::get('/downloads/{memoryWallDownload}/file', [MemoryWallDownloadController::class, 'archive'])
+            ->name('downloads.file');
+    });

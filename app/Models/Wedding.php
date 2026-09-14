@@ -106,6 +106,14 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
+     * Get the requested memory wall archive downloads.
+     */
+    public function memoryWallDownloads(): HasMany
+    {
+        return $this->hasMany(MemoryWallDownload::class);
+    }
+
+    /**
      * Get related groups for the wedding.
      */
     public function groups(): HasMany

@@ -6,7 +6,7 @@ namespace App\Events;
 
 use App\Enums\MemoryWallUploadStatus;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -14,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
  * Notifies the guest browser that a queued Memory Wall upload reached a
  * terminal state.
  */
-final class MemoryWallUploadProcessed implements ShouldBroadcast
+final class MemoryWallUploadProcessed implements ShouldBroadcastNow
 {
     use Dispatchable, SerializesModels;
 

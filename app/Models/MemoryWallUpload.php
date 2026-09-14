@@ -21,10 +21,6 @@ use Illuminate\Support\Carbon;
  * The related media row is normally created after the assembled object passes
  * validation; direct-upload adapters may create it earlier and keep it hidden
  * until the object is complete.
- *
- * @property MemoryWallUploadStatus $status
- * @property Carbon|null $completed_at
- * @property Carbon|null $digest_sent_at
  */
 #[ObservedBy(MemoryWallUploadObserver::class)]
 #[UsePolicy(MemoryWallUploadPolicy::class)]
@@ -85,8 +81,6 @@ class MemoryWallUpload extends Model
 
     /**
      * Get the Media Library record created for the completed upload.
-     *
-     * @return BelongsTo<Media, $this>
      */
     public function media(): BelongsTo
     {

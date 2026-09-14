@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Wedding\Resources\MemoryWallUploads\Tables;
 
 use App\Enums\MemoryWallUploadStatus;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Actions\DownloadMemoryWallArchiveAction;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Actions\DownloadMemoryWallUploadAction;
 use App\Models\MemoryWallUpload;
 use App\Support\MemoryWall\MemoryWallMediaType;
 use Filament\Actions\BulkActionGroup;
@@ -27,7 +31,7 @@ class MemoryWallUploadsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('media'))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['media', 'wedding']))
             ->columns([
                 ImageColumn::make('media_preview')
                     ->label(__('Preview'))
@@ -64,10 +68,12 @@ class MemoryWallUploadsTable
                     ->options(MemoryWallUploadStatus::class),
             ])
             ->recordActions([
+                DownloadMemoryWallUploadAction::make(),
                 ViewAction::make()->iconButton(),
                 DeleteAction::make()->iconButton(),
             ])
             ->toolbarActions([
+                DownloadMemoryWallArchiveAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

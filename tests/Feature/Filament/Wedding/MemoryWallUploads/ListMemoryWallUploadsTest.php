@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Contracts\MemoryWallMediaUrl;
 use App\Enums\MemoryWallUploadStatus;
 use App\Filament\Wedding\Resources\MemoryWallUploads\Pages\ListMemoryWallUploads;
 use App\Models\MemoryWallUpload;
@@ -59,4 +60,32 @@ test('shows a video placeholder in the table', function (): void {
     Livewire::test(ListMemoryWallUploads::class)
         ->assertCanSeeTableRecords([$upload])
         ->assertSee('video-placeholder.svg', false);
+});
+
+test('redirects to a direct original media download with its original name', function (): void {
+    Storage::fake('public');
+    $wedding = $this->user->team->wedding;
+    $file = UploadedFile::fake()->image('stored-file.jpg');
+    $media = $wedding->addMedia($file)
+        ->usingFileName('stored-file.jpg')
+        ->toMediaCollection('MemoryWall', 'public');
+    $upload = MemoryWallUpload::factory()->for($wedding)->create([
+        'media_id' => $media->id,
+        'mime_type' => 'image/jpeg',
+        'original_name' => 'original-memory.jpg',
+        'status' => MemoryWallUploadStatus::Completed,
+    ]);
+
+    $downloadUrl = mock(MemoryWallMediaUrl::class);
+    $downloadUrl->shouldReceive('make')
+        ->once()
+        ->withArgs(fn ($actualMedia, string $filename): bool => $actualMedia->is($media) && $filename === 'original-memory.jpg')
+        ->andReturn('https://s3.example.test/original-memory.jpg');
+    $this->app->instance(MemoryWallMediaUrl::class, $downloadUrl);
+
+    $this->get(route('memory-wall.download.single', [
+        'wedding' => $wedding,
+        'memoryWallUpload' => $upload,
+    ]))
+        ->assertRedirect('https://s3.example.test/original-memory.jpg');
 });

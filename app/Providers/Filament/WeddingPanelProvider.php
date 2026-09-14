@@ -9,6 +9,7 @@ use App\Filament\Plugins\BreezyCoreConfiguration;
 use App\Filament\Wedding\Pages\Dashboard;
 use App\Filament\Wedding\Plugins\EchoRegisterPlugin;
 use App\Filament\Wedding\Plugins\ExportPlugin;
+use App\Filament\Wedding\Plugins\MemoryWallDownloadPlugin;
 use AzGasim\FilamentUnsavedChangesModal\FilamentUnsavedChangesModalPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -48,6 +49,8 @@ class WeddingPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Wedding/Widgets'), for: 'App\Filament\Wedding\Widgets')
             ->plugins([
                 EchoRegisterPlugin::make(),
+                // Mount the global archive progress panel on every wedding page.
+                MemoryWallDownloadPlugin::make(),
                 ExportPlugin::make(),
                 FilamentUnsavedChangesModalPlugin::make(),
                 BreezyCoreConfiguration::make(),
