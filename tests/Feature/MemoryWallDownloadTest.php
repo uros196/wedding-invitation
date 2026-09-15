@@ -93,7 +93,12 @@ test('writes a readable zip64 archive without buffering source files', function 
     file_put_contents($path, $bytes->value);
     $archive = new ZipArchive;
 
+    $operatingSystem = 0;
+    $externalAttributes = 0;
+
     expect($archive->open($path))->toBeTrue()
+        ->and($archive->getExternalAttributesIndex(0, $operatingSystem, $externalAttributes))->toBeTrue()
+        ->and($externalAttributes & 0x10)->toBe(0)
         ->and($archive->getFromName('photo.txt'))->toBe('hello');
 
     $archive->close();
@@ -158,6 +163,16 @@ test('prepares an archive through multipart storage and reports completion', fun
     Event::fake();
 
     app(PrepareMemoryWallArchive::class)->handle($download);
+
+    $archivePath = tempnam(sys_get_temp_dir(), 'memory-wall-prepared-');
+    file_put_contents($archivePath, $storage->contents);
+    $archive = new ZipArchive;
+
+    expect($archive->open($archivePath))->toBeTrue()
+        ->and($archive->getFromName('memory.txt'))->toBe('hello');
+
+    $archive->close();
+    unlink($archivePath);
 
     expect($download->fresh()->status)->toBe(MemoryWallDownloadStatus::Ready)
         ->and($download->fresh()->processed_bytes)->toBe($media->size)
@@ -450,6 +465,8 @@ test('renders progress for the current wedding downloads', function (): void {
     $component = Livewire::test(MemoryWallDownloadManager::class)
         ->assertSee($download->archive_name)
         ->assertSee('50%')
+        ->assertSee(__('wedding.memory_wall.download.title'))
+        ->assertSeeHtml('animate-ping')
         ->assertSee('fixed')
         ->assertDontSeeHtml('wire:poll')
         ->assertSeeHtml('x-data="{')
@@ -470,7 +487,57 @@ test('renders progress for the current wedding downloads', function (): void {
     ]);
 
     $component->call('handleDownloadUpdated')
-        ->assertDispatched('memory-wall-download-ready');
+        ->assertDispatched('memory-wall-download-ready', uuid: $download->uuid)
+        ->assertSee(__('wedding.memory_wall.download.ready_title'))
+        ->assertDontSeeHtml('animate-ping');
+});
+
+test('tracks automatic and manual archive download requests in the manager', function (): void {
+    $user = User::factory()->weddingTeamMember()->create();
+    $this->actingAs($user, 'wedding');
+    $download = MemoryWallDownload::create([
+        'wedding_id' => $user->team->wedding->id,
+        'user_id' => $user->id,
+        'uuid' => MemoryWallDownload::newUuid(),
+        'disk' => 's3',
+        'archive_path' => 'memory-wall/archive.zip',
+        'archive_name' => 'archive.zip',
+        'status' => MemoryWallDownloadStatus::Ready,
+        'expires_at' => now()->addHour(),
+    ]);
+
+    Livewire::test(MemoryWallDownloadManager::class)
+        ->assertSeeHtml('x-on:memory-wall-download-ready.window="markDownloadStarted($event.detail.uuid)"')
+        ->assertSeeHtml("x-on:click=\"markDownloadStarted('{$download->uuid}')\"")
+        ->assertSeeHtml('downloadResetDelay: 2500')
+        ->assertSeeHtml('startedDownloadTimers: {},')
+        ->assertSeeHtml('clearTimeout(this.startedDownloadTimers[uuid]);')
+        ->assertSeeHtml('window.setTimeout')
+        ->assertSeeHtml('delete this.startedDownloads[uuid];')
+        ->assertSeeHtml('delete this.startedDownloadTimers[uuid];');
+});
+
+test('keeps a failed archive message collapsed until expanded', function (): void {
+    $user = User::factory()->weddingTeamMember()->create();
+    $this->actingAs($user, 'wedding');
+    $error = str_repeat('The archive source could not be read. ', 8);
+    MemoryWallDownload::create([
+        'wedding_id' => $user->team->wedding->id,
+        'user_id' => $user->id,
+        'uuid' => MemoryWallDownload::newUuid(),
+        'disk' => 's3',
+        'archive_path' => null,
+        'archive_name' => 'failed-archive.zip',
+        'status' => MemoryWallDownloadStatus::Failed,
+        'error_message' => $error,
+    ]);
+
+    $html = Livewire::test(MemoryWallDownloadManager::class)->html();
+
+    expect($html)
+        ->toContain('<details')
+        ->toContain('<summary')
+        ->not->toContain('<details open');
 });
 
 test('uses a Filament confirmation modal before removing a download', function (): void {

@@ -1,12 +1,26 @@
 {{-- Broadcast events refresh the manager only when the archive state changes. --}}
 <div>
     @if ($downloads->isNotEmpty())
+    @php
+        $hasActiveDownloads = $downloads->contains(
+            fn ($download): bool => $download->status->isActive(),
+        );
+        $managerTitle = $hasActiveDownloads
+            ? __('wedding.memory_wall.download.title')
+            : __('wedding.memory_wall.download.ready_title');
+    @endphp
     <aside
         x-data="{
             collapsed: false,
             storageKey: 'memory-wall-download-manager-collapsed',
             collapseLabel: @js(__('wedding.memory_wall.download.collapse')),
             expandLabel: @js(__('wedding.memory_wall.download.expand')),
+            downloadLabel: @js(__('wedding.memory_wall.download.download_file')),
+            downloadStartedLabel: @js(__('wedding.memory_wall.download.download_started')),
+            expandMessageLabel: @js(__('wedding.memory_wall.download.expand_message')),
+            downloadResetDelay: 3500,
+            startedDownloads: {},
+            startedDownloadTimers: {},
             init() {
                 this.collapsed = localStorage.getItem(this.storageKey) === 'true';
             },
@@ -14,8 +28,31 @@
                 this.collapsed = ! this.collapsed;
                 localStorage.setItem(this.storageKey, this.collapsed ? 'true' : 'false');
             },
+            markDownloadStarted(uuid) {
+                if (! uuid) {
+                    return;
+                }
+
+                this.startedDownloads[uuid] = true;
+                clearTimeout(this.startedDownloadTimers[uuid]);
+
+                const resetTimer = window.setTimeout(() => {
+                    if (this.startedDownloadTimers[uuid] !== resetTimer) {
+                        return;
+                    }
+
+                    delete this.startedDownloads[uuid];
+                    delete this.startedDownloadTimers[uuid];
+                }, this.downloadResetDelay);
+
+                this.startedDownloadTimers[uuid] = resetTimer;
+            },
+            isDownloadStarted(uuid) {
+                return this.startedDownloads[uuid] === true;
+            },
         }"
-        aria-label="{{ __('wedding.memory_wall.download.title') }}"
+        x-on:memory-wall-download-ready.window="markDownloadStarted($event.detail.uuid)"
+        aria-label="{{ $managerTitle }}"
         class="pointer-events-none fixed inset-x-3 bottom-3 z-40 sm:inset-x-auto sm:bottom-6 sm:left-6"
     >
         {{-- The outer shell keeps the tray above the panel without blocking the page around it. --}}
@@ -28,16 +65,18 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <h2 class="truncate text-sm font-semibold tracking-tight text-gray-950 dark:text-white">
-                        {{ __('wedding.memory_wall.download.title') }}
+                        {{ $managerTitle }}
                     </h2>
                     <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                         {{ trans_choice('wedding.memory_wall.download.requests', $downloads->count()) }}
                     </p>
                 </div>
-                <span aria-hidden="true" class="relative flex h-2.5 w-2.5 shrink-0">
-                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/60"></span>
-                    <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500"></span>
-                </span>
+                @if ($hasActiveDownloads)
+                    <span aria-hidden="true" class="relative flex h-2.5 w-2.5 shrink-0">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/60"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+                    </span>
+                @endif
                 <button
                     type="button"
                     x-on:click="toggle"
@@ -70,6 +109,7 @@
                 @foreach ($downloads as $download)
                     @php
                         $statusStyle = $download->status->getDownloadManagerStyle();
+                        $isFailed = $download->status->is(\App\Enums\MemoryWallDownloadStatus::Failed);
                     @endphp
 
                     <section
@@ -94,6 +134,7 @@
                                                 type="button"
                                                 wire:click="mountAction('removeDownload', { uuid: '{{ $download->uuid }}' })"
                                                 wire:loading.attr="disabled"
+                                                x-on:click.stop
                                                 aria-label="{{ $download->status->isActive() ? __('wedding.memory_wall.download.cancel') : __('wedding.memory_wall.download.delete') }}"
                                                 title="{{ $download->status->isActive() ? __('wedding.memory_wall.download.cancel') : __('wedding.memory_wall.download.delete') }}"
                                                 class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 disabled:cursor-wait disabled:opacity-50 dark:text-gray-500 dark:hover:bg-rose-400/10 dark:hover:text-rose-400"
@@ -104,8 +145,18 @@
                                     </div>
                                 </div>
 
-                                {{-- Active requests expose preparation progress in bytes and percent. --}}
-                                @if ($download->status->isActive())
+                                @if ($isFailed)
+                                    <details class="group/error mt-3">
+                                        <summary class="flex cursor-pointer list-none items-center justify-between gap-2 rounded-lg border border-rose-200/70 bg-rose-50/70 px-3 py-2 text-xs font-medium text-rose-700 marker:hidden dark:border-rose-400/20 dark:bg-rose-400/10 dark:text-rose-300">
+                                            <span x-text="expandMessageLabel">{{ __('wedding.memory_wall.download.expand_message') }}</span>
+                                            <x-filament::icon icon="heroicon-o-chevron-down" class="h-4 w-4 transition-transform group-open/error:rotate-180" />
+                                        </summary>
+                                        <p class="mt-3 text-xs leading-relaxed text-rose-600 dark:text-rose-400">
+                                            {{ $download->error_message ?: __('wedding.memory_wall.download.failed') }}
+                                        </p>
+                                    </details>
+                                @elseif ($download->status->isActive())
+                                    {{-- Active requests expose preparation progress in bytes and percent. --}}
                                     <div class="mt-3" aria-live="polite">
                                         <div class="flex items-center justify-between gap-3 text-[11px] text-gray-500 dark:text-gray-400">
                                             <span>{{ \Illuminate\Support\Number::fileSize($download->processed_bytes) }} / {{ \Illuminate\Support\Number::fileSize($download->total_bytes) }}</span>
@@ -129,20 +180,24 @@
                                 @elseif ($download->status->isReady())
                                     <a
                                         href="{{ $this->downloadUrl($download) }}"
+                                        x-on:click="markDownloadStarted('{{ $download->uuid }}')"
+                                        x-bind:aria-busy="isDownloadStarted('{{ $download->uuid }}')"
+                                        x-bind:aria-label="isDownloadStarted('{{ $download->uuid }}') ? downloadStartedLabel : downloadLabel"
                                         class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-[transform,background-color] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-amber-600 active:scale-[0.98] dark:bg-white dark:text-gray-950 dark:hover:bg-amber-400"
                                     >
-                                        <x-filament::icon icon="heroicon-o-arrow-down-tray" class="h-4 w-4" />
-                                        {{ __('wedding.memory_wall.download.download_file') }}
+                                        <x-filament::icon
+                                            icon="heroicon-o-arrow-down-tray"
+                                            class="h-4 w-4"
+                                            x-bind:class="isDownloadStarted('{{ $download->uuid }}') ? 'animate-bounce' : ''"
+                                        />
+                                        <span x-text="isDownloadStarted('{{ $download->uuid }}') ? downloadStartedLabel : downloadLabel">
+                                            {{ __('wedding.memory_wall.download.download_file') }}
+                                        </span>
                                     </a>
                                 {{-- Cancellation remains visible until the worker confirms cleanup. --}}
                                 @elseif ($download->status->isCancelling())
                                     <p class="mt-3 text-xs leading-relaxed text-amber-600 dark:text-amber-400">
                                         {{ __('wedding.memory_wall.download.cancelling') }}
-                                    </p>
-                                {{-- Failures remain visible so the user knows why no link appeared. --}}
-                                @elseif ($download->status->is(\App\Enums\MemoryWallDownloadStatus::Failed))
-                                    <p class="mt-3 text-xs leading-relaxed text-rose-600 dark:text-rose-400">
-                                        {{ $download->error_message ?: __('wedding.memory_wall.download.failed') }}
                                     </p>
                                 @endif
                             </div>

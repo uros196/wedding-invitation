@@ -306,6 +306,7 @@ return [
         ],
         'download' => [
             'title' => 'Priprema preuzimanja zida uspomena',
+            'ready_title' => 'Arhive zida uspomena su spremne',
             'requests' => ':count zahtev|:count zahteva|:count zahteva',
             'collapse' => 'Skupi preuzimanja',
             'expand' => 'Proširi preuzimanja',
@@ -313,6 +314,8 @@ return [
             'started' => 'Priprema preuzimanja je pokrenuta',
             'started_body' => 'Možete nastaviti sa radom dok se arhiva priprema.',
             'download_file' => 'Preuzmi arhivu',
+            'download_started' => 'Preuzimanje…',
+            'expand_message' => 'Prikaži detalje poruke',
             'cancel' => 'Otkaži pripremu',
             'delete' => 'Obriši arhivu',
             'cancel_confirmation' => 'Otkažiti pripremu ove arhive?',

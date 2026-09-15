@@ -306,6 +306,7 @@ return [
         ],
         'download' => [
             'title' => 'Preparing memory wall download',
+            'ready_title' => 'Memory wall downloads ready',
             'requests' => ':count download|:count downloads',
             'collapse' => 'Collapse downloads',
             'expand' => 'Expand downloads',
@@ -313,6 +314,8 @@ return [
             'started' => 'Download preparation started',
             'started_body' => 'You can continue working while the archive is prepared.',
             'download_file' => 'Download archive',
+            'download_started' => 'Downloading…',
+            'expand_message' => 'Show message details',
             'cancel' => 'Cancel preparation',
             'delete' => 'Delete archive',
             'cancel_confirmation' => 'Cancel this archive preparation?',

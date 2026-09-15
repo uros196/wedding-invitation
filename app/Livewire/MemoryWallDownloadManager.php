@@ -56,7 +56,11 @@ final class MemoryWallDownloadManager extends Component implements HasActions, H
             }
 
             $this->announcedReadyDownloads[] = $download->uuid;
-            $this->dispatch('memory-wall-download-ready', url: $this->downloadUrl($download));
+            $this->dispatch(
+                'memory-wall-download-ready',
+                uuid: $download->uuid,
+                url: $this->downloadUrl($download),
+            );
         }
     }
 

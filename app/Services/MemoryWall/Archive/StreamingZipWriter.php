@@ -152,7 +152,7 @@ final class StreamingZipWriter
                 0,
                 0,
                 0,
-                0xFFFFFFFF,
+                0,
                 0xFFFFFFFF,
             ));
             $this->write($entry['name'].$extra);
