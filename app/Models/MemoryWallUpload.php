@@ -7,13 +7,11 @@ namespace App\Models;
 use App\Enums\MemoryWallUploadStatus;
 use App\Observers\MemoryWallUploadObserver;
 use App\Policies\MemoryWallUploadPolicy;
-use Database\Factories\MemoryWallUploadFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 /**
  * Tracks the control-plane state for one memory wall multipart upload.
@@ -27,7 +25,6 @@ use Illuminate\Support\Carbon;
 
 class MemoryWallUpload extends Model
 {
-    /** @use HasFactory<MemoryWallUploadFactory> */
     use HasFactory;
 
     /**

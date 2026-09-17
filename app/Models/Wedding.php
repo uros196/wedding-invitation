@@ -106,7 +106,7 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
-     * Get the requested memory wall archive downloads.
+     * Get the requested memory wall archive download
      */
     public function memoryWallDownloads(): HasMany
     {

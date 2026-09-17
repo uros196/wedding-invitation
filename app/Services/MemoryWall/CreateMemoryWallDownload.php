@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Services\MemoryWall;
 
 use App\Enums\MemoryWallDownloadStatus;
+use App\Enums\MemoryWallUploadStatus;
 use App\Jobs\PrepareMemoryWallDownloadJob;
 use App\Models\MemoryWallDownload;
 use App\Models\User;
 use App\Models\Wedding;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -25,10 +27,12 @@ final readonly class CreateMemoryWallDownload
 
     /**
      * Snapshot completed media and queue archive creation after the transaction commits.
+     *
+     * @param  array<int, int>|null  $uploadIds
      */
-    public function handle(Wedding $wedding, User $user): MemoryWallDownload
+    public function handle(Wedding $wedding, User $user, ?array $uploadIds = null): MemoryWallDownload
     {
-        $download = DB::transaction(function () use ($wedding, $user): MemoryWallDownload {
+        $download = DB::transaction(function () use ($wedding, $user, $uploadIds): MemoryWallDownload {
             $uuid = Str::uuid()->toString();
             $download = $wedding->memoryWallDownloads()->create([
                 'user_id' => $user->getKey(),
@@ -39,7 +43,7 @@ final readonly class CreateMemoryWallDownload
                 'status' => MemoryWallDownloadStatus::Queued,
             ]);
 
-            $this->snapshotCompletedMedia($wedding, $download);
+            $this->snapshotCompletedMedia($wedding, $download, $uploadIds);
             $download->refresh();
 
             if ($download->total_files === 0) {
@@ -56,19 +60,27 @@ final readonly class CreateMemoryWallDownload
 
     /**
      * Copy source metadata into immutable download items in bounded batches.
+     *
+     * @param  array<int, int>|null  $uploadIds
      */
-    private function snapshotCompletedMedia(Wedding $wedding, MemoryWallDownload $download): void
+    private function snapshotCompletedMedia(Wedding $wedding, MemoryWallDownload $download, ?array $uploadIds = null): void
     {
         $totalBytes = 0;
         $totalFiles = 0;
 
-        $wedding->memoryWallUploads()
+        $uploads = $wedding->memoryWallUploads()
             ->select(['id', 'media_id', 'original_name'])
-            ->where('status', 'completed')
+            ->where('status', MemoryWallUploadStatus::Completed)
             ->whereNotNull('media_id')
             ->with('media')
-            ->whereHas('media')
-            ->chunkById(100, function ($uploads) use ($download, &$totalBytes, &$totalFiles): void {
+            ->whereHas('media');
+
+        if ($uploadIds !== null) {
+            $uploads->whereKey($uploadIds);
+        }
+
+        $uploads
+            ->chunkById(100, function (Collection $uploads) use ($download, &$totalBytes, &$totalFiles): void {
                 foreach ($uploads as $upload) {
                     $media = $upload->media;
                     if ($media === null) {

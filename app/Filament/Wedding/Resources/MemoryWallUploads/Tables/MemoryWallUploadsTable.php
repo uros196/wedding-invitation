@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Resources\MemoryWallUploads\Tables;
 
-use App\Enums\MemoryWallUploadStatus;
 use App\Filament\Wedding\Resources\MemoryWallUploads\Actions\DownloadMemoryWallArchiveAction;
 use App\Filament\Wedding\Resources\MemoryWallUploads\Actions\DownloadMemoryWallUploadAction;
-use App\Models\MemoryWallUpload;
-use App\Support\MemoryWall\MemoryWallMediaType;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Actions\DownloadSelectedMemoryWallArchiveAction;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Tables\Columns\CreatedAtColumn;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Tables\Columns\MediaPreviewColumn;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Tables\Columns\OriginalNameColumn;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Tables\Columns\StatusColumn;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Tables\Filters\MediaTypeFilter;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Tables\Filters\SizeFilter;
+use App\Filament\Wedding\Resources\MemoryWallUploads\Tables\Filters\StatusFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Support\Enums\FontWeight;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Number;
 
 /**
  * Defines the table used to review and remove memory wall uploads.
@@ -34,38 +34,15 @@ class MemoryWallUploadsTable
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['media', 'wedding']))
             ->columns([
-                ImageColumn::make('media_preview')
-                    ->label(__('Preview'))
-                    ->state(fn (MemoryWallUpload $record): ?string => MemoryWallMediaType::isVideo($record->mime_type)
-                        ? MemoryWallMediaType::videoPlaceholderUrl()
-                        : MemoryWallMediaType::previewUrl($record->media))
-                    ->imageSize(72)
-                    ->square()
-                    ->checkFileExistence(false),
-                TextColumn::make('original_name')
-                    ->label(__('File'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight(FontWeight::Medium)
-                    ->description(fn (MemoryWallUpload $record): string => sprintf(
-                        '%s, %s',
-                        $record->mime_type,
-                        Number::fileSize($record->expected_size),
-                    ))
-                    ->wrap(),
-                TextColumn::make('status')
-                    ->label(__('Status'))
-                    ->badge()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('Created At'))
-                    ->dateTime()
-                    ->sortable(),
+                MediaPreviewColumn::make(),
+                OriginalNameColumn::make(),
+                StatusColumn::make(),
+                CreatedAtColumn::make(),
             ])
             ->filters([
-                SelectFilter::make('status')
-                    ->label(__('Status'))
-                    ->options(MemoryWallUploadStatus::class),
+                StatusFilter::make(),
+                MediaTypeFilter::make(),
+                SizeFilter::make(),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([
@@ -76,6 +53,7 @@ class MemoryWallUploadsTable
             ->toolbarActions([
                 DownloadMemoryWallArchiveAction::make(),
                 BulkActionGroup::make([
+                    DownloadSelectedMemoryWallArchiveAction::make(),
                     DeleteBulkAction::make(),
                 ]),
             ]);
