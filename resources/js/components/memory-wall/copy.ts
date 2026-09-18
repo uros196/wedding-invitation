@@ -19,8 +19,8 @@ export const memoryWallCopy = {
     upload: {
         title: 'Podelite uspomenu',
         description:
-            'Pošaljite fotografije i snimke sa proslave. Uspomene će se pojaviti na zidu čim budu obrađene.',
-        dropzone: 'Prevucite fotografije ili snimke ovde',
+            'Pošaljite fotografije i snimke sa proslave.',
+        dropzone: 'Kliknite ovde da dodate fotografije ili snimke',
         browse: 'Izaberite fajlove',
         dropzoneHint: 'JPG, PNG, HEIC, MP4, MOV i drugi podržani formati',
         videoLabel: 'Snimak',
@@ -51,7 +51,7 @@ export const memoryWallCopy = {
         previewLoading: 'Učitavanje pregleda',
     },
     gallery: {
-        title: 'Mali prikaz uspomena',
+        title: 'Galerija uspomena',
         empty: 'Budite prvi koji će podeliti uspomenu.',
         imageAlt: 'Podeljena uspomena',
         videoLabel: 'Snimak',

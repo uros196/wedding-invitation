@@ -293,7 +293,7 @@ return [
             'completed_summary' => 'Poslate uspomene',
         ],
         'gallery' => [
-            'title' => 'Mali prikaz uspomena',
+            'title' => 'Galerija uspomena',
             'empty' => 'Budite prvi koji će podeliti uspomenu.',
             'image_alt' => 'Podeljena uspomena',
             'video_label' => 'Snimak',

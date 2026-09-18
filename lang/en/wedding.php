@@ -293,7 +293,7 @@ return [
             'completed_summary' => 'Uploaded files',
         ],
         'gallery' => [
-            'title' => 'A glimpse of the memories',
+            'title' => 'Gallery of memories',
             'empty' => 'Be the first to share a memory.',
             'image_alt' => 'Shared memory',
             'video_label' => 'Video',
