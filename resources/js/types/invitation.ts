@@ -71,6 +71,7 @@ export interface Media {
     preview_url: string;
     original_url: string;
     size: number;
+    download_url?: string;
 }
 
 /**

@@ -48,6 +48,9 @@ return [
     // Number of completed media items shown in the random public preview.
     'preview_limit' => 10,
 
+    // Number of media items returned in one public share cursor page.
+    'share_page_size' => (int) env('MEMORY_WALL_SHARE_PAGE_SIZE', 24),
+
     // Wait for a quiet period before combining completed uploads into one notification.
     'digest_delay_minutes' => (int) env('MEMORY_WALL_DIGEST_DELAY_MINUTES', 10),
 

@@ -130,6 +130,14 @@ class Wedding extends Model implements HasMedia
     }
 
     /**
+     * Get public links that share this wedding's memory wall.
+     */
+    public function memoryWallShares(): HasMany
+    {
+        return $this->hasMany(MemoryWallShare::class);
+    }
+
+    /**
      * Get the related guests for the wedding.
      */
     public function guests(): HasManyThrough

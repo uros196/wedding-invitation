@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\MediaStatus;
 use App\Enums\MemoryWallUploadStatus;
 use App\Enums\QrCodeFormat;
 use App\Models\MemoryWallUpload;
@@ -54,13 +55,29 @@ readonly class MemoryWallService
      */
     public function getRandomFiles(Wedding $wedding, int $limit = 12): Collection
     {
-        $uploadTable = (new MemoryWallUpload)->getTable();
-        $mediaTable = $wedding->media()->getModel()->getTable();
-
-        return $wedding->media()
-            ->where('collection_name', 'MemoryWall')
+        return $this->visibleMediaQuery($wedding)
             ->where('mime_type', 'like', 'image/%')
             ->whereJsonContains('generated_conversions->preview', true)
+            ->inRandomOrder()
+            ->take($limit)
+            ->get();
+    }
+
+    /**
+     * Build the reusable completed/legacy visibility predicate for Memory Wall media.
+     *
+     * Legacy media without an upload-session row remains visible. Media created by
+     * the multipart flow is visible only after its session reaches Completed.
+     */
+    public function visibleMediaQuery(Wedding $wedding): Builder
+    {
+        $uploadTable = (new MemoryWallUpload)->getTable();
+        $mediaTable = $wedding->media()->getModel()->getTable();
+        $mediaQuery = $wedding->media()->getQuery();
+
+        return $mediaQuery
+            ->where("{$mediaTable}.collection_name", Wedding::MEMORY_WALL_COLLECTION)
+            ->where("{$mediaTable}.status", MediaStatus::Ready->value)
             ->where(function (Builder $query) use ($uploadTable, $mediaTable): void {
                 $query
                     ->whereNotExists(function (QueryBuilder $query) use ($uploadTable, $mediaTable): void {
@@ -74,10 +91,7 @@ readonly class MemoryWallService
                             ->whereColumn("{$uploadTable}.media_id", "{$mediaTable}.id")
                             ->where("{$uploadTable}.status", MemoryWallUploadStatus::Completed->value);
                     });
-            })
-            ->inRandomOrder()
-            ->take($limit)
-            ->get();
+            });
     }
 
     /**

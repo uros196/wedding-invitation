@@ -131,5 +131,16 @@
     "Open file": "Otvori fajl",
     "File details": "Detalji fajla",
     "Memory upload": "Uspomena",
-    "Memory uploads": "Uspomene"
+    "Memory uploads": "Uspomene",
+    "Memory Wall Share": "Link zida uspomena",
+    "Memory Wall Shares": "Linkovi zida uspomena",
+    "Password": "Lozinka",
+    "Expires At": "Ističe",
+    "Allow Downloads": "Dozvoli preuzimanja",
+    "Protected": "Zaštićeno",
+    "Active": "Aktivno",
+    "Expired": "Isteklo",
+    "No Expiry": "Bez roka",
+    "Copy Link": "Kopiraj link",
+    "Remove password protection": "Ukloni zaštitu lozinkom"
 }

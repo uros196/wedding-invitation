@@ -9,12 +9,18 @@ import { memoryWallCopy } from './copy';
 /** Text and media data required by the public memory wall gallery. */
 interface MemoryGalleryProps {
     media: Media[];
+    allowDownloads?: boolean;
+    title?: string;
 }
 
 /**
- * Render a lightweight random preview of completed memory wall media.
+ * Render completed Memory Wall media with the shared Fancybox experience.
  */
-export default function MemoryGallery({ media }: MemoryGalleryProps) {
+export default function MemoryGallery({
+    media,
+    allowDownloads = false,
+    title = memoryWallCopy.gallery.title,
+}: MemoryGalleryProps) {
     const galleryRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
@@ -27,6 +33,17 @@ export default function MemoryGallery({ media }: MemoryGalleryProps) {
         Fancybox.bind(gallery, '[data-fancybox="memory-wall-gallery"]', {
             Carousel: {
                 infinite: false,
+                Video: {
+                    autoplay: false,
+                },
+                Toolbar: {
+                    enabled: true,
+                    display: {
+                        right: allowDownloads
+                            ? ['download', 'close']
+                            : ['close'],
+                    },
+                },
             },
         });
 
@@ -34,7 +51,7 @@ export default function MemoryGallery({ media }: MemoryGalleryProps) {
             Fancybox.unbind(gallery);
             Fancybox.close();
         };
-    }, []);
+    }, [allowDownloads]);
 
     return (
         <section
@@ -52,7 +69,7 @@ export default function MemoryGallery({ media }: MemoryGalleryProps) {
                     className="mb-7 text-center text-3xl font-medium tracking-wide"
                     style={{ color: palette.deep }}
                 >
-                    {memoryWallCopy.gallery.title}
+                    {title}
                 </h2>
 
                 {media.length === 0 ? (
@@ -67,24 +84,50 @@ export default function MemoryGallery({ media }: MemoryGalleryProps) {
                         {memoryWallCopy.gallery.empty}
                     </p>
                 ) : (
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4">
+                    <div
+                        id="memory-wall-share-grid"
+                        className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4"
+                    >
                         {media.map((item) =>
                             item.mime_type.startsWith('video/') ? (
                                 <a
                                     key={item.uuid}
                                     href={item.original_url}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                    data-media-uuid={item.uuid}
+                                    data-fancybox="memory-wall-gallery"
+                                    data-type="html5video"
+                                    data-poster={
+                                        item.preview_url !== item.original_url
+                                            ? item.preview_url
+                                            : undefined
+                                    }
+                                    data-download-src={
+                                        allowDownloads
+                                            ? item.download_url
+                                            : undefined
+                                    }
+                                    data-download-filename={
+                                        allowDownloads
+                                            ? item.file_name
+                                            : undefined
+                                    }
+                                    data-caption={item.name}
+                                    aria-label={
+                                        memoryWallCopy.gallery.videoLabel
+                                    }
                                     className="group relative aspect-square cursor-pointer overflow-hidden rounded-2xl bg-black/5 shadow-[0_12px_30px_rgba(67,58,102,0.1)] ring-1 ring-black/5 transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(67,58,102,0.16)]"
                                 >
-                                    {/* Video thumbnails are optional; the native player
-                                        keeps the original upload playable without ffmpeg. */}
                                     <video
                                         src={item.original_url}
+                                        poster={
+                                            item.preview_url !==
+                                            item.original_url
+                                                ? item.preview_url
+                                                : undefined
+                                        }
                                         muted
                                         playsInline
                                         preload="metadata"
-                                        controls
                                         aria-label={
                                             memoryWallCopy.gallery.videoLabel
                                         }
@@ -95,8 +138,19 @@ export default function MemoryGallery({ media }: MemoryGalleryProps) {
                                 <a
                                     key={item.uuid}
                                     href={item.original_url}
+                                    data-media-uuid={item.uuid}
                                     data-fancybox="memory-wall-gallery"
                                     data-caption={item.name}
+                                    data-download-src={
+                                        allowDownloads
+                                            ? item.download_url
+                                            : undefined
+                                    }
+                                    data-download-filename={
+                                        allowDownloads
+                                            ? item.file_name
+                                            : undefined
+                                    }
                                     aria-label={memoryWallCopy.gallery.imageAlt}
                                     className="group relative aspect-square cursor-pointer overflow-hidden rounded-2xl bg-black/5 shadow-[0_12px_30px_rgba(67,58,102,0.1)] ring-1 ring-black/5 transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(67,58,102,0.16)]"
                                 >

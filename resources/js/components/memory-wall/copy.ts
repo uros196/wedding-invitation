@@ -18,8 +18,7 @@ function formatFileSize(bytes: number): string {
 export const memoryWallCopy = {
     upload: {
         title: 'Podelite uspomenu',
-        description:
-            'Pošaljite fotografije i snimke sa proslave.',
+        description: 'Pošaljite fotografije i snimke sa proslave.',
         dropzone: 'Kliknite ovde da dodate fotografije ili snimke',
         browse: 'Izaberite fajlove',
         dropzoneHint: 'JPG, PNG, HEIC, MP4, MOV i drugi podržani formati',
@@ -55,6 +54,17 @@ export const memoryWallCopy = {
         empty: 'Budite prvi koji će podeliti uspomenu.',
         imageAlt: 'Podeljena uspomena',
         videoLabel: 'Snimak',
+        loading: 'Učitavanje uspomena...',
+        allLoaded: 'Sve uspomene su učitane.',
+        download: 'Preuzmi uspomenu',
+    },
+    share: {
+        passwordTitle: 'Ova galerija je zaštićena',
+        passwordDescription: 'Unesite lozinku da biste pogledali uspomene.',
+        passwordLabel: 'Lozinka',
+        passwordPlaceholder: 'Unesite lozinku',
+        unlock: 'Otključaj galeriju',
+        unlocking: 'Otključavanje...',
     },
 } as const;
 

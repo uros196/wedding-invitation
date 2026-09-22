@@ -298,6 +298,27 @@ return [
             'image_alt' => 'Podeljena uspomena',
             'video_label' => 'Snimak',
         ],
+        'share' => [
+            'invalid_password' => 'Lozinka nije ispravna.',
+            'page' => [
+                'password_title' => 'Ova galerija je zaštićena',
+                'password_description' => 'Unesite lozinku da biste pogledali uspomene.',
+                'password_label' => 'Lozinka',
+                'password_placeholder' => 'Unesite lozinku',
+                'unlock' => 'Otključaj galeriju',
+                'unlocking' => 'Otključavanje…',
+                'loading' => 'Učitavanje uspomena…',
+            ],
+            'form' => [
+                'description' => 'Napravite aktivan link ka galeriji zida uspomena. Novi završeni upload-i će se automatski pojaviti.',
+                'password_placeholder' => 'Ostavite prazno za link bez zaštite',
+                'password_help' => 'Unesite novu lozinku pri kreiranju ili promeni zaštite. Pri izmeni ostavite prazno da zadržite postojeću lozinku.',
+                'clear_password_help' => 'Uključite ovu opciju da uklonite postojeću lozinku bez postavljanja nove.',
+                'expiry_placeholder' => 'Ostavite prazno za link bez roka',
+                'expiry_help' => 'Link postaje nedostupan nakon ovog datuma i vremena.',
+                'allow_downloads_help' => 'Dozvolite posetiocima da preuzmu pojedinačne stavke galerije.',
+            ],
+        ],
         'status' => [
             'uploading' => 'Šalje se',
             'processing' => 'Obrađuje se',

@@ -298,6 +298,27 @@ return [
             'image_alt' => 'Shared memory',
             'video_label' => 'Video',
         ],
+        'share' => [
+            'invalid_password' => 'The password is incorrect.',
+            'page' => [
+                'password_title' => 'This gallery is protected',
+                'password_description' => 'Enter the password to view the memories.',
+                'password_label' => 'Password',
+                'password_placeholder' => 'Enter the password',
+                'unlock' => 'Unlock gallery',
+                'unlocking' => 'Unlocking…',
+                'loading' => 'Loading memories…',
+            ],
+            'form' => [
+                'description' => 'Create a live link to the Memory Wall gallery. New completed uploads will appear automatically.',
+                'password_placeholder' => 'Leave blank for an unprotected link',
+                'password_help' => 'Enter a new password when creating or changing protection. Leave blank while editing to keep the current password.',
+                'clear_password_help' => 'Enable this option to remove the current password without setting a new one.',
+                'expiry_placeholder' => 'Leave blank for no expiry date',
+                'expiry_help' => 'The link becomes unavailable after this date and time.',
+                'allow_downloads_help' => 'Allow visitors to download individual gallery items.',
+            ],
+        ],
         'status' => [
             'uploading' => 'Uploading',
             'processing' => 'Processing',

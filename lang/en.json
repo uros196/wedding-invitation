@@ -131,5 +131,16 @@
     "Open file": "Open file",
     "File details": "File details",
     "Memory upload": "Memory upload",
-    "Memory uploads": "Memory uploads"
+    "Memory uploads": "Memory uploads",
+    "Memory Wall Share": "Memory Wall Share",
+    "Memory Wall Shares": "Memory Wall Shares",
+    "Password": "Password",
+    "Expires At": "Expires At",
+    "Allow Downloads": "Allow Downloads",
+    "Protected": "Protected",
+    "Active": "Active",
+    "Expired": "Expired",
+    "No Expiry": "No expiry",
+    "Copy Link": "Copy link",
+    "Remove password protection": "Remove password protection"
 }
