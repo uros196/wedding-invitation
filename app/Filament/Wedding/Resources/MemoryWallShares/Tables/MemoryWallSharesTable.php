@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Wedding\Resources\MemoryWallShares\Tables;
 
+use App\Filament\Wedding\Resources\MemoryWallShares\MemoryWallShareResource;
 use App\Models\MemoryWallShare;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -24,6 +25,7 @@ class MemoryWallSharesTable
             ->columns([
                 TextColumn::make('name')
                     ->label(__('Name'))
+                    ->placeholder(__('wedding.memory_wall.share.unnamed'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
@@ -64,9 +66,14 @@ class MemoryWallSharesTable
                     ->icon(Heroicon::OutlinedClipboard)
                     ->copyable(fn (MemoryWallShare $record): string => self::getShareUrl($record))
                     ->successNotificationTitle(__('messages.link_copied')),
-                EditAction::make(),
+                EditAction::make()
+                    ->url(fn (MemoryWallShare $record): string => MemoryWallShareResource::getUrl(
+                        'edit',
+                        ['record' => $record],
+                    )),
                 DeleteAction::make(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

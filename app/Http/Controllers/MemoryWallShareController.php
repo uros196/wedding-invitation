@@ -38,7 +38,7 @@ final class MemoryWallShareController extends Controller
         return Inertia::render('memory-wall-share', [
             'share' => [
                 'uuid' => $share->uuid,
-                'name' => $share->name,
+                'title' => __('wedding.memory_wall.share.public_title'),
                 'expiresAt' => $share->expires_at?->toIso8601String(),
             ],
             'requiresPassword' => $this->service->requiresPassword($share) && ! $isUnlocked,

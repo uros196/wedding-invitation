@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Contracts\MemoryWallMediaUrl;
 use App\Enums\MemoryWallUploadStatus;
+use App\Filament\Wedding\Pages\ManageWedding\ManageWedding;
 use App\Filament\Wedding\Resources\MemoryWallUploads\Pages\ListMemoryWallUploads;
 use App\Jobs\PrepareMemoryWallDownloadJob;
 use App\Models\MemoryWallDownload;
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 use Livewire\Livewire;
+
+test('links from the memory wall uploads to link management in wedding settings', function (): void {
+    Livewire::test(ListMemoryWallUploads::class)
+        ->assertSee(__('Share Memory Wall'))
+        ->assertSee(ManageWedding::getUrl(['tab' => 'memory']), false);
+});
 
 test('lists only memory wall uploads belonging to the authenticated wedding', function (): void {
     $visibleUpload = MemoryWallUpload::factory()->for($this->user->team->wedding)->create([

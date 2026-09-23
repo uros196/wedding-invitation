@@ -123,6 +123,90 @@ test('a share gallery opens mixed media in Fancybox and honors downloads', funct
         ->assertNoJavaScriptErrors();
 });
 
+test('a visitor can continue through the gallery in Fancybox as more media loads', function (): void {
+    Storage::fake('s3');
+    registerBrowserMemoryWallMediaRoute();
+
+    $wedding = Wedding::factory()->memoryWallEnabled()->create();
+
+    /** @var array<int, Media> $olderMedia */
+    $olderMedia = [];
+
+    for ($index = 0; $index < 24; $index++) {
+        $media = addBrowserMemoryWallMedia(
+            $wedding,
+            UploadedFile::fake()->image('older-memory-'.$index.'.jpg'),
+        );
+        $media->forceFill([
+            'created_at' => now()->subMinutes(25 - $index),
+        ])->save();
+        $olderMedia[] = $media;
+    }
+
+    $newest = addBrowserMemoryWallMedia(
+        $wedding,
+        UploadedFile::fake()->image('newer-memory.jpg'),
+    );
+    $share = MemoryWallShare::factory()->for($wedding)->create();
+    $notLoadedSelector = '[data-media-uuid="'.$olderMedia[0]->uuid.'"]';
+    $notLoadedSelectorJson = json_encode($notLoadedSelector, JSON_THROW_ON_ERROR);
+
+    $page = $this->visit(route('memory-wall.share.show', $share));
+
+    $page->assertNotPresent($notLoadedSelector)
+        ->click('[data-media-uuid="'.$newest->uuid.'"]')
+        ->assertVisible('.fancybox__container');
+
+    $nextPageLoaded = $page->script(
+        <<<JS
+        async () => {
+            const selector = {$notLoadedSelectorJson};
+
+            for (let index = 0; index < 24; index++) {
+                document.querySelector('button[title="Next"]')?.click();
+
+                await new Promise((resolve) => window.setTimeout(resolve, 350));
+
+                if (document.querySelector(selector)) {
+                    return true;
+                }
+            }
+
+            return Boolean(document.querySelector(selector));
+        }
+        JS,
+    );
+
+    expect($nextPageLoaded)->toBeTrue();
+
+    $newMediaIsVisibleInFancybox = $page->script(
+        <<<JS
+        async () => {
+            const selector = {$notLoadedSelectorJson};
+
+            for (let index = 0; index < 3; index++) {
+                document.querySelector('button[title="Next"]')?.click();
+
+                await new Promise((resolve) => window.setTimeout(resolve, 350));
+            }
+
+            const trigger = document.querySelector(selector);
+            const activeImage = document.querySelector('.fancybox__slide.is-selected img');
+
+            return Boolean(
+                trigger && activeImage?.getAttribute('src') === trigger.getAttribute('href'),
+            );
+        }
+        JS,
+    );
+
+    expect($newMediaIsVisibleInFancybox)->toBeTrue();
+
+    $page->assertVisible('.fancybox__container')
+        ->assertNoJavaScriptErrors()
+        ->assertNoConsoleLogs();
+});
+
 test('a share gallery loads its next cursor page as the visitor scrolls', function (): void {
     Storage::fake('s3');
     registerBrowserMemoryWallMediaRoute();

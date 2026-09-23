@@ -1,5 +1,7 @@
 import { Form, Head, InfiniteScroll } from '@inertiajs/react';
 import { LockKeyhole } from 'lucide-react';
+import { useRef } from 'react';
+import type { ComponentRef } from 'react';
 
 import { unlock } from '@/actions/App/Http/Controllers/MemoryWallShareController';
 import { fonts, palette } from '@/components/invitation/theme';
@@ -17,10 +19,12 @@ export default function MemoryWallSharePage({
     metaData,
     media,
 }: MemoryWallSharePageProps) {
+    const infiniteScrollRef = useRef<ComponentRef<typeof InfiniteScroll>>(null);
+
     if (requiresPassword || media === null) {
         return (
             <>
-                <Head title={share.name} />
+                <Head title={share.title} />
                 <Form action={unlock.url(share.uuid)} method="post">
                     {({ errors, processing }) => (
                         <main
@@ -49,7 +53,7 @@ export default function MemoryWallSharePage({
                                     className="mb-3 text-4xl font-medium tracking-wide"
                                     style={{ color: palette.deep }}
                                 >
-                                    {share.name}
+                                    {share.title}
                                 </h1>
                                 <h2
                                     className="mb-2 text-2xl font-medium"
@@ -133,9 +137,9 @@ export default function MemoryWallSharePage({
 
     return (
         <>
-            <Head title={share.name}>
+            <Head title={share.title}>
                 <meta name="description" content={metaData.description} />
-                <meta property="og:title" content={share.name} />
+                <meta property="og:title" content={share.title} />
                 <meta
                     property="og:description"
                     content={metaData.description}
@@ -155,10 +159,11 @@ export default function MemoryWallSharePage({
                         className="text-5xl font-medium tracking-wide"
                         style={{ color: palette.deep }}
                     >
-                        {share.name}
+                        {share.title}
                     </h1>
                 </header>
                 <InfiniteScroll
+                    ref={infiniteScrollRef}
                     data="media"
                     buffer={500}
                     as="div"
@@ -175,10 +180,23 @@ export default function MemoryWallSharePage({
                         ) : null
                     }
                 >
-                    <MemoryGallery
-                        media={mediaItems}
-                        allowDownloads={allowDownloads}
-                    />
+                    {({ loadingNext }) => (
+                        <MemoryGallery
+                            media={mediaItems}
+                            allowDownloads={allowDownloads}
+                            onNeedMore={() => {
+                                const infiniteScroll =
+                                    infiniteScrollRef.current;
+
+                                if (
+                                    !loadingNext &&
+                                    infiniteScroll?.hasNext()
+                                ) {
+                                    infiniteScroll.fetchNext();
+                                }
+                            }}
+                        />
+                    )}
                 </InfiniteScroll>
             </main>
         </>

@@ -300,6 +300,13 @@ return [
         ],
         'share' => [
             'invalid_password' => 'The password is incorrect.',
+            'public_title' => 'Wedding memories',
+            'unnamed' => 'Unnamed link',
+            'created_title' => 'Your Memory Wall link is ready.',
+            'manager' => [
+                'heading' => 'Share links',
+                'description' => 'Create and manage private links to this Memory Wall.',
+            ],
             'page' => [
                 'password_title' => 'This gallery is protected',
                 'password_description' => 'Enter the password to view the memories.',
@@ -311,6 +318,7 @@ return [
             ],
             'form' => [
                 'description' => 'Create a live link to the Memory Wall gallery. New completed uploads will appear automatically.',
+                'name_help' => 'Optional internal label. Only you can see it.',
                 'password_placeholder' => 'Leave blank for an unprotected link',
                 'password_help' => 'Enter a new password when creating or changing protection. Leave blank while editing to keep the current password.',
                 'clear_password_help' => 'Enable this option to remove the current password without setting a new one.',

@@ -88,6 +88,16 @@ test('uses focused callouts for standalone wedding detail tabs', function (): vo
         ->assertSee(__('wedding.manage_wedding.memory_wall.callout.description'));
 });
 
+test('shows share-link management in the memory wall settings tab', function (): void {
+    $wedding = $this->user->team->wedding;
+    $wedding->update(['has_memory_wall' => true]);
+
+    Livewire::test(ManageWedding::class)
+        ->set('activeTab', 'memory')
+        ->assertSee(__('wedding.memory_wall.share.manager.heading'))
+        ->assertSchemaComponentExists('memory-wall-share-links');
+});
+
 test('configures the wedding schedule for compact mobile editing', function (): void {
     $component = Livewire::test(ManageWedding::class)
         ->set('activeTab', 'schedule');

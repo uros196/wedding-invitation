@@ -2,7 +2,7 @@ import type { Media, MetaData } from './invitation';
 
 export interface MemoryWallShare {
     uuid: string;
-    name: string;
+    title: string;
     expiresAt: string | null;
 }
 

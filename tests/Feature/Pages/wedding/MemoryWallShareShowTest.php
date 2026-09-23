@@ -43,7 +43,8 @@ test('renders an unlocked share with metadata and one cursor page', function ():
         ->assertInertia(fn (Assert $page) => $page
             ->component('memory-wall-share')
             ->where('share.uuid', $share->uuid)
-            ->where('share.name', 'Reception memories')
+            ->where('share.title', __('wedding.memory_wall.share.public_title'))
+            ->missing('share.name')
             ->where('requiresPassword', false)
             ->where('allowDownloads', false)
             ->has('media.data', 1)

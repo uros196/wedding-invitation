@@ -300,6 +300,13 @@ return [
         ],
         'share' => [
             'invalid_password' => 'Lozinka nije ispravna.',
+            'public_title' => 'Uspomene sa venčanja',
+            'unnamed' => 'Link bez naziva',
+            'created_title' => 'Link za zid uspomena je spreman.',
+            'manager' => [
+                'heading' => 'Linkovi za deljenje',
+                'description' => 'Kreirajte i upravljajte privatnim linkovima ka ovom zidu uspomena.',
+            ],
             'page' => [
                 'password_title' => 'Ova galerija je zaštićena',
                 'password_description' => 'Unesite lozinku da biste pogledali uspomene.',
@@ -311,6 +318,7 @@ return [
             ],
             'form' => [
                 'description' => 'Napravite aktivan link ka galeriji zida uspomena. Novi završeni upload-i će se automatski pojaviti.',
+                'name_help' => 'Opciono ime za vašu evidenciju. Vidljivo je samo vama.',
                 'password_placeholder' => 'Ostavite prazno za link bez zaštite',
                 'password_help' => 'Unesite novu lozinku pri kreiranju ili promeni zaštite. Pri izmeni ostavite prazno da zadržite postojeću lozinku.',
                 'clear_password_help' => 'Uključite ovu opciju da uklonite postojeću lozinku bez postavljanja nove.',

@@ -28,6 +28,11 @@ class MemoryWallShareResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     /**
      * Determine whether share-link management is available for the current wedding.
      */

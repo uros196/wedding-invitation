@@ -29,6 +29,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Str;
@@ -137,6 +138,14 @@ class Form
                                 MemoryWallOpenUntilPicker::make(),
                                 MemoryWallQrCode::make(),
                                 MemoryWallUrlInput::make(),
+                                Section::make(__('wedding.memory_wall.share.manager.heading'))
+                                    ->description(__('wedding.memory_wall.share.manager.description'))
+                                    ->visible(fn (?Wedding $record): bool => $record?->has_memory_wall === true)
+                                    ->schema([
+                                        View::make('filament.wedding.pages.manage-wedding.memory-wall-shares-manager')
+                                            ->key('memory-wall-share-links')
+                                            ->columnSpanFull(),
+                                    ]),
                             ]),
 
                         'meta' => Tab::make(__('Meta Data'))

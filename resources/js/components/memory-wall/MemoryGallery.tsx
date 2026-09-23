@@ -1,4 +1,5 @@
 import { Fancybox } from '@fancyapps/ui';
+import type { CarouselInstance } from '@fancyapps/ui';
 import '@fancyapps/ui/dist/fancybox/fancybox.css';
 import { useEffect, useRef } from 'react';
 
@@ -11,6 +12,7 @@ interface MemoryGalleryProps {
     media: Media[];
     allowDownloads?: boolean;
     title?: string;
+    onNeedMore?: () => void;
 }
 
 /**
@@ -20,8 +22,16 @@ export default function MemoryGallery({
     media,
     allowDownloads = false,
     title = memoryWallCopy.gallery.title,
+    onNeedMore,
 }: MemoryGalleryProps) {
     const galleryRef = useRef<HTMLElement | null>(null);
+    const carouselRef = useRef<CarouselInstance | null>(null);
+    const addedMediaUuidsRef = useRef(new Set<string>());
+    const onNeedMoreRef = useRef(onNeedMore);
+
+    useEffect(() => {
+        onNeedMoreRef.current = onNeedMore;
+    }, [onNeedMore]);
 
     useEffect(() => {
         const gallery = galleryRef.current;
@@ -29,6 +39,15 @@ export default function MemoryGallery({
         if (!gallery) {
             return;
         }
+
+        const requestMoreIfNeeded = (carousel: CarouselInstance): void => {
+            const currentSlideIndex = carousel.getPage().index;
+            const slides = carousel.getSlides();
+
+            if (currentSlideIndex >= slides.length - 3) {
+                onNeedMoreRef.current?.();
+            }
+        };
 
         Fancybox.bind(gallery, '[data-fancybox="memory-wall-gallery"]', {
             Carousel: {
@@ -45,6 +64,17 @@ export default function MemoryGallery({
                     },
                 },
             },
+            on: {
+                initCarousel: (_instance, carousel) => {
+                    carouselRef.current = carousel;
+                },
+                'Carousel.change': (_instance, carousel) => {
+                    requestMoreIfNeeded(carousel);
+                },
+                destroy: () => {
+                    carouselRef.current = null;
+                },
+            },
         });
 
         return () => {
@@ -52,6 +82,54 @@ export default function MemoryGallery({
             Fancybox.close();
         };
     }, [allowDownloads]);
+
+    useEffect(() => {
+        const gallery = galleryRef.current;
+
+        if (!gallery) {
+            return;
+        }
+
+        const newMedia = media.filter((item) => {
+            if (addedMediaUuidsRef.current.has(item.uuid)) {
+                return false;
+            }
+
+            addedMediaUuidsRef.current.add(item.uuid);
+
+            return true;
+        });
+
+        if (newMedia.length > 0 && carouselRef.current) {
+            carouselRef.current.add(
+                newMedia.map((item) => ({
+                    src: item.original_url,
+                    type: item.mime_type.startsWith('video/')
+                        ? 'html5video'
+                        : undefined,
+                    caption: item.name,
+                    downloadSrc: allowDownloads
+                        ? item.download_url
+                        : undefined,
+                    downloadFilename: allowDownloads
+                        ? item.file_name
+                        : undefined,
+                    thumb:
+                        item.preview_url !== item.original_url
+                            ? item.preview_url
+                            : undefined,
+                    poster:
+                        item.mime_type.startsWith('video/') &&
+                        item.preview_url !== item.original_url
+                            ? item.preview_url
+                            : undefined,
+                    triggerEl: gallery.querySelector<HTMLElement>(
+                        `[data-media-uuid="${item.uuid}"]`,
+                    ) ?? undefined,
+                })),
+            );
+        }
+    }, [allowDownloads, media]);
 
     return (
         <section

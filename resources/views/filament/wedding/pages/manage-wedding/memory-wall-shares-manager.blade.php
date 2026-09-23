@@ -1,0 +1,1 @@
+@livewire(\App\Filament\Wedding\Pages\ManageWedding\MemoryWallSharesManager::class, [], key('memory-wall-shares-manager'))
